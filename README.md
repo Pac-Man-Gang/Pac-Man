@@ -30,23 +30,31 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
   - Merges into `main` require at least one approval.
 
 Step 1: Make sure main is up to date
+
 ```bash
+npm run lint:fix
+npm run format
 git checkout main
 git pull origin main
 ```
+
 Step 2: Create a new branch from main
+
 ```bash
 git checkout -b BRANCH_NAME
 ```
+
 Step 3: Make changes
 
 Step 4: Commit changes
+
 ```bash
 git add *
 git commit -m "COMMIT MESSAGE"
 ```
 
 Step 5: Push changes
+
 ```bash
 git push origin BRANCH_NAME
 ```
