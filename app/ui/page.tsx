@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Maze from './maze';
 
 export default function GamePage() {
   return (
@@ -7,6 +8,7 @@ export default function GamePage() {
         <button>Home</button>
       </Link>
       <p>This is the game page</p>
+      <Maze></Maze>
     </main>
   );
 }
