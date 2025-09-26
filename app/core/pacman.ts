@@ -1,4 +1,4 @@
-import type { PacMan, Position, Direction } from './types';
+import { PacMan, Position, Direction } from './types';
 
 export function createPacman(
   x: number,
@@ -8,7 +8,7 @@ export function createPacman(
   return {
     pos: { x, y },
     sprite,
-    dir: 'E', // default facing East
+    dir: Direction.N, // default facing East
     frame: 0,
   };
 }
@@ -18,16 +18,16 @@ export function movePacman(pacman: PacMan, dir: Direction): PacMan {
   let newPos: Position;
 
   switch (dir) {
-    case 'N':
+    case Direction.N:
       newPos = { x: pos.x, y: pos.y - 1 };
       break;
-    case 'S':
+    case Direction.S:
       newPos = { x: pos.x, y: pos.y + 1 };
       break;
-    case 'W':
+    case Direction.W:
       newPos = { x: pos.x - 1, y: pos.y };
       break;
-    case 'E':
+    case Direction.E:
       newPos = { x: pos.x + 1, y: pos.y };
       break;
     default:
@@ -43,12 +43,12 @@ export function movePacman(pacman: PacMan, dir: Direction): PacMan {
 }
 
 export const keyToDirection: Record<string, Direction> = {
-  w: 'N',
-  ArrowUp: 'N',
-  s: 'S',
-  ArrowDown: 'S',
-  a: 'W',
-  ArrowLeft: 'W',
-  d: 'E',
-  ArrowRight: 'E',
+  w: Direction.N,
+  ArrowUp: Direction.N,
+  s: Direction.S,
+  ArrowDown: Direction.S,
+  a: Direction.W,
+  ArrowLeft: Direction.W,
+  d: Direction.E,
+  ArrowRight: Direction.E,
 };

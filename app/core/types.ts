@@ -1,5 +1,10 @@
 export type Position = { x: number; y: number };
-export type Direction = 'N' | 'S' | 'W' | 'E';
+export enum Direction {
+  N = 'N',
+  S = 'S',
+  W = 'W',
+  E = 'E',
+}
 
 export type Entity = { pos: Position; sprite: string };
 export type MoveableEntity = Entity & { dir: Direction; frame: number };
