@@ -32,8 +32,6 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 Step 1: Make sure main is up to date
 
 ```bash
-npm run lint:fix
-npm run format
 git checkout main
 git pull origin main
 ```
@@ -49,6 +47,8 @@ Step 3: Make changes
 Step 4: Commit changes
 
 ```bash
+npm run lint:fix
+npm run format
 git add *
 git commit -m "COMMIT MESSAGE"
 ```
