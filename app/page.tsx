@@ -6,6 +6,11 @@ export default function HomePage() {
       <Link href="/game">
         <button>Game</button>
       </Link>
+      <br></br>
+      <Link href={'ui/ghostTestEnv'}>
+        <button>Ghost Test Enviroment</button>
+      </Link>
+      <br></br>
       <p>This is the home page</p>
     </main>
   );
