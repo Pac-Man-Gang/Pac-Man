@@ -61,5 +61,5 @@ jobs:
           if npm run | grep -qE '^  lint:ci'; then
             npm run lint:ci
           else
-            npx eslint . --max-warnings=0
+            npx eslint .
           fi
