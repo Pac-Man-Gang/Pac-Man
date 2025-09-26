@@ -1,0 +1,65 @@
+name: Auto-Fix (Prettier + ESLint)
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  autofix_and_lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ---- Auto-FIX (Prettier + ESLint) ----
+      - name: Run Prettier (write)
+        run: |
+          if npm run | grep -qE '^  format'; then
+            npm run format
+          else
+            npx prettier --write .
+          fi
+
+      - name: Run ESLint (fix)
+        run: |
+          if npm run | grep -qE '^  lint:fix'; then
+            npm run lint:fix
+          else
+            npx eslint . --fix
+          fi
+
+      - name: Commit fixes back to PR
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(ci): auto-fix (prettier + eslint)"
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
+          push_options: --force-with-lease
+          skip_dirty_check: false
+
+      # ---- Final Gate: fail if anything still violates rules ----
+      - name: ESLint (no fix, fail on warn)
+        run: |
+          if npm run | grep -qE '^  lint:ci'; then
+            npm run lint:ci
+          else
+            npx eslint . --max-warnings=0
+          fi

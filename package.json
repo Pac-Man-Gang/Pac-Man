@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
+    "lint:ci": "eslint . --max-warnings=0",
     "format": "prettier --write ."
   },
   "dependencies": {
