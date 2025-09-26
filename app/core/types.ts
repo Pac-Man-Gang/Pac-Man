@@ -1,9 +1,9 @@
 export type Position = { x: number; y: number };
 export enum Direction {
-  N = 'N',
-  S = 'S',
-  W = 'W',
-  E = 'E',
+  N,
+  S,
+  W,
+  E,
 }
 
 export type Entity = { pos: Position; sprite: string };

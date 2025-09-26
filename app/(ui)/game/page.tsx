@@ -10,7 +10,7 @@ export default function GamePage() {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       const dir = keyToDirection[e.key];
-      if (dir) {
+      if (dir !== undefined) {
         setPacman((prev: PacMan) => movePacman(prev, dir));
       }
     };
