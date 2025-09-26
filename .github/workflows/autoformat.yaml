@@ -58,8 +58,8 @@ jobs:
       # ---- Final Gate: fail if anything still violates rules ----
       - name: ESLint (no fix, fail on warn)
         run: |
-          if npm run | grep -qE '^  lint:ci'; then
-            npm run lint:ci
+          if npm run | grep -qE '^  lint'; then
+            npm run lint
           else
             npx eslint .
           fi
