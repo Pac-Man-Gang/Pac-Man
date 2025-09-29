@@ -7,10 +7,28 @@ export enum Direction {
 }
 
 export type Entity = { pos: Position; sprite: string };
-export type MoveableEntity = Entity & { dir: Direction; frame: number };
+export type MoveableEntity = Entity & {
+  dir: Direction;
+  frame: number;
+  spawnPoint: Position;
+};
 
 export type PacMan = MoveableEntity & {};
-export type Ghost = MoveableEntity & {};
+
+export enum GhostMode {
+  CHASE,
+  SCATTER,
+  FRIGHTENED,
+  EATEN,
+}
+export enum GhostType {
+  BLINKY,
+  PINKY,
+  INKY,
+  CLYDE,
+}
+export type Ghost = MoveableEntity & { type: GhostType; mode: GhostMode };
+
 export type Pellet = Entity & {};
 export type SuperPellet = Pellet & {};
 
