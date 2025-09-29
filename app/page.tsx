@@ -7,7 +7,7 @@ export default function HomePage() {
         <button>Game</button>
       </Link>
       <br></br>
-      <Link href={'ui/ghostTestEnv'}>
+      <Link href={'/ghostTestEnv'}>
         <button>Ghost Test Enviroment</button>
       </Link>
       <br></br>
