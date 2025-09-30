@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from 'next/image';
 
 export default function SingleCorner({ size = 50, rotation = 0 }) {
   return (
