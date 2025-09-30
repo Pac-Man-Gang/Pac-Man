@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function EmptyCell() {
-  return <img src="/assets/Empty.svg" alt="" />;
+  return <Image src="/assets/Empty.svg" width={40} height={40} alt="" />;
 }

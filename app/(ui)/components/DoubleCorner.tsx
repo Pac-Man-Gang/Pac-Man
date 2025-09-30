@@ -1,6 +1,8 @@
+import Image from "next/image";
+
 export default function DoubleCorner({ size = 50, rotation = 0 }) {
   return (
-    <img
+    <Image
       src="/assets/DoubleCorner.svg"
       alt=""
       width={size}

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function DoubleWall({
   size = 50,
   rotation = 0,
@@ -8,7 +10,7 @@ export default function DoubleWall({
     : '/assets/DoubleWall.svg';
 
   return (
-    <img
+    <Image
       src={src}
       alt=""
       width={size}

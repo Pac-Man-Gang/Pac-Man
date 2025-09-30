@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Connector({
   size = 50,
   rotation = 0,
@@ -6,7 +8,7 @@ export default function Connector({
   const src = mirrored ? '/assets/ConnectorLeft.svg' : '/assets/Connector.svg';
 
   return (
-    <img
+    <Image
       src={src}
       alt=""
       width={size}

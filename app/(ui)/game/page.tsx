@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { createPacman, keyToDirection, movePacman } from '../../core/pacman';
 import { PacMan } from '../../core/types';
+import Maze from './maze';
 
 export default function GamePage() {
   const [pacman, setPacman] = useState(() => createPacman(5, 5));
@@ -29,6 +30,7 @@ export default function GamePage() {
         Direction: {pacman.dir} <br />
         Frame: {pacman.frame}
       </p>
+      <Maze></Maze>
     </main>
   );
 }
