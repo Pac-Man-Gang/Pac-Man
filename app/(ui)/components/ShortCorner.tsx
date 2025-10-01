@@ -1,21 +1,19 @@
 import Image from 'next/image';
 
 export default function ShortCorner({
-  size = 50,
+  size = 40,
   rotation = 0,
   mirrored = false,
 }) {
-  const src = mirrored
-    ? '/assets/ShortCorner.svg'
-    : '/assets/RightShortCorner.svg';
-
   return (
     <Image
-      src={src}
-      alt=""
+      src="/assets/ShortCorner.svg"
+      alt="Short Corner"
       width={size}
       height={size}
-      style={{ transform: `rotate(${rotation}deg)` }}
+      style={{
+        transform: `${mirrored ? 'scaleX(-1)' : ''} rotate(${rotation}deg)`,
+      }}
     />
   );
 }

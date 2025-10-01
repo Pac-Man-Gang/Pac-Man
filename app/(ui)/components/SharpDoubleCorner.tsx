@@ -1,10 +1,10 @@
 import Image from 'next/image';
 
-export default function SingleCorner({ size = 50, rotation = 0 }) {
+export default function SharpDoubleCorner({ size = 40, rotation = 0 }) {
   return (
     <Image
-      src="/assets/NormalCorner.svg"
-      alt="Single Corner"
+      src="/assets/SharpDoubleCorner.svg"
+      alt="Sharp Double Corner"
       width={size}
       height={size}
       style={{ transform: `rotate(${rotation}deg)` }}
