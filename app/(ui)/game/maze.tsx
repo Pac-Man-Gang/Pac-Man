@@ -136,7 +136,6 @@ const maze: number[][] = [
 ];
 
 
-
 function defineComponent(row: number, col: number) {
   const cell = maze[row]?.[col];
 
@@ -321,6 +320,7 @@ function defineComponent(row: number, col: number) {
           return <SingleWall mirrored={true} />;
         }
       }
+
     // Horizontal walls
     case (isE && isW) ||
       (isE && W === undefined) ||
