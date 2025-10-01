@@ -5,17 +5,13 @@ export default function DoubleWall({
   rotation = 0,
   mirrored = false,
 }) {
-  const src = mirrored
-    ? '/assets/RightSingleWall.svg'
-    : '/assets/SingleWall.svg';
-
   return (
     <Image
-      src={src}
-      alt=""
+      src="/assets/SingleWall.svg"
+      alt="Single Wall"
       width={size}
       height={size}
-      style={{ transform: `rotate(${rotation}deg)` }}
+      style={{ transform: `${mirrored ? "scaleX(-1)" : ""} rotate(${rotation}deg)` }}
     />
   );
 }

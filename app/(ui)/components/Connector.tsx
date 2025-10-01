@@ -1,19 +1,17 @@
 import Image from 'next/image';
 
 export default function Connector({
-  size = 50,
+  size = 40,
   rotation = 0,
   mirrored = false,
 }) {
-  const src = mirrored ? '/assets/ConnectorLeft.svg' : '/assets/Connector.svg';
-
   return (
     <Image
-      src={src}
-      alt=""
+      src="assets/Connector.svg"
+      alt="Connector"
       width={size}
       height={size}
-      style={{ transform: `rotate(${rotation}deg)` }}
+      style={{ transform: `${mirrored ? "scaleX(-1)" : ""} rotate(${rotation}deg)` }}
     />
   );
 }

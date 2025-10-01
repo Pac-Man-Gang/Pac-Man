@@ -1,21 +1,17 @@
 import Image from 'next/image';
 
 export default function DoubleWall({
-  size = 50,
+  size = 40,
   rotation = 0,
   mirrored = false,
 }) {
-  const src = mirrored
-    ? '/assets/RightDoubleWall.svg'
-    : '/assets/DoubleWall.svg';
-
   return (
     <Image
-      src={src}
-      alt=""
+      src="/assets/DoubleWall.svg"
+      alt="Double Wall"
       width={size}
       height={size}
-      style={{ transform: `rotate(${rotation}deg)` }}
+      style={{ transform: `${mirrored ? "scaleX(-1)" : ""} rotate(${rotation}deg)` }}
     />
   );
 }

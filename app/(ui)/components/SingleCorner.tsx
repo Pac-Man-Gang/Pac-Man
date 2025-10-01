@@ -4,7 +4,7 @@ export default function SingleCorner({ size = 50, rotation = 0 }) {
   return (
     <Image
       src="/assets/NormalCorner.svg"
-      alt=""
+      alt="Single Corner"
       width={size}
       height={size}
       style={{ transform: `rotate(${rotation}deg)` }}
