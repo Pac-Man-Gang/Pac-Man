@@ -7,6 +7,7 @@ import ShortCorner from '../components/ShortCorner';
 import Connector from '../components/Connector';
 import SharpDoubleCorner from '../components/SharpDoubleCorner';
 import DoubleEndWall from '../components/DoubleWallStop';
+import SmallPellet from '../components/SmallPellet';
 
 const maze: number[][] = [
   [
@@ -136,10 +137,8 @@ const maze: number[][] = [
 ];
 
 function defineComponent(row: number, col: number) {
+  // Define current cell
   const cell = maze[row]?.[col];
-
-  // Empty cells
-  if (cell !== 1) return <EmptyCell />;
 
   // Define neighbours
   const N = maze[row - 1]?.[col];
@@ -160,6 +159,24 @@ function defineComponent(row: number, col: number) {
   const isNW = NW === 1;
   const isSE = SE === 1;
   const isSW = SW === 1;
+
+  // Empty cells / Pellets
+  if (cell !== 1 && cell !== 3) {
+    // Check for cell around ghost house to not render pellets there
+    if (maze[row - 2]?.[col] === 4 
+        || maze[row + 2]?.[col] === 4 
+        || maze[row]?.[col + 2] === 4 
+        || maze[row]?.[col - 2] === 4 
+        || maze[row - 2]?.[col + 2] === 4 
+        || maze[row - 2]?.[col - 2] === 4 
+        || maze[row + 2]?.[col + 2] === 4 
+        || maze[row + 2]?.[col - 2] === 4) {
+      return <EmptyCell />;
+    // If is not around ghost house, render pellet
+    } else {
+      return <SmallPellet />;
+    }
+}
 
   switch (true) {
     // Corner (N to E)
