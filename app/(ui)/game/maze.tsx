@@ -135,7 +135,6 @@ const maze: number[][] = [
   ],
 ];
 
-
 function defineComponent(row: number, col: number) {
   const cell = maze[row]?.[col];
 
@@ -174,7 +173,7 @@ function defineComponent(row: number, col: number) {
           return <ShortCorner rotation={270} mirrored={true} />;
         } else {
           if (NE === 4) {
-            return <SharpDoubleCorner/>;
+            return <SharpDoubleCorner />;
           } else {
             return <SingleCorner />;
           }
@@ -190,12 +189,12 @@ function defineComponent(row: number, col: number) {
         // Normal corners
       } else if (S === 0 || E === 0) {
         if (NW === 3) {
-          return <ShortCorner rotation={270}/>;
+          return <ShortCorner rotation={270} />;
         } else {
           if (NW === 4) {
             return <SharpDoubleCorner rotation={270} />;
           } else {
-          return <SingleCorner rotation={270} />;
+            return <SingleCorner rotation={270} />;
           }
         }
       }
@@ -214,8 +213,8 @@ function defineComponent(row: number, col: number) {
           if (SE === 4) {
             return <SharpDoubleCorner rotation={90} />;
           } else {
-          return <SingleCorner rotation={90} />;
-          }   
+            return <SingleCorner rotation={90} />;
+          }
         }
       }
       break;
@@ -228,12 +227,12 @@ function defineComponent(row: number, col: number) {
         // Normal corners
       } else if (N === 0 || E === 0) {
         if (SW === 3) {
-          return <ShortCorner rotation={90} mirrored={true}/>;
+          return <ShortCorner rotation={90} mirrored={true} />;
         } else {
           if (SW === 4) {
-            return <SharpDoubleCorner rotation={180}/>;
-          } else {  
-          return <SingleCorner rotation={180}/>;
+            return <SharpDoubleCorner rotation={180} />;
+          } else {
+            return <SingleCorner rotation={180} />;
           }
         }
       }
@@ -241,43 +240,43 @@ function defineComponent(row: number, col: number) {
 
     // Ghost house walls
     case N === 4 || S === 4 || E === 4 || W === 4:
-        switch (true) {
-            case N === 4:
-                if (E === 0) {
-                    return <DoubleEndWall rotation={270}/>;
-                } else if (W === 0) {
-                    return <DoubleEndWall rotation={270}/>;
-                } else {
-                    return <DoubleWall rotation={90}/>;
-                }
+      switch (true) {
+        case N === 4:
+          if (E === 0) {
+            return <DoubleEndWall rotation={270} />;
+          } else if (W === 0) {
+            return <DoubleEndWall rotation={270} />;
+          } else {
+            return <DoubleWall rotation={90} />;
+          }
 
-            case S === 4:
-                if (E === 0) {
-                    return <DoubleEndWall mirrored={true}/>;
-                } else if (W === 0) {
-                    return <DoubleEndWall/>;
-                } else {
-                  return <DoubleWall rotation={270} mirrored={true}/>;
-                }
+        case S === 4:
+          if (E === 0) {
+            return <DoubleEndWall mirrored={true} />;
+          } else if (W === 0) {
+            return <DoubleEndWall />;
+          } else {
+            return <DoubleWall rotation={270} mirrored={true} />;
+          }
 
-            case E === 4:
-                if (N === 0) {
-                    return <DoubleEndWall rotation={90} mirrored={true}/>;
-                } else if (S === 0) {
-                    return <DoubleEndWall rotation={270}/>;
-                } else {
-                    return <DoubleWall mirrored={true}/>;
-                }
+        case E === 4:
+          if (N === 0) {
+            return <DoubleEndWall rotation={90} mirrored={true} />;
+          } else if (S === 0) {
+            return <DoubleEndWall rotation={270} />;
+          } else {
+            return <DoubleWall mirrored={true} />;
+          }
 
-            case W === 4:
-                if (N === 0) {
-                    return <DoubleEndWall rotation={90}/>;
-                } else if (S === 0) {
-                    return <DoubleEndWall rotation={270} mirrored={true}/>;
-                } else {
-                    return <DoubleWall/>;
-                }
-        }
+        case W === 4:
+          if (N === 0) {
+            return <DoubleEndWall rotation={90} />;
+          } else if (S === 0) {
+            return <DoubleEndWall rotation={270} mirrored={true} />;
+          } else {
+            return <DoubleWall />;
+          }
+      }
 
     // Vertical walls
     case isN && isS && !(isE && isW):
@@ -288,7 +287,7 @@ function defineComponent(row: number, col: number) {
           if (isSE) {
             return <Connector rotation={270} />;
           } else {
-            return <Connector rotation={90} mirrored={true}/>;
+            return <Connector rotation={90} mirrored={true} />;
           }
         } else {
           return <DoubleWall />;
@@ -300,17 +299,17 @@ function defineComponent(row: number, col: number) {
           if (isSW) {
             return <Connector rotation={270} mirrored={true} />;
           } else {
-            return <Connector rotation={90}/>;
+            return <Connector rotation={90} />;
           }
         } else {
-          return <DoubleWall mirrored={true}/>;
+          return <DoubleWall mirrored={true} />;
         }
         // Left wall
       } else if (W === 0) {
         if (E === 3) {
-          return <DoubleWall mirrored={true}/>;
+          return <DoubleWall mirrored={true} />;
         } else {
-          return <SingleWall/>;
+          return <SingleWall />;
         }
         // Right wall
       } else if (E === 0) {
@@ -370,9 +369,9 @@ function defineComponent(row: number, col: number) {
         } else if (SE !== 1) {
           return <ShortCorner rotation={90} />;
         } else if (NE !== 1) {
-          return <ShortCorner rotation={270} mirrored={true}/>;
+          return <ShortCorner rotation={270} mirrored={true} />;
         } else if (NW !== 1) {
-          return <ShortCorner rotation={270}/>;
+          return <ShortCorner rotation={270} />;
         }
       }
   }

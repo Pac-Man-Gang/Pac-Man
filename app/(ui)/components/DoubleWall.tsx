@@ -11,7 +11,9 @@ export default function DoubleWall({
       alt="Double Wall"
       width={size}
       height={size}
-      style={{ transform: `${mirrored ? "scaleX(-1)" : ""} rotate(${rotation}deg)` }}
+      style={{
+        transform: `${mirrored ? 'scaleX(-1)' : ''} rotate(${rotation}deg)`,
+      }}
     />
   );
 }
