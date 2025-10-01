@@ -138,7 +138,7 @@ const maze: number[][] = [
 function defineComponent(row: number, col: number) {
   const cell = maze[row]?.[col];
 
-  // Not a wall? Show empty
+  // Empty cells
   if (cell !== 1) return <EmptyCell />;
 
   // Define neighbours
