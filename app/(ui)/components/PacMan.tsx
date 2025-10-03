@@ -5,21 +5,25 @@ const SPRITES = {
   [Direction.N]: [
     'PacmanFacingUp.svg',
     'PacmanMouthOpenFacingUp.svg',
+    'PacmanFacingUp.svg',
     'PacmanFull.svg',
   ],
   [Direction.S]: [
     'PacmanFacingDown.svg',
     'PacmanMouthOpenFacingDown.svg',
+    'PacmanFacingDown.svg',
     'PacmanFull.svg',
   ],
   [Direction.E]: [
     'PacmanFacingRight.svg',
     'PacmanMouthOpenFacingRight.svg',
+    'PacmanFacingRight.svg',
     'PacmanFull.svg',
   ],
   [Direction.W]: [
     'PacmanFacingLeft.svg',
     'PacmanMouthOpenFacingLeft.svg',
+    'PacmanFacingLeft.svg',
     'PacmanFull.svg',
   ],
 };
@@ -37,26 +41,25 @@ export const DEATH_SPRITES = [
   'PacmanDeath9.svg',
   'PacmanDeathEnd.svg',
 ];
-
 export default function PacMan({
   direction,
   frame,
-  position,
+  pixelPos,
   isDead,
 }: {
   direction: Direction;
   frame: number;
-  currentposition: { x: number; y: number };
-  isDead?: boolean;
+  pixelPos: { x: number; y: number };
+  isDead: boolean;
 }) {
   const sprite = isDead ? DEATH_SPRITES[frame] : SPRITES[direction][frame];
+
   return (
     <div
       style={{
         position: 'absolute',
-        top: `${position.y * 20}px`,
-        left: `${position.x * 20}px`,
-        transition: 'top 0.2s, left 0.2s', // Smooth movement
+        top: `${pixelPos.y}px`,
+        left: `${pixelPos.x}px`,
       }}
     >
       <Image

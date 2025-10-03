@@ -13,7 +13,7 @@ export type MoveableEntity = Entity & {
   spawnPoint: Position;
 };
 
-export type PacMan = MoveableEntity & {};
+export type PacMan = MoveableEntity & { pixelPos: Position };
 
 export enum GhostMode {
   CHASE,

@@ -143,6 +143,8 @@ function defineComponent(row: number, col: number, pacman: PacMan) {
         direction={pacman.dir}
         frame={pacman.frame}
         position={pacman.pos}
+        pixelPos={pacman.pixelPos}
+        isDead={false}
       />
     );
   }

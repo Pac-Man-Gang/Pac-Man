@@ -1,8 +1,9 @@
 import { PacMan, Position, Direction } from './types';
 
-export function createPacman(x: number, y: number, sprite = 1): PacMan {
+export function createPacman(x: number, y: number, sprite = 0): PacMan {
   return {
     pos: { x, y },
+    pixelPos: { x: x * 20, y: y * 20 },
     sprite,
     dir: Direction.N, // default facing East
     frame: 0,
@@ -12,7 +13,7 @@ export function createPacman(x: number, y: number, sprite = 1): PacMan {
 
 export function movePacman(pacman: PacMan, dir: Direction): PacMan {
   const { pos } = pacman;
-  let newPos: Position;
+  let newPos = { ...pos };
 
   switch (dir) {
     case Direction.N:
@@ -35,7 +36,7 @@ export function movePacman(pacman: PacMan, dir: Direction): PacMan {
     ...pacman,
     pos: newPos,
     dir,
-    frame: (pacman.frame + 1) % 3, // assuming 3 frames for animation
+    frame: (pacman.frame + 1) % 4, // assuming 3 frames for animation
   };
 }
 
