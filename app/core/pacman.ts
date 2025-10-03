@@ -1,15 +1,12 @@
 import { PacMan, Position, Direction } from './types';
 
-export function createPacman(
-  x: number,
-  y: number,
-  sprite = 'pacman.png'
-): PacMan {
+export function createPacman(x: number, y: number, sprite = 1): PacMan {
   return {
     pos: { x, y },
     sprite,
     dir: Direction.N, // default facing East
     frame: 0,
+    spawnPoint: { x, y },
   };
 }
 
@@ -38,7 +35,7 @@ export function movePacman(pacman: PacMan, dir: Direction): PacMan {
     ...pacman,
     pos: newPos,
     dir,
-    frame: (pacman.frame + 1) % 4, // assuming 4 frames for animation
+    frame: (pacman.frame + 1) % 3, // assuming 3 frames for animation
   };
 }
 

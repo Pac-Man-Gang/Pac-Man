@@ -6,7 +6,7 @@ export enum Direction {
   E,
 }
 
-export type Entity = { pos: Position; sprite: string };
+export type Entity = { pos: Position; sprite: number };
 export type MoveableEntity = Entity & {
   dir: Direction;
   frame: number;

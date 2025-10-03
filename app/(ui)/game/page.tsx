@@ -4,9 +4,24 @@ import { useEffect, useState } from 'react';
 import { createPacman, keyToDirection, movePacman } from '../../core/pacman';
 import { PacMan } from '../../core/types';
 import Maze from './maze';
+import { DEATH_SPRITES } from '../components/PacMan';
 
 export default function GamePage() {
   const [pacman, setPacman] = useState(() => createPacman(5, 5));
+  const [isDead, setIsDead] = useState(false);
+
+  // Trigger death animation
+  function handleDeath() {
+    setIsDead(true);
+    let frame = 0;
+    const interval = setInterval(() => {
+      setPacman((prev) => ({ ...prev, frame: frame++ }));
+      if (frame >= DEATH_SPRITES.length) {
+        clearInterval(interval);
+        // Reset game or handle game over
+      }
+    }, 200); // Adjust speed as needed
+  }
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -30,7 +45,7 @@ export default function GamePage() {
         Direction: {pacman.dir} <br />
         Frame: {pacman.frame}
       </p>
-      <Maze></Maze>
+      <Maze pacman={pacman} />
     </main>
   );
 }

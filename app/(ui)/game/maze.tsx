@@ -7,6 +7,7 @@ import ShortCorner from '../components/ShortCorner';
 import Connector from '../components/Connector';
 import SharpDoubleCorner from '../components/SharpDoubleCorner';
 import DoubleEndWall from '../components/DoubleWallStop';
+import PacMan from '../components/PacMan';
 
 const maze: number[][] = [
   [
@@ -135,10 +136,19 @@ const maze: number[][] = [
   ],
 ];
 
-function defineComponent(row: number, col: number) {
+function defineComponent(row: number, col: number, pacman: PacMan) {
+  if (pacman.pos.x === col && pacman.pos.y === row) {
+    return (
+      <PacMan
+        direction={pacman.dir}
+        frame={pacman.frame}
+        position={pacman.pos}
+      />
+    );
+  }
   const cell = maze[row]?.[col];
 
-  // Empty cells
+  // Not a wall? Show empty
   if (cell !== 1) return <EmptyCell />;
 
   // Define neighbours
@@ -377,11 +387,12 @@ function defineComponent(row: number, col: number) {
   }
 }
 
-export default function Maze() {
+export default function Maze({ pacman }: { pacman: PacMan }) {
   return (
     <div
       className="maze"
       style={{
+        position: 'relative',
         display: 'grid',
         gridTemplateColumns: `repeat(${maze[0].length}, 20px)`, // 28 columns
         gridTemplateRows: `repeat(${maze.length}, 20px)`, // 36 rows
@@ -390,7 +401,7 @@ export default function Maze() {
       {maze.map((row, rowIndex) =>
         row.map((_, colIndex) => (
           <div key={`${rowIndex}-${colIndex}`}>
-            {defineComponent(rowIndex, colIndex)}
+            {defineComponent(rowIndex, colIndex, pacman)}
           </div>
         ))
       )}
