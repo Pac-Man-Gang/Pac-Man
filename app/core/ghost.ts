@@ -6,130 +6,7 @@ import {
   GhostType,
   Position,
 } from './types';
-
-export const LEVEL_MAP: number[][] = [
-  [
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0,
-    1, 1, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1,
-  ],
-];
-
+import { equalPos, tileIsFree } from './util/position';
 /*
     WARNINGS
     - targetPoints can be outside the maze or on walls
@@ -157,13 +34,14 @@ function ghostTick(gameState: GameState, ghostType: GhostType): Ghost {
   if (!firstTickTimestamp) firstTickTimestamp = Date.now();
 
   const ghost = findGhost(gameState, ghostType);
-  const mode = calcMode(gameState, ghost);
-  const pos = calcTile(ghost, mode, calcTargetPoint(mode, ghost, gameState));
-  const facing = facingDirection(ghost.pos, pos);
+
+  const newMode = calcMode(gameState, ghost);
+  const newPos = calcTile(ghost, newMode, calcTargetPoint(newMode, ghost, gameState));
+  const newFacing = facingDirection(ghost.pos, newPos);
   return {
-    pos: pos,
-    dir: facing,
-    mode: mode,
+    pos: newPos,
+    dir: newFacing,
+    mode: newMode,
 
     type: ghost.type,
     sprite: ghost.sprite,
@@ -187,7 +65,7 @@ function shortestPath(paths: Position[], targetPoint: Position): Position {
   return paths.reduce(
     (bestPath, currentPath) =>
       euclideanDistance(currentPath, targetPoint) <
-      euclideanDistance(bestPath, targetPoint)
+        euclideanDistance(bestPath, targetPoint)
         ? currentPath
         : bestPath,
     paths[0]
@@ -349,10 +227,6 @@ function freeTilesAround(pos: Position): Position[] {
     .map((dir) => tileAt(pos, dir, 1));
 }
 
-function tileIsFree(pos: Position): boolean {
-  return inBounds(pos) && LEVEL_MAP[pos.y][pos.x] === 0;
-}
-
 function tileAt(from: Position, dir: Direction, amount: number): Position {
   return {
     x:
@@ -372,17 +246,4 @@ function tileAt(from: Position, dir: Direction, amount: number): Position {
 
 function euclideanDistance(pos1: Position, pos2: Position): number {
   return Math.hypot(pos1.x - pos2.x, pos1.y - pos2.y);
-}
-
-function equalPos(pos1: Position, pos2: Position): boolean {
-  return pos1.x === pos2.x && pos1.y === pos2.y;
-}
-
-function inBounds(pos: Position): boolean {
-  return (
-    pos.y >= 0 &&
-    pos.y < LEVEL_MAP.length &&
-    pos.x >= 0 &&
-    pos.x < LEVEL_MAP[pos.y].length
-  );
 }

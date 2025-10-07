@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { ghostsTick, LEVEL_MAP } from '../../core/ghost';
+import { useState } from 'react';
+import { ghostsTick } from '../../core/ghost';
 import { Direction, GameState, GhostMode, GhostType } from '../../core/types';
+import { LEVEL_MAP } from '../game/maze';
 import { GridView } from './GridView';
 
 const INITIAL_STATE: GameState = {
@@ -12,7 +13,6 @@ const INITIAL_STATE: GameState = {
     sprite: 'pacman',
     dir: Direction.E,
     frame: 0,
-    spawnPoint: { x: 26, y: 6 },
   },
   ghosts: [
     {
@@ -66,11 +66,7 @@ export default function HomePage() {
     });
   }
 
-  useEffect(() => {
-    console.log(gameState.ghosts[0]);
-  }, [gameState.ghosts]);
-
-  function testFunction() {}
+  function testFunction() { }
 
   return (
     <main style={{ padding: 16 }}>

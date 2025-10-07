@@ -1,4 +1,5 @@
-import { PacMan, Position, Direction } from './types';
+import { Direction, PacMan, Position } from './types';
+import { tileIsFree } from './util/position';
 
 export function createPacman(
   x: number,
@@ -33,6 +34,8 @@ export function movePacman(pacman: PacMan, dir: Direction): PacMan {
     default:
       newPos = pos; // no movement if direction is invalid
   }
+
+  if (!tileIsFree(newPos)) newPos = pos;
 
   return {
     ...pacman,

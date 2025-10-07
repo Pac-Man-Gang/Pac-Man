@@ -1,14 +1,14 @@
-import DoubleCorner from '../components/DoubleCorner';
-import DoubleWall from '../components/DoubleWall';
 import EmptyCell from '../components/EmptyCell';
-import SingleWall from '../components/SingleWall';
-import SingleCorner from '../components/SingleCorner';
-import ShortCorner from '../components/ShortCorner';
-import Connector from '../components/Connector';
-import SharpDoubleCorner from '../components/SharpDoubleCorner';
-import DoubleEndWall from '../components/DoubleWallStop';
+import Connector from '../components/maze/Connector';
+import DoubleCorner from '../components/maze/DoubleCorner';
+import DoubleWall from '../components/maze/DoubleWall';
+import DoubleEndWall from '../components/maze/DoubleWallStop';
+import SharpDoubleCorner from '../components/maze/SharpDoubleCorner';
+import ShortCorner from '../components/maze/ShortCorner';
+import SingleCorner from '../components/maze/SingleCorner';
+import SingleWall from '../components/maze/SingleWall';
 
-const maze: number[][] = [
+export const LEVEL_MAP: number[][] = [
   [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1,
@@ -136,20 +136,20 @@ const maze: number[][] = [
 ];
 
 function defineComponent(row: number, col: number) {
-  const cell = maze[row]?.[col];
+  const cell = LEVEL_MAP[row]?.[col];
 
   // Empty cells
   if (cell !== 1) return <EmptyCell />;
 
   // Define neighbours
-  const N = maze[row - 1]?.[col];
-  const S = maze[row + 1]?.[col];
-  const W = maze[row]?.[col - 1];
-  const E = maze[row]?.[col + 1];
-  const NE = maze[row - 1]?.[col + 1];
-  const NW = maze[row - 1]?.[col - 1];
-  const SE = maze[row + 1]?.[col + 1];
-  const SW = maze[row + 1]?.[col - 1];
+  const N = LEVEL_MAP[row - 1]?.[col];
+  const S = LEVEL_MAP[row + 1]?.[col];
+  const W = LEVEL_MAP[row]?.[col - 1];
+  const E = LEVEL_MAP[row]?.[col + 1];
+  const NE = LEVEL_MAP[row - 1]?.[col + 1];
+  const NW = LEVEL_MAP[row - 1]?.[col - 1];
+  const SE = LEVEL_MAP[row + 1]?.[col + 1];
+  const SW = LEVEL_MAP[row + 1]?.[col - 1];
 
   // Define if neighbours are also walls
   const isN = N === 1;
@@ -383,11 +383,11 @@ export default function Maze() {
       className="maze"
       style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(${maze[0].length}, 20px)`, // 28 columns
-        gridTemplateRows: `repeat(${maze.length}, 20px)`, // 36 rows
+        gridTemplateColumns: `repeat(${LEVEL_MAP[0].length}, 20px)`, // 28 columns
+        gridTemplateRows: `repeat(${LEVEL_MAP.length}, 20px)`, // 36 rows
       }}
     >
-      {maze.map((row, rowIndex) =>
+      {LEVEL_MAP.map((row, rowIndex) =>
         row.map((_, colIndex) => (
           <div key={`${rowIndex}-${colIndex}`}>
             {defineComponent(rowIndex, colIndex)}
