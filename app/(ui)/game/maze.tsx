@@ -138,9 +138,6 @@ export const LEVEL_MAP: number[][] = [
 function defineComponent(row: number, col: number) {
   const cell = LEVEL_MAP[row]?.[col];
 
-  // Empty cells
-  if (cell !== 1) return <EmptyCell />;
-
   // Define neighbours
   const N = LEVEL_MAP[row - 1]?.[col];
   const S = LEVEL_MAP[row + 1]?.[col];
@@ -160,6 +157,24 @@ function defineComponent(row: number, col: number) {
   const isNW = NW === 1;
   const isSE = SE === 1;
   const isSW = SW === 1;
+
+  // Empty cells / Pellets
+  if (cell !== 1 && cell !== 3) {
+    // Check for cell around ghost house to not render pellets there
+    if (maze[row - 2]?.[col] === 4 
+        || maze[row + 2]?.[col] === 4 
+        || maze[row]?.[col + 2] === 4 
+        || maze[row]?.[col - 2] === 4 
+        || maze[row - 2]?.[col + 2] === 4 
+        || maze[row - 2]?.[col - 2] === 4 
+        || maze[row + 2]?.[col + 2] === 4 
+        || maze[row + 2]?.[col - 2] === 4) {
+      return <EmptyCell />;
+    // If is not around ghost house, render pellet
+    } else {
+      return <SmallPellet />;
+    }
+}
 
   switch (true) {
     // Corner (N to E)
