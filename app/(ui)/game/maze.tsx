@@ -377,23 +377,30 @@ function defineComponent(row: number, col: number) {
   }
 }
 
-export default function Maze() {
+import { memo, useMemo } from "react";
+
+const Maze = memo(function Maze() {
+  // compute once inside Maze, not on every GamePage render
+  const cells = useMemo(() => (
+    LEVEL_MAP.flatMap((row, r) =>
+      row.map((_, c) => (
+        <div key={`${r}-${c}`}>{defineComponent(r, c)}</div>
+      ))
+    )
+  ), []);
+
   return (
     <div
       className="maze"
       style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${LEVEL_MAP[0].length}, 20px)`, // 28 columns
-        gridTemplateRows: `repeat(${LEVEL_MAP.length}, 20px)`, // 36 rows
+        display: "grid",
+        gridTemplateColumns: `repeat(${LEVEL_MAP[0].length}, 20px)`,
+        gridTemplateRows: `repeat(${LEVEL_MAP.length}, 20px)`,
       }}
     >
-      {LEVEL_MAP.map((row, rowIndex) =>
-        row.map((_, colIndex) => (
-          <div key={`${rowIndex}-${colIndex}`}>
-            {defineComponent(rowIndex, colIndex)}
-          </div>
-        ))
-      )}
+      {cells}
     </div>
   );
-}
+});
+
+export default Maze;

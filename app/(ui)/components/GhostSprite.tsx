@@ -1,9 +1,10 @@
-import { Direction, Ghost } from '@/app/core/types';
+import { Direction, Ghost, GhostType } from '@/app/core/types';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 type GhostSpriteProps = {
     ghost: Ghost,
+    tickCallback: () => void,
     size?: number,
     tileSize?: number,
     fps?: number
@@ -16,9 +17,12 @@ const DIR_KEY: Record<Direction, 'N' | 'E' | 'S' | 'W'> = {
     [Direction.W]: 'W',
 }
 
-
-export default function GhostSprite({ ghost, size = 32, tileSize = 20, fps = 5 }: GhostSpriteProps) {
+export default function GhostSprite({ ghost, tickCallback, size = 32, tileSize = 20, fps = 6 }: GhostSpriteProps) {
     const [frame, setFrame] = useState(0);
+
+    if (ghost.type === GhostType.PINKY) {
+        console.log('');
+    }
 
     const baseName = useMemo(() => ghost.sprite.replace('.png', ''), [ghost.sprite])
     const dirKey = DIR_KEY[ghost.dir]
@@ -28,14 +32,15 @@ export default function GhostSprite({ ghost, size = 32, tileSize = 20, fps = 5 }
         `/assets/ghost/${baseName}/${baseName}2-${dirKey}.png`
     ], [baseName, dirKey])
 
+    //preload once
     useEffect(() => {
         frames.forEach((src) => new window.Image().src = src);
-    }, [frames]);
+    }, []);
 
     useEffect(() => {
-        const id = setInterval(() => setFrame((f) => (f + 1) % frames.length), 1000 / fps)
-        return () => clearInterval(id)
-    }, [fps, frames.length])
+        const intervalId = setInterval(() => setFrame((f) => (f + 1) % frames.length), 1000 / fps)
+        return () => clearInterval(intervalId)
+    }, [fps])
 
     const xPixel = Math.round(ghost.pos.x * tileSize + (tileSize - size) / 2)
     const yPixel = Math.round(ghost.pos.y * tileSize + (tileSize - size) / 2)
@@ -46,9 +51,13 @@ export default function GhostSprite({ ghost, size = 32, tileSize = 20, fps = 5 }
             left: 0,
             right: 0,
             transform: `translate3d(${xPixel}px, ${yPixel}px, 0)`,
-            transition: "transform 0.4s linear",
+            transition: "transform 0.2s linear",
             willChange: "transform"
-        }}>
+        }}
+            onTransitionEnd={(e) => {
+                if (e.propertyName === 'transform' && ghost.type === GhostType.BLINKY) tickCallback();
+            }}
+        >
             <Image
                 src={frames[frame]}
                 alt="BLINKY"
@@ -60,3 +69,5 @@ export default function GhostSprite({ ghost, size = 32, tileSize = 20, fps = 5 }
         </div>
     );
 }
+
+

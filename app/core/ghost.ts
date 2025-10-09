@@ -1,3 +1,4 @@
+import { LEVEL_MAP } from '../(ui)/game/maze';
 import {
   Direction,
   GameState,
@@ -6,7 +7,7 @@ import {
   GhostType,
   Position,
 } from './types';
-import { equalPos, tileIsFree } from './util/position';
+import { equalPos, posAt, tileIsFree } from './util/position';
 /*
     WARNINGS
     - targetPoints can be outside the maze or on walls
@@ -26,6 +27,43 @@ import { equalPos, tileIsFree } from './util/position';
 let firstTickTimestamp: number;
 let frightenedModeEnteredTimestamp: number;
 
+export function initalGhosts(): Ghost[] {
+  return [
+    {
+      pos: { x: 15, y: 14 },
+      sprite: "clyde",
+      dir: Direction.E,
+      type: GhostType.CLYDE,
+      mode: GhostMode.HOME,
+      spawnPoint: { x: 14, y: 11 },
+    },
+    {
+      pos: { x: 13, y: 14 },
+      sprite: "inky",
+      dir: Direction.E,
+      type: GhostType.INKY,
+      mode: GhostMode.HOME,
+      spawnPoint: { x: 14, y: 11 },
+    },
+    {
+      pos: { x: 14, y: 14 },
+      sprite: "pinky",
+      dir: Direction.E,
+      type: GhostType.PINKY,
+      mode: GhostMode.HOME,
+      spawnPoint: { x: 14, y: 13 },
+    },
+    {
+      pos: { x: 13, y: 11 },
+      sprite: "blinky",
+      dir: Direction.N,
+      type: GhostType.BLINKY,
+      mode: GhostMode.SCATTER,
+      spawnPoint: { x: 14, y: 11 },
+    },
+  ]
+}
+
 export function ghostsTick(gameState: GameState): Ghost[] {
   return gameState.ghosts.map((ghost) => ghostTick(gameState, ghost.type));
 }
@@ -34,10 +72,10 @@ function ghostTick(gameState: GameState, ghostType: GhostType): Ghost {
   if (!firstTickTimestamp) firstTickTimestamp = Date.now();
 
   const ghost = findGhost(gameState, ghostType);
-
   const newMode = calcMode(gameState, ghost);
   const newPos = calcTile(ghost, newMode, calcTargetPoint(newMode, ghost, gameState));
   const newFacing = facingDirection(ghost.pos, newPos);
+
   return {
     pos: newPos,
     dir: newFacing,
@@ -45,7 +83,6 @@ function ghostTick(gameState: GameState, ghostType: GhostType): Ghost {
 
     type: ghost.type,
     sprite: ghost.sprite,
-    frame: 0,
     spawnPoint: ghost.spawnPoint,
   };
 }
@@ -74,49 +111,34 @@ function shortestPath(paths: Position[], targetPoint: Position): Position {
 
 function possiblePaths(ghostState: Ghost, nextMode: GhostMode): Position[] {
   const freeTiles = freeTilesAround(ghostState.pos);
-  if (
-    freeTiles.length === 1 ||
-    needsImmediateReverse(ghostState.mode, nextMode)
-  )
+  if (freeTiles.length === 1 || needsImmediateReverse(ghostState.mode, nextMode))
     return freeTiles;
 
   return freeTiles.filter(
     (tile) =>
-      !equalPos(
-        tile,
-        tileAt(ghostState.pos, reverseDirection(ghostState.dir), 1)
-      )
+      !equalPos(tile, posAt(ghostState.pos, reverseDirection(ghostState.dir), 1))
   );
 }
 
 function facingDirection(lastPoint: Position, nextPoint: Position): Direction {
   return allDirections().find((dir) =>
-    equalPos(nextPoint, tileAt(lastPoint, dir, 1))
+    equalPos(nextPoint, posAt(lastPoint, dir, 1))
   )!;
 }
 
 function calcMode(gameState: GameState, ghost: Ghost): GhostMode {
-  if (
-    gameState.pellets
-      .filter((pellet) => pellet.sprite === 'SuperPellet.png')
-      .map((superPellet) => superPellet.pos)
-      .find((pos) => equalPos(gameState.pacman.pos, pos))
-  ) {
+  if (ghost.mode === GhostMode.HOME) return canLeaveHouse(ghost.type, gameState) ? GhostMode.SCATTER : GhostMode.HOME;
+
+  if (gameState.pellets
+    .filter((pellet) => pellet.sprite === 'SuperPellet.png')
+    .map((superPellet) => superPellet.pos)
+    .find((pos) => equalPos(gameState.pacman.pos, pos))) {
     frightenedModeEnteredTimestamp = Date.now();
     return GhostMode.FRIGHTENED;
   }
-  if (
-    ghost.mode === GhostMode.FRIGHTENED &&
-    (Date.now() - frightenedModeEnteredTimestamp) / 1000 < 6
-  )
-    return GhostMode.FRIGHTENED;
-  if (
-    ghost.mode === GhostMode.FRIGHTENED &&
-    equalPos(gameState.pacman.pos, ghost.pos)
-  )
-    return GhostMode.EATEN;
-  if (ghost.mode === GhostMode.EATEN && !equalPos(ghost.pos, ghost.spawnPoint))
-    return GhostMode.EATEN;
+  if (ghost.mode === GhostMode.FRIGHTENED && (Date.now() - frightenedModeEnteredTimestamp) / 1000 < 6) return GhostMode.FRIGHTENED;
+  if (ghost.mode === GhostMode.FRIGHTENED && equalPos(gameState.pacman.pos, ghost.pos)) return GhostMode.EATEN;
+  if (ghost.mode === GhostMode.EATEN && !equalPos(ghost.pos, ghost.spawnPoint)) return GhostMode.EATEN;
 
   const secondsSinceGameStart = (Date.now() - firstTickTimestamp) / 1000;
   if (secondsSinceGameStart > 84) return GhostMode.CHASE;
@@ -136,14 +158,14 @@ function calcTargetPoint(
 ): Position {
   const ghostType = ghost.type;
   if (needsImmediateReverse(ghost.mode, nextMode))
-    return tileAt(ghost.pos, reverseDirection(ghost.dir), 1);
+    return posAt(ghost.pos, reverseDirection(ghost.dir), 1);
 
   const chaseMode = () => {
     if (ghostType === GhostType.BLINKY) return gameState.pacman.pos;
     else if (ghostType === GhostType.PINKY)
-      return tileAt(gameState.pacman.pos, gameState.pacman.dir, 4);
+      return posAt(gameState.pacman.pos, gameState.pacman.dir, 4);
     else if (ghostType === GhostType.INKY) {
-      const twoTilesAheadOfPac = tileAt(
+      const twoTilesAheadOfPac = posAt(
         gameState.pacman.pos,
         gameState.pacman.dir,
         2
@@ -171,7 +193,7 @@ function calcTargetPoint(
 
   const frightenedMode = () => {
     const dirs = allDirections();
-    return tileAt(ghost.pos, dirs[Math.floor(Math.random() * dirs.length)], 1);
+    return posAt(ghost.pos, dirs[Math.floor(Math.random() * dirs.length)], 1);
   };
 
   const eatenMode = () => {
@@ -187,6 +209,7 @@ function calcTargetPoint(
       return frightenedMode();
     case GhostMode.EATEN:
       return eatenMode();
+    default: return chaseMode();
   }
 }
 
@@ -196,7 +219,14 @@ function needsImmediateReverse(prev: GhostMode, next: GhostMode): boolean {
     prev !== GhostMode.FRIGHTENED &&
     prev !== GhostMode.EATEN &&
     next !== GhostMode.EATEN
-  );
+  ) || next === GhostMode.HOME;
+}
+
+function canLeaveHouse(ghostType: GhostType, gameState: GameState): boolean {
+  return ghostType === GhostType.BLINKY ? true :
+    ghostType === GhostType.PINKY ? Date.now() - firstTickTimestamp > 2000 :
+      ghostType === GhostType.INKY ? gameState.pacman.pelletsEaten >= 30 :
+        gameState.pacman.pelletsEaten >= 60;
 }
 
 function findGhost(gameState: GameState, ghostType: GhostType): Ghost {
@@ -223,25 +253,8 @@ function reverseDirection(dir: Direction): Direction {
 // Position Utils ----------
 function freeTilesAround(pos: Position): Position[] {
   return allDirections()
-    .filter((dir) => tileIsFree(tileAt(pos, dir, 1)))
-    .map((dir) => tileAt(pos, dir, 1));
-}
-
-function tileAt(from: Position, dir: Direction, amount: number): Position {
-  return {
-    x:
-      dir === Direction.W
-        ? from.x - amount
-        : dir === Direction.E
-          ? from.x + amount
-          : from.x,
-    y:
-      dir === Direction.N
-        ? from.y - amount
-        : dir === Direction.S
-          ? from.y + amount
-          : from.y,
-  };
+    .filter((dir) => tileIsFree(posAt(pos, dir, 1), LEVEL_MAP[pos.y][pos.x] === 4))
+    .map((dir) => posAt(pos, dir, 1));
 }
 
 function euclideanDistance(pos1: Position, pos2: Position): number {
