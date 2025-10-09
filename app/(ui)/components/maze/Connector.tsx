@@ -1,14 +1,14 @@
 import Image from 'next/image';
 
-export default function ShortCorner({
+export default function Connector({
   size = 40,
   rotation = 0,
   mirrored = false,
 }) {
   return (
     <Image
-      src="/assets/ShortCorner.svg"
-      alt="Short Corner"
+      src="assets/maze/Connector.svg"
+      alt="Connector"
       width={size}
       height={size}
       style={{

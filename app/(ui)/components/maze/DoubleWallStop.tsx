@@ -1,14 +1,14 @@
 import Image from 'next/image';
 
-export default function Connector({
+export default function DoubleWallStop({
   size = 40,
   rotation = 0,
   mirrored = false,
 }) {
   return (
     <Image
-      src="assets/Connector.svg"
-      alt="Connector"
+      src="assets/maze/WallStop.svg"
+      alt="Double Wall Stop"
       width={size}
       height={size}
       style={{

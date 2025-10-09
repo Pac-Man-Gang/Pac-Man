@@ -1,4 +1,5 @@
-import { PacMan, Position, Direction } from './types';
+import { Direction, PacMan } from './types';
+import { posAt, tileIsFree } from './util/position';
 
 export function createPacman(
   x: number,
@@ -9,36 +10,29 @@ export function createPacman(
     pos: { x, y },
     sprite,
     dir: Direction.N, // default facing East
-    frame: 0,
+    movingDir: Direction.N,
+    pelletsEaten: 0
   };
 }
 
 export function movePacman(pacman: PacMan, dir: Direction): PacMan {
-  const { pos } = pacman;
-  let newPos: Position;
+  let newPos = posAt(pacman.pos, dir, 1);
+  let newMovingDir = dir;
+  if (!tileIsFree(newPos, false)) {
+    newPos = posAt(pacman.pos, pacman.movingDir, 1);
+    if (!tileIsFree(newPos, false)) newPos = pacman.pos;
 
-  switch (dir) {
-    case Direction.N:
-      newPos = { x: pos.x, y: pos.y - 1 };
-      break;
-    case Direction.S:
-      newPos = { x: pos.x, y: pos.y + 1 };
-      break;
-    case Direction.W:
-      newPos = { x: pos.x - 1, y: pos.y };
-      break;
-    case Direction.E:
-      newPos = { x: pos.x + 1, y: pos.y };
-      break;
-    default:
-      newPos = pos; // no movement if direction is invalid
+    if (newPos.x > pacman.pos.x) newMovingDir = Direction.E;
+    else if (newPos.x < pacman.pos.x) newMovingDir = Direction.W;
+    else if (newPos.y > pacman.pos.y) newMovingDir = Direction.S;
+    else if (newPos.y < pacman.pos.y) newMovingDir = Direction.N;
   }
 
   return {
     ...pacman,
     pos: newPos,
     dir,
-    frame: (pacman.frame + 1) % 4, // assuming 4 frames for animation
+    movingDir: newMovingDir
   };
 }
 

@@ -1,15 +1,14 @@
-import DoubleCorner from '../components/DoubleCorner';
-import DoubleWall from '../components/DoubleWall';
 import EmptyCell from '../components/EmptyCell';
-import SingleWall from '../components/SingleWall';
-import SingleCorner from '../components/SingleCorner';
-import ShortCorner from '../components/ShortCorner';
-import Connector from '../components/Connector';
-import SharpDoubleCorner from '../components/SharpDoubleCorner';
-import DoubleEndWall from '../components/DoubleWallStop';
-import SmallPellet from '../components/SmallPellet';
+import Connector from '../components/maze/Connector';
+import DoubleCorner from '../components/maze/DoubleCorner';
+import DoubleWall from '../components/maze/DoubleWall';
+import DoubleEndWall from '../components/maze/DoubleWallStop';
+import SharpDoubleCorner from '../components/maze/SharpDoubleCorner';
+import ShortCorner from '../components/maze/ShortCorner';
+import SingleCorner from '../components/maze/SingleCorner';
+import SingleWall from '../components/maze/SingleWall';
 
-const maze: number[][] = [
+export const LEVEL_MAP: number[][] = [
   [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1,
@@ -137,18 +136,17 @@ const maze: number[][] = [
 ];
 
 function defineComponent(row: number, col: number) {
-  // Define current cell
-  const cell = maze[row]?.[col];
+  const cell = LEVEL_MAP[row]?.[col];
 
   // Define neighbours
-  const N = maze[row - 1]?.[col];
-  const S = maze[row + 1]?.[col];
-  const W = maze[row]?.[col - 1];
-  const E = maze[row]?.[col + 1];
-  const NE = maze[row - 1]?.[col + 1];
-  const NW = maze[row - 1]?.[col - 1];
-  const SE = maze[row + 1]?.[col + 1];
-  const SW = maze[row + 1]?.[col - 1];
+  const N = LEVEL_MAP[row - 1]?.[col];
+  const S = LEVEL_MAP[row + 1]?.[col];
+  const W = LEVEL_MAP[row]?.[col - 1];
+  const E = LEVEL_MAP[row]?.[col + 1];
+  const NE = LEVEL_MAP[row - 1]?.[col + 1];
+  const NW = LEVEL_MAP[row - 1]?.[col - 1];
+  const SE = LEVEL_MAP[row + 1]?.[col + 1];
+  const SW = LEVEL_MAP[row + 1]?.[col - 1];
 
   // Define if neighbours are also walls
   const isN = N === 1;
@@ -394,23 +392,30 @@ function defineComponent(row: number, col: number) {
   }
 }
 
-export default function Maze() {
+import { memo, useMemo } from "react";
+
+const Maze = memo(function Maze() {
+  // compute once inside Maze, not on every GamePage render
+  const cells = useMemo(() => (
+    LEVEL_MAP.flatMap((row, r) =>
+      row.map((_, c) => (
+        <div key={`${r}-${c}`}>{defineComponent(r, c)}</div>
+      ))
+    )
+  ), []);
+
   return (
     <div
       className="maze"
       style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${maze[0].length}, 20px)`, // 28 columns
-        gridTemplateRows: `repeat(${maze.length}, 20px)`, // 36 rows
+        display: "grid",
+        gridTemplateColumns: `repeat(${LEVEL_MAP[0].length}, 20px)`,
+        gridTemplateRows: `repeat(${LEVEL_MAP.length}, 20px)`,
       }}
     >
-      {maze.map((row, rowIndex) =>
-        row.map((_, colIndex) => (
-          <div key={`${rowIndex}-${colIndex}`}>
-            {defineComponent(rowIndex, colIndex)}
-          </div>
-        ))
-      )}
+      {cells}
     </div>
   );
-}
+});
+
+export default Maze;

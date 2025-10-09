@@ -1,24 +1,46 @@
-'use client';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { createPacman, keyToDirection, movePacman } from '../../core/pacman';
-import { PacMan } from '../../core/types';
-import Maze from './maze';
+"use client";
+import { ghostsTick, initalGhosts } from "@/app/core/ghost";
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import { createPacman, keyToDirection, movePacman } from "../../core/pacman";
+import { Direction, GameState } from "../../core/types";
+import EntityLayer from "./entitylayer";
+import Maze from "./maze";
+
+const INITIAL_STATE: GameState = {
+  pacman: createPacman(5, 5),
+  ghosts: initalGhosts(),
+  pellets: [],
+  score: 0,
+  lives: 3,
+};
 
 export default function GamePage() {
-  const [pacman, setPacman] = useState(() => createPacman(5, 5));
+  const [gameState, setGameState] = useState<GameState>(INITIAL_STATE);
+  const [playerDir, setPlayerDir] = useState<Direction | undefined>(undefined);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       const dir = keyToDirection[e.key];
-      if (dir !== undefined) {
-        setPacman((prev: PacMan) => movePacman(prev, dir));
-      }
+      if (dir !== undefined) setPlayerDir(dir);
     };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
+    window.addEventListener("keydown", handleKey);
+    tick();
+
+    return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
+  function tick() {
+    setGameState((prev) => ({
+      ...prev,
+      ghosts: ghostsTick(prev),
+      pacman:
+        playerDir === undefined
+          ? prev.pacman
+          : movePacman(prev.pacman, playerDir),
+    }));
+  }
+  const tickCallback = useCallback(() => tick(), [playerDir]);
   return (
     <main>
       <Link href="/">
@@ -26,11 +48,18 @@ export default function GamePage() {
       </Link>
       <p>This is the game page</p>
       <p>
-        Position: ({pacman.pos.x}, {pacman.pos.y}) <br />
-        Direction: {pacman.dir} <br />
-        Frame: {pacman.frame}
+        Position: ({gameState.pacman.pos.x}, {gameState.pacman.pos.y}) <br />
+        Direction: {gameState.pacman.dir} <br />
       </p>
-      <Maze></Maze>
+      <div style={{ position: "absolute" }}>
+        <Maze></Maze>
+        <EntityLayer
+          pacman={gameState.pacman}
+          ghosts={gameState.ghosts}
+          tickCallback={tickCallback}
+          uiPlayerDir={playerDir}
+        ></EntityLayer>
+      </div>
     </main>
   );
 }

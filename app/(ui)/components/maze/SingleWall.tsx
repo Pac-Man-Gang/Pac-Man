@@ -1,14 +1,14 @@
 import Image from 'next/image';
 
-export default function DoubleWallStop({
-  size = 40,
+export default function DoubleWall({
+  size = 50,
   rotation = 0,
   mirrored = false,
 }) {
   return (
     <Image
-      src="assets/WallStop.svg"
-      alt="Double Wall Stop"
+      src="/assets/maze/SingleWall.svg"
+      alt="Single Wall"
       width={size}
       height={size}
       style={{

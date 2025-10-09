@@ -1,14 +1,14 @@
 import Image from 'next/image';
 
-export default function DoubleWall({
-  size = 50,
+export default function ShortCorner({
+  size = 40,
   rotation = 0,
   mirrored = false,
 }) {
   return (
     <Image
-      src="/assets/SingleWall.svg"
-      alt="Single Wall"
+      src="/assets/maze/ShortCorner.svg"
+      alt="Short Corner"
       width={size}
       height={size}
       style={{

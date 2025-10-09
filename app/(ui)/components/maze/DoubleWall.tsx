@@ -7,7 +7,7 @@ export default function DoubleWall({
 }) {
   return (
     <Image
-      src="/assets/DoubleWall.svg"
+      src="/assets/maze/DoubleWall.svg"
       alt="Double Wall"
       width={size}
       height={size}
