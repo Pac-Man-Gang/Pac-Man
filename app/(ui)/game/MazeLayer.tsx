@@ -7,6 +7,8 @@ import SharpDoubleCorner from '../components/maze/SharpDoubleCorner';
 import ShortCorner from '../components/maze/ShortCorner';
 import SingleCorner from '../components/maze/SingleCorner';
 import SingleWall from '../components/maze/SingleWall';
+import SmallPelletSprite from '../components/SmallPelletSprite';
+import SuperPelletSprite from '../components/SuperPelletSprite';
 
 export const LEVEL_MAP: number[][] = [
   [
@@ -58,7 +60,7 @@ export const LEVEL_MAP: number[][] = [
     3, 3, 3,
   ],
   [
-    3, 3, 3, 3, 3, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 3, 3,
+    3, 3, 3, 3, 3, 1, 0, 1, 1, 0, 1, 1, 1, 4, 4, 1, 1, 1, 0, 1, 1, 0, 1, 3, 3,
     3, 3, 3,
   ],
   [
@@ -135,6 +137,8 @@ export const LEVEL_MAP: number[][] = [
   ],
 ];
 
+export let initialPelletAmount = 0;
+
 function defineComponent(row: number, col: number) {
   const cell = LEVEL_MAP[row]?.[col];
 
@@ -161,20 +165,22 @@ function defineComponent(row: number, col: number) {
   // Empty cells / Pellets
   if (cell !== 1 && cell !== 3) {
     // Check for cell around ghost house to not render pellets there
-    if (maze[row - 2]?.[col] === 4 
-        || maze[row + 2]?.[col] === 4 
-        || maze[row]?.[col + 2] === 4 
-        || maze[row]?.[col - 2] === 4 
-        || maze[row - 2]?.[col + 2] === 4 
-        || maze[row - 2]?.[col - 2] === 4 
-        || maze[row + 2]?.[col + 2] === 4 
-        || maze[row + 2]?.[col - 2] === 4) {
+    if (LEVEL_MAP[row - 2]?.[col] === 4
+      || LEVEL_MAP[row + 2]?.[col] === 4
+      || LEVEL_MAP[row]?.[col + 2] === 4
+      || LEVEL_MAP[row]?.[col - 2] === 4
+      || LEVEL_MAP[row - 2]?.[col + 2] === 4
+      || LEVEL_MAP[row - 2]?.[col - 2] === 4
+      || LEVEL_MAP[row + 2]?.[col + 2] === 4
+      || LEVEL_MAP[row + 2]?.[col - 2] === 4) {
       return <EmptyCell />;
-    // If is not around ghost house, render pellet
+      // If is not around ghost house, render pellet
     } else {
-      return <SmallPellet />;
+      // WARNING: HARDCODED
+      const superPellets = [{ row: 3, col: 1 }, { row: 3, col: 26 }, { row: 23, col: 1 }, { row: 23, col: 26 },];
+      return superPellets.find((pos) => pos.row === row && pos.col === col) ? <SuperPelletSprite row={row} col={col} /> : <SmallPelletSprite row={row} col={col} />;
     }
-}
+  }
 
   switch (true) {
     // Corner (N to E)
@@ -392,9 +398,9 @@ function defineComponent(row: number, col: number) {
   }
 }
 
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo } from "react";
 
-const Maze = memo(function Maze() {
+const MazeLayer = memo(function MazeLayer() {
   // compute once inside Maze, not on every GamePage render
   const cells = useMemo(() => (
     LEVEL_MAP.flatMap((row, r) =>
@@ -403,6 +409,11 @@ const Maze = memo(function Maze() {
       ))
     )
   ), []);
+
+  useEffect(() => {
+    initialPelletAmount = document.querySelectorAll("[data-type='SmallPellet']").length
+      + document.querySelectorAll("[data-type='SuperPellet']").length;
+  }, []);
 
   return (
     <div
@@ -418,4 +429,4 @@ const Maze = memo(function Maze() {
   );
 });
 
-export default Maze;
+export default MazeLayer;

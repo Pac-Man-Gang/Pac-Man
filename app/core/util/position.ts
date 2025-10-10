@@ -1,4 +1,4 @@
-import { LEVEL_MAP } from "@/app/(ui)/game/maze";
+import { LEVEL_MAP } from "@/app/(ui)/game/MazeLayer";
 import { Direction, Position } from "../types";
 
 export function equalPos(pos1: Position, pos2: Position): boolean {

@@ -1,14 +1,18 @@
-import { Direction, PacMan } from "@/app/core/types";
+import { Direction, PacManState } from "@/app/core/types";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
 type PacmanSpriteProps = {
-    pacman: PacMan;
+    pacman: PacManState;
     uiPlayerDir?: Direction;
     size?: number;
     tileSize?: number;
     fps?: number;
 };
+
+export function getPacmanSprite() {
+    return document.querySelector("[data-type='PacMan']")!;
+}
 
 export default function PacmanSprite({ pacman, uiPlayerDir, size = 32, tileSize = 20, fps = 8 }: PacmanSpriteProps) {
     const getPath = (frame: number) => `/assets/pacman/pacman${frame}.png`;
@@ -69,6 +73,7 @@ export default function PacmanSprite({ pacman, uiPlayerDir, size = 32, tileSize 
                     transition: "none",
                 }}>
                     <Image
+                        data-type='PacMan'
                         src={pacSrc}
                         alt="PACMAN"
                         width={size}

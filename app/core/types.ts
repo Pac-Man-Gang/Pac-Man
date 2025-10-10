@@ -9,7 +9,7 @@ export enum Direction {
 export type Entity = { pos: Position; sprite: string };
 export type MoveableEntity = Entity & { dir: Direction };
 
-export type PacMan = MoveableEntity & { movingDir: Direction, pelletsEaten: number };
+export type PacManState = MoveableEntity & { movingDir: Direction };
 
 export enum GhostMode {
   HOME,
@@ -24,15 +24,11 @@ export enum GhostType {
   INKY,
   CLYDE,
 }
-export type Ghost = MoveableEntity & { type: GhostType; mode: GhostMode; spawnPoint: Position; };
-
-export type Pellet = Entity & {};
-export type SuperPellet = Pellet & {};
+export type GhostState = MoveableEntity & { type: GhostType; mode: GhostMode; };
 
 export type GameState = {
-  pacman: PacMan;
-  ghosts: Ghost[];
-  pellets: Pellet[];
-  score: number;
-  lives: number;
+  pacman: PacManState,
+  ghosts: GhostState[],
+  score: number,
+  lives: number
 };
