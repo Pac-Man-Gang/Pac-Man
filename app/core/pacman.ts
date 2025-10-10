@@ -11,11 +11,14 @@ export function initialPacman(
     pos: { x, y },
     sprite,
     dir: Direction.N, // default facing East
-    movingDir: Direction.N
+    movingDir: Direction.N,
   };
 }
 
-export function nextPacManState(pacman: PacManState, dir: Direction): PacManState {
+export function nextPacManState(
+  pacman: PacManState,
+  dir: Direction
+): PacManState {
   let newPos = posAt(pacman.pos, dir, 1);
   let newMovingDir = dir;
   if (!tileIsFree(newPos, false)) {
@@ -28,7 +31,9 @@ export function nextPacManState(pacman: PacManState, dir: Direction): PacManStat
     else if (newPos.y < pacman.pos.y) newMovingDir = Direction.N;
   }
 
-  const cell = document.querySelector<HTMLDivElement>(`[data-r="${pacman.pos.y}"][data-c="${pacman.pos.x}"]`);
+  const cell = document.querySelector<HTMLDivElement>(
+    `[data-r="${pacman.pos.y}"][data-c="${pacman.pos.x}"]`
+  );
   if (cell) {
     cell.remove();
     addScore(10);

@@ -28,51 +28,58 @@ let firstTickTimestamp: number;
 let frightenedModeEnteredTimestamp: number;
 
 // WARNING: HARDCODED
-const housePos = { x: 14, y: 14 }
+const housePos = { x: 14, y: 14 };
 
 export function initalGhosts(): GhostState[] {
   return [
     {
       pos: { x: 15, y: 14 },
-      sprite: "clyde",
+      sprite: 'clyde',
       dir: Direction.N,
       type: GhostType.CLYDE,
-      mode: GhostMode.HOME
+      mode: GhostMode.HOME,
     },
     {
       pos: { x: 13, y: 14 },
-      sprite: "inky",
+      sprite: 'inky',
       dir: Direction.N,
       type: GhostType.INKY,
-      mode: GhostMode.HOME
+      mode: GhostMode.HOME,
     },
     {
       pos: { x: 14, y: 14 },
-      sprite: "pinky",
+      sprite: 'pinky',
       dir: Direction.N,
       type: GhostType.PINKY,
-      mode: GhostMode.HOME
+      mode: GhostMode.HOME,
     },
     {
       pos: { x: 13, y: 11 },
-      sprite: "blinky",
+      sprite: 'blinky',
       dir: Direction.N,
       type: GhostType.BLINKY,
-      mode: GhostMode.SCATTER
+      mode: GhostMode.SCATTER,
     },
-  ]
+  ];
 }
 
 export function nextGhostStates(gameState: GameState): GhostState[] {
   return gameState.ghosts.map((ghost) => nextGhostState(gameState, ghost.type));
 }
 
-function nextGhostState(gameState: GameState, ghostType: GhostType): GhostState {
+function nextGhostState(
+  gameState: GameState,
+  ghostType: GhostType
+): GhostState {
   if (!firstTickTimestamp) firstTickTimestamp = Date.now();
 
   const ghost = findGhost(gameState, ghostType);
   const newMode = nextMode(gameState, ghost);
-  const newPos = nextTile(ghost, newMode, calcTargetPoint(newMode, ghost, gameState));
+  const newPos = nextTile(
+    ghost,
+    newMode,
+    calcTargetPoint(newMode, ghost, gameState)
+  );
   const newFacing = calcFacing(ghost.pos, newPos);
 
   return {
@@ -81,7 +88,7 @@ function nextGhostState(gameState: GameState, ghostType: GhostType): GhostState 
     mode: newMode,
 
     type: ghost.type,
-    sprite: ghost.sprite
+    sprite: ghost.sprite,
   };
 }
 
@@ -100,21 +107,30 @@ function shortestPath(paths: Position[], targetPoint: Position): Position {
   return paths.reduce(
     (bestPath, currentPath) =>
       euclideanDistance(currentPath, targetPoint) <
-        euclideanDistance(bestPath, targetPoint)
+      euclideanDistance(bestPath, targetPoint)
         ? currentPath
         : bestPath,
     paths[0]
   );
 }
 
-function possiblePaths(ghostState: GhostState, nextMode: GhostMode): Position[] {
+function possiblePaths(
+  ghostState: GhostState,
+  nextMode: GhostMode
+): Position[] {
   const freeTiles = freeTilesAround(ghostState.pos, ghostState.mode);
-  if (freeTiles.length === 1 || needsImmediateReverse(ghostState.mode, nextMode))
+  if (
+    freeTiles.length === 1 ||
+    needsImmediateReverse(ghostState.mode, nextMode)
+  )
     return freeTiles;
 
   return freeTiles.filter(
     (tile) =>
-      !equalPos(tile, posAt(ghostState.pos, reverseDirection(ghostState.dir), 1))
+      !equalPos(
+        tile,
+        posAt(ghostState.pos, reverseDirection(ghostState.dir), 1)
+      )
   );
 }
 
@@ -125,16 +141,26 @@ function calcFacing(lastPoint: Position, nextPoint: Position): Direction {
 }
 
 function nextMode(gameState: GameState, ghost: GhostState): GhostMode {
-  if (ghost.mode === GhostMode.HOME) return canLeaveHouse(ghost.type) ? GhostMode.SCATTER : GhostMode.HOME;
+  if (ghost.mode === GhostMode.HOME)
+    return canLeaveHouse(ghost.type) ? GhostMode.SCATTER : GhostMode.HOME;
 
-  if (pacmanAteSuperPellet(gameState.pacman) && ghost.mode !== GhostMode.EATEN) {
+  if (
+    pacmanAteSuperPellet(gameState.pacman) &&
+    ghost.mode !== GhostMode.EATEN
+  ) {
     frightenedModeEnteredTimestamp = Date.now();
     return GhostMode.FRIGHTENED;
   }
   //if (ghost.mode === GhostMode.FRIGHTENED && (equalPos(gameState.pacman.pos, ghost.pos) || equalPos(previousGameState().pacman.pos, ghost.pos))) return GhostMode.EATEN;
-  if (ghost.mode === GhostMode.FRIGHTENED && overlappingWithPacman(ghost.type)) return GhostMode.EATEN;
-  if (ghost.mode === GhostMode.FRIGHTENED && (Date.now() - frightenedModeEnteredTimestamp) / 1000 < 6) return GhostMode.FRIGHTENED;
-  if (ghost.mode === GhostMode.EATEN && !equalPos(ghost.pos, housePos)) return GhostMode.EATEN;
+  if (ghost.mode === GhostMode.FRIGHTENED && overlappingWithPacman(ghost.type))
+    return GhostMode.EATEN;
+  if (
+    ghost.mode === GhostMode.FRIGHTENED &&
+    (Date.now() - frightenedModeEnteredTimestamp) / 1000 < 6
+  )
+    return GhostMode.FRIGHTENED;
+  if (ghost.mode === GhostMode.EATEN && !equalPos(ghost.pos, housePos))
+    return GhostMode.EATEN;
 
   const secondsSinceGameStart = (Date.now() - firstTickTimestamp) / 1000;
   if (secondsSinceGameStart > 84) return GhostMode.CHASE;
@@ -157,7 +183,8 @@ function calcTargetPoint(
   if (needsImmediateReverse(ghost.mode, nextMode))
     return posAt(ghost.pos, reverseDirection(ghost.dir), 1);
 
-  if (LEVEL_MAP[ghost.pos.y][ghost.pos.x] === 4 && nextMode !== GhostMode.EATEN) return { x: 13, y: 11 };
+  if (LEVEL_MAP[ghost.pos.y][ghost.pos.x] === 4 && nextMode !== GhostMode.EATEN)
+    return { x: 13, y: 11 };
 
   const chaseMode = () => {
     if (ghostType === GhostType.BLINKY) return gameState.pacman.pos;
@@ -208,25 +235,33 @@ function calcTargetPoint(
       return frightenedMode();
     case GhostMode.EATEN:
       return eatenMode();
-    default: return chaseMode();
+    default:
+      return chaseMode();
   }
 }
 
 function needsImmediateReverse(prev: GhostMode, next: GhostMode): boolean {
   return (
-    prev !== next &&
-    prev !== GhostMode.FRIGHTENED &&
-    prev !== GhostMode.EATEN &&
-    next !== GhostMode.EATEN
-  ) || next === GhostMode.HOME;
+    (prev !== next &&
+      prev !== GhostMode.FRIGHTENED &&
+      prev !== GhostMode.EATEN &&
+      next !== GhostMode.EATEN) ||
+    next === GhostMode.HOME
+  );
 }
 
 function canLeaveHouse(ghostType: GhostType): boolean {
-  const pelletsEaten = initialPelletAmount - (document.querySelectorAll("[data-type='SmallPellet']").length + document.querySelectorAll("[data-type='SuperPellet']").length);
-  return ghostType === GhostType.BLINKY ? true :
-    ghostType === GhostType.PINKY ? Date.now() - firstTickTimestamp > 4000 :
-      ghostType === GhostType.INKY ? pelletsEaten >= 30 :
-        pelletsEaten >= 60;
+  const pelletsEaten =
+    initialPelletAmount -
+    (document.querySelectorAll("[data-type='SmallPellet']").length +
+      document.querySelectorAll("[data-type='SuperPellet']").length);
+  return ghostType === GhostType.BLINKY
+    ? true
+    : ghostType === GhostType.PINKY
+      ? Date.now() - firstTickTimestamp > 4000
+      : ghostType === GhostType.INKY
+        ? pelletsEaten >= 30
+        : pelletsEaten >= 60;
 }
 
 function findGhost(gameState: GameState, ghostType: GhostType): GhostState {
@@ -234,7 +269,11 @@ function findGhost(gameState: GameState, ghostType: GhostType): GhostState {
 }
 
 function pacmanAteSuperPellet(pacman: PacManState): boolean {
-  return document.querySelector<HTMLDivElement>(`[data-r="${pacman.pos.y}"][data-c="${pacman.pos.x}"][data-type='SuperPellet']`) !== null;
+  return (
+    document.querySelector<HTMLDivElement>(
+      `[data-r="${pacman.pos.y}"][data-c="${pacman.pos.x}"][data-type='SuperPellet']`
+    ) !== null
+  );
 }
 
 function overlappingWithPacman(ghostType: GhostType): boolean {
@@ -269,7 +308,12 @@ function reverseDirection(dir: Direction): Direction {
 // Position Utils ----------
 function freeTilesAround(pos: Position, ghostMode: GhostMode): Position[] {
   return allDirections()
-    .filter((dir) => tileIsFree(posAt(pos, dir, 1), (LEVEL_MAP[pos.y][pos.x] === 4 || ghostMode === GhostMode.EATEN)))
+    .filter((dir) =>
+      tileIsFree(
+        posAt(pos, dir, 1),
+        LEVEL_MAP[pos.y][pos.x] === 4 || ghostMode === GhostMode.EATEN
+      )
+    )
     .map((dir) => posAt(pos, dir, 1));
 }
 
