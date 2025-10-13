@@ -1,7 +1,10 @@
 import { getGhostSprite } from '../(ui)/components/GhostSprite';
 import { getPacmanSprite } from '../(ui)/components/PacmanSprite';
 import { getAllSmallPelletSprites } from '../(ui)/components/SmallPelletSprite';
-import { getAllSuperPelletSprites, getSuperPelletSprite } from '../(ui)/components/SuperPelletSprite';
+import {
+  getAllSuperPelletSprites,
+  getSuperPelletSprite,
+} from '../(ui)/components/SuperPelletSprite';
 import { initialPelletAmount, LEVEL_MAP } from '../(ui)/game/MazeLayer';
 import {
   Direction,
@@ -109,7 +112,7 @@ function shortestPath(paths: Position[], targetPoint: Position): Position {
   return paths.reduce(
     (bestPath, currentPath) =>
       euclideanDistance(currentPath, targetPoint) <
-        euclideanDistance(bestPath, targetPoint)
+      euclideanDistance(bestPath, targetPoint)
         ? currentPath
         : bestPath,
     paths[0]
@@ -253,11 +256,16 @@ function needsImmediateReverse(prev: GhostMode, next: GhostMode): boolean {
 }
 
 function canLeaveHouse(ghostType: GhostType): boolean {
-  const pelletsEaten = initialPelletAmount - (getAllSmallPelletSprites().length + getAllSuperPelletSprites().length);
-  return ghostType === GhostType.BLINKY ? true :
-    ghostType === GhostType.PINKY ? Date.now() - firstTickTimestamp > 4000 :
-      ghostType === GhostType.INKY ? pelletsEaten >= 30 :
-        pelletsEaten >= 60;
+  const pelletsEaten =
+    initialPelletAmount -
+    (getAllSmallPelletSprites().length + getAllSuperPelletSprites().length);
+  return ghostType === GhostType.BLINKY
+    ? true
+    : ghostType === GhostType.PINKY
+      ? Date.now() - firstTickTimestamp > 4000
+      : ghostType === GhostType.INKY
+        ? pelletsEaten >= 30
+        : pelletsEaten >= 60;
 }
 
 function findGhost(gameState: GameState, ghostType: GhostType): GhostState {
