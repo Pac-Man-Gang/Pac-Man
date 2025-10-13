@@ -1,3 +1,4 @@
+import { getPelletSprite } from '../(ui)/components/SmallPelletSprite';
 import { addScore } from './GameStateManager';
 import { Direction, PacManState } from './types';
 import { posAt, tileIsFree } from './util/position';
@@ -28,7 +29,7 @@ export function nextPacManState(pacman: PacManState, dir: Direction): PacManStat
     else if (newPos.y < pacman.pos.y) newMovingDir = Direction.N;
   }
 
-  const cell = document.querySelector<HTMLDivElement>(`[data-r="${pacman.pos.y}"][data-c="${pacman.pos.x}"]`);
+  const cell = getPelletSprite(pacman.pos.y, pacman.pos.x);
   if (cell) {
     cell.remove();
     addScore(10);

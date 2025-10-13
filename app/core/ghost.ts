@@ -1,5 +1,7 @@
 import { getGhostSprite } from '../(ui)/components/GhostSprite';
 import { getPacmanSprite } from '../(ui)/components/PacmanSprite';
+import { getAllSmallPelletSprites } from '../(ui)/components/SmallPelletSprite';
+import { getAllSuperPelletSprites, getSuperPelletSprite } from '../(ui)/components/SuperPelletSprite';
 import { initialPelletAmount, LEVEL_MAP } from '../(ui)/game/MazeLayer';
 import {
   Direction,
@@ -222,7 +224,7 @@ function needsImmediateReverse(prev: GhostMode, next: GhostMode): boolean {
 }
 
 function canLeaveHouse(ghostType: GhostType): boolean {
-  const pelletsEaten = initialPelletAmount - (document.querySelectorAll("[data-type='SmallPellet']").length + document.querySelectorAll("[data-type='SuperPellet']").length);
+  const pelletsEaten = initialPelletAmount - (getAllSmallPelletSprites().length + getAllSuperPelletSprites().length);
   return ghostType === GhostType.BLINKY ? true :
     ghostType === GhostType.PINKY ? Date.now() - firstTickTimestamp > 4000 :
       ghostType === GhostType.INKY ? pelletsEaten >= 30 :
@@ -234,7 +236,7 @@ function findGhost(gameState: GameState, ghostType: GhostType): GhostState {
 }
 
 function pacmanAteSuperPellet(pacman: PacManState): boolean {
-  return document.querySelector<HTMLDivElement>(`[data-r="${pacman.pos.y}"][data-c="${pacman.pos.x}"][data-type='SuperPellet']`) !== null;
+  return getSuperPelletSprite(pacman.pos.y, pacman.pos.x) !== null;
 }
 
 function overlappingWithPacman(ghostType: GhostType): boolean {

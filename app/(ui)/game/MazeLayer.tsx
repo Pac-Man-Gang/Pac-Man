@@ -7,8 +7,8 @@ import SharpDoubleCorner from '../components/maze/SharpDoubleCorner';
 import ShortCorner from '../components/maze/ShortCorner';
 import SingleCorner from '../components/maze/SingleCorner';
 import SingleWall from '../components/maze/SingleWall';
-import SmallPelletSprite from '../components/SmallPelletSprite';
-import SuperPelletSprite from '../components/SuperPelletSprite';
+import SmallPelletSprite, { getAllSmallPelletSprites } from '../components/SmallPelletSprite';
+import SuperPelletSprite, { getAllSuperPelletSprites } from '../components/SuperPelletSprite';
 
 export const LEVEL_MAP: number[][] = [
   [
@@ -411,8 +411,8 @@ const MazeLayer = memo(function MazeLayer() {
   ), []);
 
   useEffect(() => {
-    initialPelletAmount = document.querySelectorAll("[data-type='SmallPellet']").length
-      + document.querySelectorAll("[data-type='SuperPellet']").length;
+    initialPelletAmount = getAllSmallPelletSprites().length
+      + getAllSuperPelletSprites().length;
   }, []);
 
   return (

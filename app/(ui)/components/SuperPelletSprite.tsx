@@ -13,6 +13,14 @@ const frames = [
     '/assets/SuperPellet2.png'
 ];
 
+export function getAllSuperPelletSprites() {
+    return document.querySelectorAll("[data-type='SmallPellet']");
+}
+
+export function getSuperPelletSprite(row: number, col: number) {
+    return document.querySelector<HTMLDivElement>(`[data-r="${row}"][data-c="${col}"][data-type='SuperPellet']`);
+}
+
 export default function SuperPelletSprite({ row, col, size = 40, fps = 5 }: SuperPelletSpriteProps) {
     const [frame, setFrame] = useState(0);
 
