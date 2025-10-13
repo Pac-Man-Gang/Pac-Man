@@ -1,9 +1,9 @@
-import Image from "next/image";
+import Image from 'next/image';
 
 type SmallPelletSpriteProps = {
-    row: number,
-    col: number,
-    size?: number
+    row: number;
+    col: number;
+    size?: number;
 };
 
 export function getAllSmallPelletSprites() {

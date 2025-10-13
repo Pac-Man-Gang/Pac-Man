@@ -165,20 +165,31 @@ function defineComponent(row: number, col: number) {
   // Empty cells / Pellets
   if (cell !== 1 && cell !== 3) {
     // Check for cell around ghost house to not render pellets there
-    if (LEVEL_MAP[row - 2]?.[col] === 4
-      || LEVEL_MAP[row + 2]?.[col] === 4
-      || LEVEL_MAP[row]?.[col + 2] === 4
-      || LEVEL_MAP[row]?.[col - 2] === 4
-      || LEVEL_MAP[row - 2]?.[col + 2] === 4
-      || LEVEL_MAP[row - 2]?.[col - 2] === 4
-      || LEVEL_MAP[row + 2]?.[col + 2] === 4
-      || LEVEL_MAP[row + 2]?.[col - 2] === 4) {
+    if (
+      LEVEL_MAP[row - 2]?.[col] === 4 ||
+      LEVEL_MAP[row + 2]?.[col] === 4 ||
+      LEVEL_MAP[row]?.[col + 2] === 4 ||
+      LEVEL_MAP[row]?.[col - 2] === 4 ||
+      LEVEL_MAP[row - 2]?.[col + 2] === 4 ||
+      LEVEL_MAP[row - 2]?.[col - 2] === 4 ||
+      LEVEL_MAP[row + 2]?.[col + 2] === 4 ||
+      LEVEL_MAP[row + 2]?.[col - 2] === 4
+    ) {
       return <EmptyCell />;
       // If is not around ghost house, render pellet
     } else {
       // WARNING: HARDCODED
-      const superPellets = [{ row: 3, col: 1 }, { row: 3, col: 26 }, { row: 23, col: 1 }, { row: 23, col: 26 },];
-      return superPellets.find((pos) => pos.row === row && pos.col === col) ? <SuperPelletSprite row={row} col={col} /> : <SmallPelletSprite row={row} col={col} />;
+      const superPellets = [
+        { row: 3, col: 1 },
+        { row: 3, col: 26 },
+        { row: 23, col: 1 },
+        { row: 23, col: 26 },
+      ];
+      return superPellets.find((pos) => pos.row === row && pos.col === col) ? (
+        <SuperPelletSprite row={row} col={col} />
+      ) : (
+        <SmallPelletSprite row={row} col={col} />
+      );
     }
   }
 
@@ -398,17 +409,17 @@ function defineComponent(row: number, col: number) {
   }
 }
 
-import { memo, useEffect, useMemo } from "react";
+import { memo, useEffect, useMemo } from 'react';
 
 const MazeLayer = memo(function MazeLayer() {
   // compute once inside Maze, not on every GamePage render
-  const cells = useMemo(() => (
-    LEVEL_MAP.flatMap((row, r) =>
-      row.map((_, c) => (
-        <div key={`${r}-${c}`}>{defineComponent(r, c)}</div>
-      ))
-    )
-  ), []);
+  const cells = useMemo(
+    () =>
+      LEVEL_MAP.flatMap((row, r) =>
+        row.map((_, c) => <div key={`${r}-${c}`}>{defineComponent(r, c)}</div>)
+      ),
+    []
+  );
 
   useEffect(() => {
     initialPelletAmount = getAllSmallPelletSprites().length
@@ -419,7 +430,7 @@ const MazeLayer = memo(function MazeLayer() {
     <div
       className="maze"
       style={{
-        display: "grid",
+        display: 'grid',
         gridTemplateColumns: `repeat(${LEVEL_MAP[0].length}, 20px)`,
         gridTemplateRows: `repeat(${LEVEL_MAP.length}, 20px)`,
       }}

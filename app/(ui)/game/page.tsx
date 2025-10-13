@@ -1,20 +1,20 @@
-"use client";
-import { INITIAL_GAMESTATE, nextGameState } from "@/app/core/GameStateManager";
-import localFont from "next/font/local";
-import { useEffect, useRef, useState } from "react";
-import { keyToDirection } from "../../core/pacman";
-import { Direction, GameState, Position } from "../../core/types";
-import EntityLayer from "./EntityLayer";
-import MazeLayer from "./MazeLayer";
+'use client';
+import { INITIAL_GAMESTATE, nextGameState } from '@/app/core/GameStateManager';
+import localFont from 'next/font/local';
+import { useEffect, useRef, useState } from 'react';
+import { keyToDirection } from '../../core/pacman';
+import { Direction, GameState, Position } from '../../core/types';
+import EntityLayer from './EntityLayer';
+import MazeLayer from './MazeLayer';
 
 const BASE_W = 560;
 const BASE_H = 620;
 
 const arcadeFont = localFont({
-  src: "../../../public/fonts/ARCADECLASSIC.ttf",
-  weight: "400",
-  style: "normal",
-  display: "swap",
+  src: '../../../public/fonts/ARCADECLASSIC.ttf',
+  weight: '400',
+  style: 'normal',
+  display: 'swap',
 });
 
 export type PopupBean = {
@@ -45,7 +45,9 @@ export default function GamePage() {
   const [scale, setScale] = useState(1);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  const [popups, setPopups] = useState<{ id: number; x: number; y: number; text: string }[]>([]);
+  const [popups, setPopups] = useState<
+    { id: number; x: number; y: number; text: string }[]
+  >([]);
 
   useEffect(() => {
     const update = () => {
@@ -54,8 +56,8 @@ export default function GamePage() {
       setScale(Math.min(w / BASE_W, h / BASE_H));
     };
     update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
   }, []);
 
   useEffect(() => {
@@ -64,10 +66,9 @@ export default function GamePage() {
       if (dir !== undefined) setPlayerDir(dir);
     };
 
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
   }, []);
-
 
   const tick = () => setGameState(nextGameState(playerDir!));
   useEffect(() => tick(), []);
@@ -77,45 +78,47 @@ export default function GamePage() {
     return () => window.removeEventListener('tick', tick);
   }, [playerDir]);
 
-
   useEffect(() => {
     const handler = (e: CustomEvent<PopupBean>) => {
       const { x, y, text } = e.detail;
       const id = Date.now();
-      setPopups(p => [...p, { id, x, y, text }]);
+      setPopups((p) => [...p, { id, x, y, text }]);
       setTimeout(() => {
-        setPopups(p => p.filter(pop => pop.id !== id));
+        setPopups((p) => p.filter((pop) => pop.id !== id));
       }, 1000);
-    }
+    };
     window.addEventListener('newPopup', handler as EventListener);
 
-    window.dispatchEvent(new CustomEvent<PopupBean>('newPopup', {
-      detail: { x: 100, y: 100, text: '200' }
-    }));
-    return () => window.removeEventListener('newPopup', handler as EventListener);
+    window.dispatchEvent(
+      new CustomEvent<PopupBean>('newPopup', {
+        detail: { x: 100, y: 100, text: '200' },
+      })
+    );
+    return () =>
+      window.removeEventListener('newPopup', handler as EventListener);
   }, []);
 
   return (
     <main
       ref={wrapRef}
       style={{
-        minHeight: "100svh",
-        display: "grid",
-        placeItems: "center",
-        background: "#000",
-        overflow: "hidden",
-      }}>
-
+        minHeight: '100svh',
+        display: 'grid',
+        placeItems: 'center',
+        background: '#000',
+        overflow: 'hidden',
+      }}
+    >
       <div
         className={arcadeFont.className}
         style={{
-          position: "absolute",
+          position: 'absolute',
           top: 12,
-          left: "15%",
-          transform: "translateX(-50%)",
-          pointerEvents: "none",
+          left: '15%',
+          transform: 'translateX(-50%)',
+          pointerEvents: 'none',
           zIndex: 2,
-          fontSize: 45
+          fontSize: 45,
         }}
       >
         SCORE: {gameState.score}
@@ -126,10 +129,11 @@ export default function GamePage() {
         style={{
           width: BASE_W,
           height: BASE_H,
-          position: "relative",
-          transformOrigin: "center center",
+          position: 'relative',
+          transformOrigin: 'center center',
           transform: `scale(${scale})`,
-        }}>
+        }}
+      >
         <MazeLayer></MazeLayer>
         <EntityLayer
           pacman={gameState.pacman}
@@ -139,26 +143,27 @@ export default function GamePage() {
 
         <div
           style={{
-            position: "absolute",
+            position: 'absolute',
             inset: 0,
-            pointerEvents: "none",
+            pointerEvents: 'none',
             zIndex: 10,
             fontFamily: arcadeFont.style.fontFamily, // keeps same font
           }}
         >
-          {popups.map(p => (
+          {popups.map((p) => (
             <div
               key={p.id}
               style={{
-                position: "absolute",
+                position: 'absolute',
                 left: p.x,
                 top: p.y,
-                transform: "translate(-50%, -50%)",
-                color: "blue",
+                transform: 'translate(-50%, -50%)',
+                color: 'blue',
                 fontSize: 24,
                 fontWeight: 700,
-                animation: "popupFloat 900ms cubic-bezier(0.22, 1.0, 0.36, 1.0) forwards",
-                willChange: "transform, opacity",
+                animation:
+                  'popupFloat 900ms cubic-bezier(0.22, 1.0, 0.36, 1.0) forwards',
+                willChange: 'transform, opacity',
               }}
             >
               {p.text}

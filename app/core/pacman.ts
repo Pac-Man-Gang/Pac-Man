@@ -12,11 +12,14 @@ export function initialPacman(
     pos: { x, y },
     sprite,
     dir: Direction.N, // default facing East
-    movingDir: Direction.N
+    movingDir: Direction.N,
   };
 }
 
-export function nextPacManState(pacman: PacManState, dir: Direction): PacManState {
+export function nextPacManState(
+  pacman: PacManState,
+  dir: Direction
+): PacManState {
   let newPos = posAt(pacman.pos, dir, 1);
   let newMovingDir = dir;
   if (!tileIsFree(newPos, false)) {
