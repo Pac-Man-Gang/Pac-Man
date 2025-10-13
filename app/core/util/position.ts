@@ -30,7 +30,7 @@ export function tileIsFree(pos: Position, includeGhostHouse: boolean): boolean {
   if (!inBounds(pos)) return false;
 
   const tile = LEVEL_MAP[pos.y][pos.x];
-  return tile === 0 || (includeGhostHouse && tile === 4);
+  return tile === 0 || tile === 2 || tile === 5 || (includeGhostHouse && tile === 4);
 }
 
 export function inBounds(pos: Position): boolean {
