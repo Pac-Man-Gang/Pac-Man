@@ -1,44 +1,48 @@
-import { PacMan, Position, Direction } from './types';
+import { getPelletSprite } from '../(ui)/components/SmallPelletSprite';
+import { addScore } from './GameStateManager';
+import { Direction, PacManState } from './types';
+import { posAt, tileIsFree } from './util/position';
 
-export function createPacman(
+export function initialPacman(
   x: number,
   y: number,
   sprite = 'pacman.png'
-): PacMan {
+): PacManState {
   return {
     pos: { x, y },
     sprite,
     dir: Direction.N, // default facing East
-    frame: 0,
+    movingDir: Direction.N,
   };
 }
 
-export function movePacman(pacman: PacMan, dir: Direction): PacMan {
-  const { pos } = pacman;
-  let newPos: Position;
+export function nextPacManState(
+  pacman: PacManState,
+  dir: Direction
+): PacManState {
+  let newPos = posAt(pacman.pos, dir, 1);
+  let newMovingDir = dir;
+  if (!tileIsFree(newPos, false)) {
+    newPos = posAt(pacman.pos, pacman.movingDir, 1);
+    if (!tileIsFree(newPos, false)) newPos = pacman.pos;
 
-  switch (dir) {
-    case Direction.N:
-      newPos = { x: pos.x, y: pos.y - 1 };
-      break;
-    case Direction.S:
-      newPos = { x: pos.x, y: pos.y + 1 };
-      break;
-    case Direction.W:
-      newPos = { x: pos.x - 1, y: pos.y };
-      break;
-    case Direction.E:
-      newPos = { x: pos.x + 1, y: pos.y };
-      break;
-    default:
-      newPos = pos; // no movement if direction is invalid
+    if (newPos.x > pacman.pos.x) newMovingDir = Direction.E;
+    else if (newPos.x < pacman.pos.x) newMovingDir = Direction.W;
+    else if (newPos.y > pacman.pos.y) newMovingDir = Direction.S;
+    else if (newPos.y < pacman.pos.y) newMovingDir = Direction.N;
+  }
+
+  const cell = getPelletSprite(pacman.pos.y, pacman.pos.x);
+  if (cell) {
+    cell.remove();
+    addScore(10);
   }
 
   return {
     ...pacman,
     pos: newPos,
     dir,
-    frame: (pacman.frame + 1) % 4, // assuming 4 frames for animation
+    movingDir: newMovingDir,
   };
 }
 

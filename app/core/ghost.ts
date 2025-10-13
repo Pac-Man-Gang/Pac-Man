@@ -1,135 +1,21 @@
+import { getGhostSprite } from '../(ui)/components/GhostSprite';
+import { getPacmanSprite } from '../(ui)/components/PacmanSprite';
+import { getAllSmallPelletSprites } from '../(ui)/components/SmallPelletSprite';
+import {
+  getAllSuperPelletSprites,
+  getSuperPelletSprite,
+} from '../(ui)/components/SuperPelletSprite';
+import { initialPelletAmount, LEVEL_MAP } from '../(ui)/game/MazeLayer';
 import {
   Direction,
   GameState,
-  Ghost,
   GhostMode,
+  GhostState,
   GhostType,
+  PacManState,
   Position,
 } from './types';
-
-export const LEVEL_MAP: number[][] = [
-  [
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 1, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0,
-    1, 1, 1,
-  ],
-  [
-    1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0,
-    1, 1, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 0, 1,
-  ],
-  [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
-  ],
-  [
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1,
-  ],
-];
-
+import { equalPos, posAt, tileIsFree } from './util/position';
 /*
     WARNINGS
     - targetPoints can be outside the maze or on walls
@@ -137,11 +23,8 @@ export const LEVEL_MAP: number[][] = [
 
 /*
     TODO
-    - Not all ghosts spawn right away, dpends on points and lvl
-    - chooseMode() uses sprite to filter pellets, typeof only works with classes
     - Timers are not functional programming (dont use Date.now())
     - frightened pauses schedule
-    - Ghost House doesnt exist
     - EatenMode: double speed through tunnes
     - Blinky speeds up and stops scattering if only few pellets are left
 */
@@ -149,31 +32,73 @@ export const LEVEL_MAP: number[][] = [
 let firstTickTimestamp: number;
 let frightenedModeEnteredTimestamp: number;
 
-export function ghostsTick(gameState: GameState): Ghost[] {
-  return gameState.ghosts.map((ghost) => ghostTick(gameState, ghost.type));
+// WARNING: HARDCODED
+const housePos = { x: 14, y: 14 };
+
+export function initalGhosts(): GhostState[] {
+  return [
+    {
+      pos: { x: 15, y: 14 },
+      sprite: 'clyde',
+      dir: Direction.N,
+      type: GhostType.CLYDE,
+      mode: GhostMode.HOME,
+    },
+    {
+      pos: { x: 13, y: 14 },
+      sprite: 'inky',
+      dir: Direction.N,
+      type: GhostType.INKY,
+      mode: GhostMode.HOME,
+    },
+    {
+      pos: { x: 14, y: 14 },
+      sprite: 'pinky',
+      dir: Direction.N,
+      type: GhostType.PINKY,
+      mode: GhostMode.HOME,
+    },
+    {
+      pos: { x: 13, y: 11 },
+      sprite: 'blinky',
+      dir: Direction.N,
+      type: GhostType.BLINKY,
+      mode: GhostMode.SCATTER,
+    },
+  ];
 }
 
-function ghostTick(gameState: GameState, ghostType: GhostType): Ghost {
+export function nextGhostStates(gameState: GameState): GhostState[] {
+  return gameState.ghosts.map((ghost) => nextGhostState(gameState, ghost.type));
+}
+
+function nextGhostState(
+  gameState: GameState,
+  ghostType: GhostType
+): GhostState {
   if (!firstTickTimestamp) firstTickTimestamp = Date.now();
 
   const ghost = findGhost(gameState, ghostType);
-  const mode = calcMode(gameState, ghost);
-  const pos = calcTile(ghost, mode, calcTargetPoint(mode, ghost, gameState));
-  const facing = facingDirection(ghost.pos, pos);
+  const newMode = nextMode(gameState, ghost);
+  const newPos = nextTile(
+    ghost,
+    newMode,
+    calcTargetPoint(newMode, ghost, gameState)
+  );
+  const newFacing = calcFacing(ghost.pos, newPos);
+
   return {
-    pos: pos,
-    dir: facing,
-    mode: mode,
+    pos: newPos,
+    dir: newFacing,
+    mode: newMode,
 
     type: ghost.type,
     sprite: ghost.sprite,
-    frame: 0,
-    spawnPoint: ghost.spawnPoint,
   };
 }
 
-function calcTile(
-  ghostState: Ghost,
+function nextTile(
+  ghostState: GhostState,
   nextMode: GhostMode,
   targetPoint: Position
 ): Position {
@@ -194,8 +119,11 @@ function shortestPath(paths: Position[], targetPoint: Position): Position {
   );
 }
 
-function possiblePaths(ghostState: Ghost, nextMode: GhostMode): Position[] {
-  const freeTiles = freeTilesAround(ghostState.pos);
+function possiblePaths(
+  ghostState: GhostState,
+  nextMode: GhostMode
+): Position[] {
+  const freeTiles = freeTilesAround(ghostState.pos, ghostState.mode);
   if (
     freeTiles.length === 1 ||
     needsImmediateReverse(ghostState.mode, nextMode)
@@ -206,38 +134,37 @@ function possiblePaths(ghostState: Ghost, nextMode: GhostMode): Position[] {
     (tile) =>
       !equalPos(
         tile,
-        tileAt(ghostState.pos, reverseDirection(ghostState.dir), 1)
+        posAt(ghostState.pos, reverseDirection(ghostState.dir), 1)
       )
   );
 }
 
-function facingDirection(lastPoint: Position, nextPoint: Position): Direction {
+function calcFacing(lastPoint: Position, nextPoint: Position): Direction {
   return allDirections().find((dir) =>
-    equalPos(nextPoint, tileAt(lastPoint, dir, 1))
+    equalPos(nextPoint, posAt(lastPoint, dir, 1))
   )!;
 }
 
-function calcMode(gameState: GameState, ghost: Ghost): GhostMode {
+function nextMode(gameState: GameState, ghost: GhostState): GhostMode {
+  if (ghost.mode === GhostMode.HOME)
+    return canLeaveHouse(ghost.type) ? GhostMode.SCATTER : GhostMode.HOME;
+
   if (
-    gameState.pellets
-      .filter((pellet) => pellet.sprite === 'SuperPellet.png')
-      .map((superPellet) => superPellet.pos)
-      .find((pos) => equalPos(gameState.pacman.pos, pos))
+    pacmanAteSuperPellet(gameState.pacman) &&
+    ghost.mode !== GhostMode.EATEN
   ) {
     frightenedModeEnteredTimestamp = Date.now();
     return GhostMode.FRIGHTENED;
   }
+  //if (ghost.mode === GhostMode.FRIGHTENED && (equalPos(gameState.pacman.pos, ghost.pos) || equalPos(previousGameState().pacman.pos, ghost.pos))) return GhostMode.EATEN;
+  if (ghost.mode === GhostMode.FRIGHTENED && overlappingWithPacman(ghost.type))
+    return GhostMode.EATEN;
   if (
     ghost.mode === GhostMode.FRIGHTENED &&
     (Date.now() - frightenedModeEnteredTimestamp) / 1000 < 6
   )
     return GhostMode.FRIGHTENED;
-  if (
-    ghost.mode === GhostMode.FRIGHTENED &&
-    equalPos(gameState.pacman.pos, ghost.pos)
-  )
-    return GhostMode.EATEN;
-  if (ghost.mode === GhostMode.EATEN && !equalPos(ghost.pos, ghost.spawnPoint))
+  if (ghost.mode === GhostMode.EATEN && !equalPos(ghost.pos, housePos))
     return GhostMode.EATEN;
 
   const secondsSinceGameStart = (Date.now() - firstTickTimestamp) / 1000;
@@ -253,19 +180,23 @@ function calcMode(gameState: GameState, ghost: Ghost): GhostMode {
 
 function calcTargetPoint(
   nextMode: GhostMode,
-  ghost: Ghost,
+  ghost: GhostState,
   gameState: GameState
 ): Position {
   const ghostType = ghost.type;
+
   if (needsImmediateReverse(ghost.mode, nextMode))
-    return tileAt(ghost.pos, reverseDirection(ghost.dir), 1);
+    return posAt(ghost.pos, reverseDirection(ghost.dir), 1);
+
+  if (LEVEL_MAP[ghost.pos.y][ghost.pos.x] === 4 && nextMode !== GhostMode.EATEN)
+    return { x: 13, y: 11 };
 
   const chaseMode = () => {
     if (ghostType === GhostType.BLINKY) return gameState.pacman.pos;
     else if (ghostType === GhostType.PINKY)
-      return tileAt(gameState.pacman.pos, gameState.pacman.dir, 4);
+      return posAt(gameState.pacman.pos, gameState.pacman.dir, 4);
     else if (ghostType === GhostType.INKY) {
-      const twoTilesAheadOfPac = tileAt(
+      const twoTilesAheadOfPac = posAt(
         gameState.pacman.pos,
         gameState.pacman.dir,
         2
@@ -293,11 +224,11 @@ function calcTargetPoint(
 
   const frightenedMode = () => {
     const dirs = allDirections();
-    return tileAt(ghost.pos, dirs[Math.floor(Math.random() * dirs.length)], 1);
+    return posAt(ghost.pos, dirs[Math.floor(Math.random() * dirs.length)], 1);
   };
 
   const eatenMode = () => {
-    return ghost.spawnPoint;
+    return housePos;
   };
 
   switch (nextMode) {
@@ -309,20 +240,52 @@ function calcTargetPoint(
       return frightenedMode();
     case GhostMode.EATEN:
       return eatenMode();
+    default:
+      return chaseMode();
   }
 }
 
 function needsImmediateReverse(prev: GhostMode, next: GhostMode): boolean {
   return (
-    prev !== next &&
-    prev !== GhostMode.FRIGHTENED &&
-    prev !== GhostMode.EATEN &&
-    next !== GhostMode.EATEN
+    (prev !== next &&
+      prev !== GhostMode.FRIGHTENED &&
+      prev !== GhostMode.EATEN &&
+      next !== GhostMode.EATEN) ||
+    next === GhostMode.HOME
   );
 }
 
-function findGhost(gameState: GameState, ghostType: GhostType): Ghost {
+function canLeaveHouse(ghostType: GhostType): boolean {
+  const pelletsEaten =
+    initialPelletAmount -
+    (getAllSmallPelletSprites().length + getAllSuperPelletSprites().length);
+  return ghostType === GhostType.BLINKY
+    ? true
+    : ghostType === GhostType.PINKY
+      ? Date.now() - firstTickTimestamp > 4000
+      : ghostType === GhostType.INKY
+        ? pelletsEaten >= 30
+        : pelletsEaten >= 60;
+}
+
+function findGhost(gameState: GameState, ghostType: GhostType): GhostState {
   return gameState.ghosts.find((ghost) => ghost.type === ghostType)!;
+}
+
+function pacmanAteSuperPellet(pacman: PacManState): boolean {
+  return getSuperPelletSprite(pacman.pos.y, pacman.pos.x) !== null;
+}
+
+function overlappingWithPacman(ghostType: GhostType): boolean {
+  const pacman = getPacmanSprite().getBoundingClientRect();
+  const ghost = getGhostSprite(ghostType).getBoundingClientRect();
+
+  return !(
+    pacman.right < ghost.left ||
+    pacman.left > ghost.right ||
+    pacman.bottom < ghost.top ||
+    pacman.top > ghost.bottom
+  );
 }
 
 // Util functions -------------------------------------------
@@ -343,46 +306,17 @@ function reverseDirection(dir: Direction): Direction {
 }
 
 // Position Utils ----------
-function freeTilesAround(pos: Position): Position[] {
+function freeTilesAround(pos: Position, ghostMode: GhostMode): Position[] {
   return allDirections()
-    .filter((dir) => tileIsFree(tileAt(pos, dir, 1)))
-    .map((dir) => tileAt(pos, dir, 1));
-}
-
-function tileIsFree(pos: Position): boolean {
-  return inBounds(pos) && LEVEL_MAP[pos.y][pos.x] === 0;
-}
-
-function tileAt(from: Position, dir: Direction, amount: number): Position {
-  return {
-    x:
-      dir === Direction.W
-        ? from.x - amount
-        : dir === Direction.E
-          ? from.x + amount
-          : from.x,
-    y:
-      dir === Direction.N
-        ? from.y - amount
-        : dir === Direction.S
-          ? from.y + amount
-          : from.y,
-  };
+    .filter((dir) =>
+      tileIsFree(
+        posAt(pos, dir, 1),
+        LEVEL_MAP[pos.y][pos.x] === 4 || ghostMode === GhostMode.EATEN
+      )
+    )
+    .map((dir) => posAt(pos, dir, 1));
 }
 
 function euclideanDistance(pos1: Position, pos2: Position): number {
   return Math.hypot(pos1.x - pos2.x, pos1.y - pos2.y);
-}
-
-function equalPos(pos1: Position, pos2: Position): boolean {
-  return pos1.x === pos2.x && pos1.y === pos2.y;
-}
-
-function inBounds(pos: Position): boolean {
-  return (
-    pos.y >= 0 &&
-    pos.y < LEVEL_MAP.length &&
-    pos.x >= 0 &&
-    pos.x < LEVEL_MAP[pos.y].length
-  );
 }
