@@ -67,8 +67,6 @@ export default function GamePage() {
     };
   }, []);
 
-
-
   useEffect(() => {
     const update = () => {
       const w = wrapRef.current?.clientWidth ?? window.innerWidth;
