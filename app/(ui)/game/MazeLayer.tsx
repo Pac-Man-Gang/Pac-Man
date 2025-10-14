@@ -14,126 +14,132 @@ import SuperPelletSprite, {
   getAllSuperPelletSprites,
 } from '../components/SuperPelletSprite';
 
+// Empty = 0
+// Wall = 1
+// Small Pellet = 2
+// Out of Map = 3
+// Ghost House = 4
+// Super Pellets = 5
 export const LEVEL_MAP: number[][] = [
   [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1,
   ],
   [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
+    1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    2, 2, 1,
   ],
   [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
+    1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1,
+    1, 2, 1,
   ],
   [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
+    1, 5, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1,
+    1, 5, 1,
   ],
   [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
+    1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1,
+    1, 2, 1,
   ],
   [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
+    1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    2, 2, 1,
   ],
   [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
+    1, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1,
+    1, 2, 1,
   ],
   [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
+    1, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1,
+    1, 2, 1,
   ],
   [
-    1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-    0, 0, 1,
+    1, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2,
+    2, 2, 1,
   ],
   [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 1,
     1, 1, 1,
   ],
   [
-    3, 3, 3, 3, 3, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 3, 3,
+    3, 3, 3, 3, 3, 1, 2, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 1, 3, 3,
     3, 3, 3,
   ],
   [
-    3, 3, 3, 3, 3, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 3, 3,
+    3, 3, 3, 3, 3, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 3, 3,
     3, 3, 3,
   ],
   [
-    3, 3, 3, 3, 3, 1, 0, 1, 1, 0, 1, 1, 1, 4, 4, 1, 1, 1, 0, 1, 1, 0, 1, 3, 3,
+    3, 3, 3, 3, 3, 1, 2, 1, 1, 0, 1, 1, 1, 4, 4, 1, 1, 1, 0, 1, 1, 2, 1, 3, 3,
     3, 3, 3,
   ],
   [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 4, 4, 4, 4, 4, 4, 1, 0, 1, 1, 0, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 2, 1, 1, 0, 1, 4, 4, 4, 4, 4, 4, 1, 0, 1, 1, 2, 1, 1, 1,
     1, 1, 1,
   ],
   [
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 4, 4, 4, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 4, 4, 4, 4, 4, 4, 1, 0, 0, 0, 2, 0, 0, 0,
     0, 0, 0,
   ],
   [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 4, 4, 4, 4, 4, 4, 1, 0, 1, 1, 0, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 2, 1, 1, 0, 1, 4, 4, 4, 4, 4, 4, 1, 0, 1, 1, 2, 1, 1, 1,
     1, 1, 1,
   ],
   [
-    3, 3, 3, 3, 3, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 3, 3,
+    3, 3, 3, 3, 3, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 3, 3,
     3, 3, 3,
   ],
   [
-    3, 3, 3, 3, 3, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 3, 3,
+    3, 3, 3, 3, 3, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 3, 3,
     3, 3, 3,
   ],
   [
-    3, 3, 3, 3, 3, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 3, 3,
+    3, 3, 3, 3, 3, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 3, 3,
     3, 3, 3,
   ],
   [
-    1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1,
     1, 1, 1,
   ],
   [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
+    1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    2, 2, 1,
   ],
   [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
+    1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1,
+    1, 2, 1,
   ],
   [
-    1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1,
-    1, 0, 1,
+    1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1,
+    1, 2, 1,
   ],
   [
-    1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
-    0, 0, 1,
+    1, 5, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2,
+    2, 5, 1,
   ],
   [
-    1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0,
+    1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,
     1, 1, 1,
   ],
   [
-    1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0,
+    1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2,
     1, 1, 1,
   ],
   [
-    1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-    0, 0, 1,
+    1, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2,
+    2, 2, 1,
   ],
   [
-    1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 0, 1,
+    1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 2, 1,
   ],
   [
-    1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 0, 1,
+    1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 2, 1,
   ],
   [
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 1,
+    1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    2, 2, 1,
   ],
   [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -145,6 +151,7 @@ export let initialPelletAmount = 0;
 
 function defineComponent(row: number, col: number) {
   const cell = LEVEL_MAP[row]?.[col];
+  const notWall: number[] = [0, 2, 4, 5];
 
   // Define neighbours
   const N = LEVEL_MAP[row - 1]?.[col];
@@ -168,32 +175,12 @@ function defineComponent(row: number, col: number) {
 
   // Empty cells / Pellets
   if (cell !== 1 && cell !== 3) {
-    // Check for cell around ghost house to not render pellets there
-    if (
-      LEVEL_MAP[row - 2]?.[col] === 4 ||
-      LEVEL_MAP[row + 2]?.[col] === 4 ||
-      LEVEL_MAP[row]?.[col + 2] === 4 ||
-      LEVEL_MAP[row]?.[col - 2] === 4 ||
-      LEVEL_MAP[row - 2]?.[col + 2] === 4 ||
-      LEVEL_MAP[row - 2]?.[col - 2] === 4 ||
-      LEVEL_MAP[row + 2]?.[col + 2] === 4 ||
-      LEVEL_MAP[row + 2]?.[col - 2] === 4
-    ) {
+    if (cell === 0 || cell === 4) {
       return <EmptyCell />;
-      // If is not around ghost house, render pellet
+    } else if (cell === 5) {
+      return <SuperPelletSprite row={row} col={col} />;
     } else {
-      // WARNING: HARDCODED
-      const superPellets = [
-        { row: 3, col: 1 },
-        { row: 3, col: 26 },
-        { row: 23, col: 1 },
-        { row: 23, col: 26 },
-      ];
-      return superPellets.find((pos) => pos.row === row && pos.col === col) ? (
-        <SuperPelletSprite row={row} col={col} />
-      ) : (
-        <SmallPelletSprite row={row} col={col} />
-      );
+      return <SmallPelletSprite row={row} col={col} />;
     }
   }
 
@@ -204,7 +191,7 @@ function defineComponent(row: number, col: number) {
       if (S === undefined || W === undefined) {
         return <DoubleCorner />;
         // Normal corners
-      } else if (S === 0 && W === 0) {
+      } else if (notWall.includes(S) && notWall.includes(W)) {
         if (NE === 3) {
           return <ShortCorner rotation={270} mirrored={true} />;
         } else {
@@ -223,7 +210,7 @@ function defineComponent(row: number, col: number) {
       if (S === undefined || E === undefined) {
         return <DoubleCorner rotation={270} />;
         // Normal corners
-      } else if (S === 0 || E === 0) {
+      } else if (notWall.includes(S) || notWall.includes(E)) {
         if (NW === 3) {
           return <ShortCorner rotation={270} />;
         } else {
@@ -242,7 +229,7 @@ function defineComponent(row: number, col: number) {
       if (N === undefined || W === undefined) {
         return <DoubleCorner rotation={90} />;
         // Normal corners
-      } else if (N === 0 || W === 0) {
+      } else if (notWall.includes(N) || notWall.includes(W)) {
         if (SE === 3) {
           return <ShortCorner rotation={90} />;
         } else {
@@ -261,7 +248,7 @@ function defineComponent(row: number, col: number) {
       if (N === undefined || E === undefined) {
         return <DoubleCorner rotation={180} />;
         // Normal corners
-      } else if (N === 0 || E === 0) {
+      } else if (notWall.includes(N) || notWall.includes(E)) {
         if (SW === 3) {
           return <ShortCorner rotation={90} mirrored={true} />;
         } else {
@@ -278,36 +265,36 @@ function defineComponent(row: number, col: number) {
     case N === 4 || S === 4 || E === 4 || W === 4:
       switch (true) {
         case N === 4:
-          if (E === 0) {
+          if (notWall.includes(E)) {
             return <DoubleEndWall rotation={270} />;
-          } else if (W === 0) {
+          } else if (notWall.includes(W)) {
             return <DoubleEndWall rotation={270} />;
           } else {
             return <DoubleWall rotation={90} />;
           }
 
         case S === 4:
-          if (E === 0) {
+          if (notWall.includes(E)) {
             return <DoubleEndWall mirrored={true} />;
-          } else if (W === 0) {
+          } else if (notWall.includes(W)) {
             return <DoubleEndWall />;
           } else {
             return <DoubleWall rotation={270} mirrored={true} />;
           }
 
         case E === 4:
-          if (N === 0) {
+          if (notWall.includes(N)) {
             return <DoubleEndWall rotation={90} mirrored={true} />;
-          } else if (S === 0) {
+          } else if (notWall.includes(S)) {
             return <DoubleEndWall rotation={270} />;
           } else {
             return <DoubleWall mirrored={true} />;
           }
 
         case W === 4:
-          if (N === 0) {
+          if (notWall.includes(N)) {
             return <DoubleEndWall rotation={90} />;
-          } else if (S === 0) {
+          } else if (notWall.includes(S)) {
             return <DoubleEndWall rotation={270} mirrored={true} />;
           } else {
             return <DoubleWall />;
@@ -341,14 +328,14 @@ function defineComponent(row: number, col: number) {
           return <DoubleWall mirrored={true} />;
         }
         // Left wall
-      } else if (W === 0) {
+      } else if (notWall.includes(W)) {
         if (E === 3) {
           return <DoubleWall mirrored={true} />;
         } else {
           return <SingleWall />;
         }
         // Right wall
-      } else if (E === 0) {
+      } else if (notWall.includes(E)) {
         if (W === 3) {
           return <DoubleWall />;
         } else {
@@ -385,14 +372,14 @@ function defineComponent(row: number, col: number) {
           return <DoubleWall rotation={270} mirrored={true} />;
         }
         // Top wall
-      } else if (N === 0) {
+      } else if (notWall.includes(N)) {
         if (S === 3) {
           return <DoubleWall rotation={270} mirrored={true} />;
         } else {
           return <SingleWall rotation={90} />;
         }
         // Bottom wall
-      } else if (S === 0) {
+      } else if (notWall.includes(S)) {
         if (N === 3) {
           return <DoubleWall rotation={90} />;
         } else {

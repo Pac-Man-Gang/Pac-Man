@@ -11,8 +11,8 @@ export function initialPacman(
   return {
     pos: { x, y },
     sprite,
-    dir: Direction.N, // default facing East
-    movingDir: Direction.N,
+    dir: Direction.E, // default facing East
+    movingDir: Direction.E,
   };
 }
 
