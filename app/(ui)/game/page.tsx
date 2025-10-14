@@ -4,7 +4,7 @@ import localFont from 'next/font/local';
 import { useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
 import { Direction, GameState, Position } from '../../core/types';
-import EntityLayer from './Entitylayer';
+import EntityLayer from './EntityLayer';
 import MazeLayer from './MazeLayer';
 
 const BASE_W = 560;
