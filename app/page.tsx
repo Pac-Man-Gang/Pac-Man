@@ -20,6 +20,7 @@ export default function HomePage() {
   const [buttonVisibility, setButtonVisibility] = useState<
     'visible' | 'hidden'
   >('hidden');
+  const [isPressed, setIsPressed] = useState(false);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -58,6 +59,7 @@ export default function HomePage() {
           alt="Pacman's Rogue Logo"
           style={{ width: `${titleWidth}px` }}
         />
+
         <Link
           href="/game"
           aria-label="Start game"
@@ -65,21 +67,21 @@ export default function HomePage() {
             display: 'inline-block',
             outline: 'none',
             borderRadius: '12px',
-            transition: 'transform 120ms ease, filter 120ms ease',
             visibility: `${buttonVisibility}`,
+            transition: 'transform 80ms ease, filter 120ms ease',
           }}
-          onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
-          onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-          onFocus={(e) =>
-            (e.currentTarget.style.filter =
-              'drop-shadow(0 0 8px rgba(255,255,255,.5))')
-          }
+          onMouseDown={() => setIsPressed(true)}
+          onMouseUp={() => setIsPressed(false)}
+          onMouseLeave={() => setIsPressed(false)}
           onBlur={(e) => (e.currentTarget.style.filter = 'none')}
         >
           <Image
-            src="/assets/hud/play.png"
-            alt=""
+            src={
+              isPressed
+                ? '/assets/hud/playbutton_pressed.png'
+                : '/assets/hud/playbutton.png'
+            }
+            alt="Play button"
             width={300}
             height={96}
             priority
@@ -87,6 +89,8 @@ export default function HomePage() {
               display: 'block',
               cursor: 'pointer',
               borderRadius: '12px',
+              userSelect: 'none',
+              transform: isPressed ? 'translateY(2px)' : 'translateY(0)',
             }}
           />
         </Link>
