@@ -169,7 +169,6 @@ function defineComponent(row: number, col: number) {
   const isW = W === 1;
   const isE = E === 1;
   const isNE = NE === 1;
-  const isNW = NW === 1;
   const isSE = SE === 1;
   const isSW = SW === 1;
 
@@ -400,7 +399,7 @@ function defineComponent(row: number, col: number) {
   }
 }
 
-import { memo, useEffect, useMemo } from 'react';
+import React, { memo, useEffect, useMemo } from 'react';
 
 type MazeLayerProps = { gameOver: boolean };
 
@@ -450,7 +449,7 @@ export const MazeLayer = memo(function MazeLayer({ gameOver }: MazeLayerProps) {
             <div
               key={key}
               className="maze-cell"
-              style={{ ['--delay' as any]: `${hideOrder.get(key) ?? 0}ms` }}
+              style={{ ['--delay']: `${hideOrder.get(key) ?? 0}ms` } as React.CSSProperties}
             >
               {defineComponent(r, c)}
             </div>

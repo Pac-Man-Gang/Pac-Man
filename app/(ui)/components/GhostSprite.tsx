@@ -6,7 +6,6 @@ type GhostSpriteProps = {
   ghost: GhostState;
   size?: number;
   tileSize?: number;
-  fps?: number;
 };
 
 const DIR_KEY: Record<Direction, 'N' | 'E' | 'S' | 'W'> = {
@@ -29,7 +28,6 @@ export default function GhostSprite({
   ghost,
   size = 32,
   tileSize = 20,
-  fps = 6,
 }: GhostSpriteProps) {
   const [timer, setTimer] = useState(0);
 
@@ -60,8 +58,7 @@ export default function GhostSprite({
         ? frightenedFrames[timer]
         : frames[timer];
 
-  //preload once
-  useEffect(() => frames.forEach((src) => (new window.Image().src = src)), []);
+  useEffect(() => frames.forEach((src) => (new window.Image().src = src)), [frames]);
 
   useEffect(() => {
     const intervalId = setInterval(() => setTimer((prev) => (prev === 0 ? 1 : 0)), 100);

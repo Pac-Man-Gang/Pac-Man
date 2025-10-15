@@ -1,9 +1,10 @@
 'use client';
 import { INITIAL_GAMESTATE, nextGameState } from '@/app/core/GameStateManager';
 import localFont from 'next/font/local';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
-import { Direction, GameState, Position } from '../../core/types';
+import { allGhostTypes, Direction, GameState, Position } from '../../core/types';
 import { getGhostSprite } from '../components/GhostSprite';
 import EntityLayer from './EntityLayer';
 import { MazeLayer } from './MazeLayer';
@@ -65,30 +66,29 @@ export default function GamePage() {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (gameOver) return;
       const dir = keyToDirection[e.key];
       if (dir !== undefined) setPlayerDir(dir);
     };
-    window.addEventListener('keydown', handleKey);
+    if (!gameOver) window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, []);
+  }, [gameOver]);
 
   const tick = () => {
     if (gameOver) return;
     const nextState = nextGameState(playerDir!);
     setGameState(nextState);
   };
-  useEffect(() => tick(), []);
+  useEffect(() => tick(), [tick]);
 
   useEffect(() => {
     window.addEventListener('tick', tick);
     return () => window.removeEventListener('tick', tick);
-  }, [playerDir]);
+  }, [tick]);
 
   useEffect(() => {
     const handleGameOver = () => {
       setGameOver(true);
-      gameState.ghosts.forEach((g, index) => setTimeout(() => getGhostSprite(g.type).style.visibility = 'hidden', index * 100));
+      allGhostTypes().forEach((gt, index) => setTimeout(() => getGhostSprite(gt).style.visibility = 'hidden', index * 100));
       setTimeout(() => setShowGameOverImage(true), 400);
     }
     window.addEventListener('gameOver', handleGameOver);
@@ -167,7 +167,7 @@ export default function GamePage() {
         ></EntityLayer>
 
         {showGameOverImage && (
-          <img
+          <Image
             src="/assets/hud/gameover.png" // adjust path
             alt="Game Over"
             style={{
