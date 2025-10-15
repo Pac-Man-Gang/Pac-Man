@@ -403,7 +403,7 @@ import React, { memo, useEffect, useMemo } from 'react';
 
 type MazeLayerProps = { gameOver: boolean };
 
-export const HIDE_MAZE_DELAY = 2500;
+export const HIDE_MAZE_DELAY = 2000;
 
 function buildHideOrder(rows: number, cols: number) {
   const cx = (cols - 1) / 2;

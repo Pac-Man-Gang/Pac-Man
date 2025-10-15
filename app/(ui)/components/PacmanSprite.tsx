@@ -15,6 +15,10 @@ export function getPacmanSprite() {
   return document.querySelector("[data-type='PacMan']")! as HTMLElement;
 }
 
+export function getPacmanArrow() {
+  return document.querySelector("[data-type='pacArrow']")! as HTMLElement;
+}
+
 export default function PacmanSprite({
   pacman,
   uiPlayerDir,
@@ -139,6 +143,7 @@ export default function PacmanSprite({
           <Image
             src="/assets/pacman/facingArrow.png"
             alt="ARROW"
+            data-type='pacArrow'
             width={size}
             height={size}
             style={{ imageRendering: 'pixelated' }}

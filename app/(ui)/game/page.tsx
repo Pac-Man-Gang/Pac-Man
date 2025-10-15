@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
 import { allGhostTypes, Direction, GameState, Position } from '../../core/types';
 import { getGhostSprite } from '../components/GhostSprite';
+import { getPacmanArrow } from '../components/PacmanSprite';
 import EntityLayer from './EntityLayer';
 import { MazeLayer } from './MazeLayer';
 
@@ -75,21 +76,21 @@ export default function GamePage() {
 
   const tick = () => {
     if (gameOver) return;
-    const nextState = nextGameState(playerDir!);
-    setGameState(nextState);
+    setGameState(nextGameState(playerDir!));
   };
-  useEffect(() => tick(), [tick]);
+  useEffect(() => tick(), []);
 
   useEffect(() => {
     window.addEventListener('tick', tick);
     return () => window.removeEventListener('tick', tick);
-  }, [tick]);
+  }, [playerDir]);
 
   useEffect(() => {
     const handleGameOver = () => {
       setGameOver(true);
       allGhostTypes().forEach((gt, index) => setTimeout(() => getGhostSprite(gt).style.visibility = 'hidden', index * 100));
-      setTimeout(() => setShowGameOverImage(true), 400);
+      getPacmanArrow().style.visibility = 'hidden';
+      setTimeout(() => setShowGameOverImage(true), 2500);
     }
     window.addEventListener('gameOver', handleGameOver);
     return () => window.removeEventListener('gameOver', handleGameOver);
@@ -170,13 +171,14 @@ export default function GamePage() {
           <Image
             src="/assets/hud/gameover.png" // adjust path
             alt="Game Over"
+            width={500}
+            height={300}
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
               zIndex: 20, // above ghosts & maze, below popups if needed
-              width: 500, // tweak for your layout
               opacity: 0,
               animation: 'fadeIn 1s ease forwards',
               pointerEvents: 'none',

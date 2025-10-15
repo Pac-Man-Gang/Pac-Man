@@ -56,7 +56,8 @@ export default function HomePage() {
         <Image
           src="/assets/hud/title.png"
           alt="Pacman's Rogue Logo"
-          style={{ width: `${titleWidth}px` }}
+          width={titleWidth}
+          height={0}
         />
         <Link
           href="/game"
