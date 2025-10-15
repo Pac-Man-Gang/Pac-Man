@@ -115,7 +115,7 @@ function shortestPath(paths: Position[], targetPoint: Position): Position {
   return paths.reduce(
     (bestPath, currentPath) =>
       euclideanDistance(currentPath, targetPoint) <
-        euclideanDistance(bestPath, targetPoint)
+      euclideanDistance(bestPath, targetPoint)
         ? currentPath
         : bestPath,
     paths[0]
@@ -159,7 +159,10 @@ function nextMode(gameState: GameState, ghost: GhostState): GhostMode {
     frightenedModeEnteredTimestamp = Date.now();
     return GhostMode.FRIGHTENED;
   }
-  if (ghost.mode === GhostMode.FRIGHTENED && spritesOverlapping(getPacmanSprite(), getGhostSprite(ghost.type)))
+  if (
+    ghost.mode === GhostMode.FRIGHTENED &&
+    spritesOverlapping(getPacmanSprite(), getGhostSprite(ghost.type))
+  )
     return GhostMode.EATEN;
   if (
     ghost.mode === GhostMode.FRIGHTENED &&

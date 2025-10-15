@@ -73,8 +73,8 @@ export default function HomePage() {
           onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
           onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
           onFocus={(e) =>
-          (e.currentTarget.style.filter =
-            'drop-shadow(0 0 8px rgba(255,255,255,.5))')
+            (e.currentTarget.style.filter =
+              'drop-shadow(0 0 8px rgba(255,255,255,.5))')
           }
           onBlur={(e) => (e.currentTarget.style.filter = 'none')}
         >

@@ -4,7 +4,12 @@ import localFont from 'next/font/local';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
-import { allGhostTypes, Direction, GameState, Position } from '../../core/types';
+import {
+  allGhostTypes,
+  Direction,
+  GameState,
+  Position,
+} from '../../core/types';
 import { getGhostSprite } from '../components/GhostSprite';
 import { getPacmanArrow } from '../components/PacmanSprite';
 import EntityLayer from './EntityLayer';
@@ -182,7 +187,7 @@ export default function GamePage() {
               opacity: 0,
               animation: 'fadeIn 1s ease forwards',
               pointerEvents: 'none',
-              imageRendering: 'pixelated'
+              imageRendering: 'pixelated',
             }}
           />
         )}

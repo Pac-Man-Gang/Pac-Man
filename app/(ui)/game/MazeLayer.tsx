@@ -409,7 +409,13 @@ function buildHideOrder(rows: number, cols: number) {
   const cx = (cols - 1) / 2;
   const cy = (rows - 1) / 2;
 
-  type Item = { key: string; r: number; c: number; layer: number; angle: number };
+  type Item = {
+    key: string;
+    r: number;
+    c: number;
+    layer: number;
+    angle: number;
+  };
   const items: Item[] = [];
 
   for (let r = 0; r < rows; r++) {
@@ -421,14 +427,15 @@ function buildHideOrder(rows: number, cols: number) {
     }
   }
 
-  items.sort((a, b) => (a.layer - b.layer) || (a.angle - b.angle));
+  items.sort((a, b) => a.layer - b.layer || a.angle - b.angle);
 
   // Accelerating delay: later tiles have smaller increments
   const order = new Map<string, number>();
   const n = items.length;
   items.forEach((it, i) => {
     const progress = i / n;
-    const delay = (Math.exp(progress * 3) - 1) / (Math.exp(3) - 1) * HIDE_MAZE_DELAY;
+    const delay =
+      ((Math.exp(progress * 3) - 1) / (Math.exp(3) - 1)) * HIDE_MAZE_DELAY;
     order.set(it.key, delay);
   });
   return order;
@@ -449,11 +456,14 @@ export const MazeLayer = memo(function MazeLayer({ gameOver }: MazeLayerProps) {
             <div
               key={key}
               className="maze-cell"
-              style={{ ['--delay']: `${hideOrder.get(key) ?? 0}ms` } as React.CSSProperties}
+              style={
+                {
+                  ['--delay']: `${hideOrder.get(key) ?? 0}ms`,
+                } as React.CSSProperties
+              }
             >
               {defineComponent(r, c)}
             </div>
-
           );
         })
       ),
