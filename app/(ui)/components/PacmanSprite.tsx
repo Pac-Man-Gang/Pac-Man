@@ -59,7 +59,7 @@ export default function PacmanSprite({
     return () => {
       clearInterval(id);
       window.removeEventListener('gameOver', handleGameOver);
-    }
+    };
   }, [fps]);
 
   useEffect(() => {

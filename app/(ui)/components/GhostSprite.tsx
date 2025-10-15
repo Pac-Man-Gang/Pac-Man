@@ -58,16 +58,22 @@ export default function GhostSprite({
         ? frightenedFrames[timer]
         : frames[timer];
 
-  useEffect(() => frames.forEach((src) => (new window.Image().src = src)), [frames]);
+  useEffect(
+    () => frames.forEach((src) => (new window.Image().src = src)),
+    [frames]
+  );
 
   useEffect(() => {
-    const intervalId = setInterval(() => setTimer((prev) => (prev === 0 ? 1 : 0)), 100);
+    const intervalId = setInterval(
+      () => setTimer((prev) => (prev === 0 ? 1 : 0)),
+      100
+    );
     const handleGameOver = () => clearInterval(intervalId);
     window.addEventListener('gameOver', handleGameOver);
     return () => {
       clearInterval(intervalId);
       window.removeEventListener('gameOver', handleGameOver);
-    }
+    };
   }, []);
 
   const xPixel = Math.round(ghost.pos.x * tileSize + (tileSize - size) / 2);

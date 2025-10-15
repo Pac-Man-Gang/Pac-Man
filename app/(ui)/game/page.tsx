@@ -4,7 +4,12 @@ import localFont from 'next/font/local';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
-import { allGhostTypes, Direction, GameState, Position } from '../../core/types';
+import {
+  allGhostTypes,
+  Direction,
+  GameState,
+  Position,
+} from '../../core/types';
 import { getGhostSprite } from '../components/GhostSprite';
 import EntityLayer from './EntityLayer';
 import { MazeLayer } from './MazeLayer';
@@ -88,9 +93,14 @@ export default function GamePage() {
   useEffect(() => {
     const handleGameOver = () => {
       setGameOver(true);
-      allGhostTypes().forEach((gt, index) => setTimeout(() => getGhostSprite(gt).style.visibility = 'hidden', index * 100));
+      allGhostTypes().forEach((gt, index) =>
+        setTimeout(
+          () => (getGhostSprite(gt).style.visibility = 'hidden'),
+          index * 100
+        )
+      );
       setTimeout(() => setShowGameOverImage(true), 400);
-    }
+    };
     window.addEventListener('gameOver', handleGameOver);
     return () => window.removeEventListener('gameOver', handleGameOver);
   }, []);
@@ -180,7 +190,7 @@ export default function GamePage() {
               opacity: 0,
               animation: 'fadeIn 1s ease forwards',
               pointerEvents: 'none',
-              imageRendering: 'pixelated'
+              imageRendering: 'pixelated',
             }}
           />
         )}

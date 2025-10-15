@@ -24,10 +24,10 @@ export function spritesOverlapping(sprite1: Element, sprite2: Element) {
   const shrinkHitbox = 3;
 
   return !(
-    (rect1.right - shrinkHitbox) < (rect2.left + shrinkHitbox) ||
-    (rect1.left + shrinkHitbox) > (rect2.right - shrinkHitbox) ||
-    (rect1.bottom - shrinkHitbox) < (rect2.top + shrinkHitbox) ||
-    (rect1.top + shrinkHitbox) > (rect2.bottom - shrinkHitbox)
+    rect1.right - shrinkHitbox < rect2.left + shrinkHitbox ||
+    rect1.left + shrinkHitbox > rect2.right - shrinkHitbox ||
+    rect1.bottom - shrinkHitbox < rect2.top + shrinkHitbox ||
+    rect1.top + shrinkHitbox > rect2.bottom - shrinkHitbox
   );
 }
 
@@ -46,7 +46,7 @@ export function nextGameState(playerDir: Direction): GameState {
     (ghost) =>
       ghost.mode === GhostMode.EATEN &&
       prevGameState.ghosts.find((g) => g.type === ghost.type)!.mode !==
-      GhostMode.EATEN
+        GhostMode.EATEN
   );
   if (eatenGhost) {
     const ghostSpritePos = calcPixelPos(
@@ -64,8 +64,12 @@ export function nextGameState(playerDir: Direction): GameState {
     addScore(200);
   } else {
     const overlappingGhost = nextGameState.ghosts
-      .filter((g) => g.mode !== GhostMode.FRIGHTENED && g.mode !== GhostMode.EATEN)
-      .find((g) => spritesOverlapping(getPacmanSprite(), getGhostSprite(g.type)));
+      .filter(
+        (g) => g.mode !== GhostMode.FRIGHTENED && g.mode !== GhostMode.EATEN
+      )
+      .find((g) =>
+        spritesOverlapping(getPacmanSprite(), getGhostSprite(g.type))
+      );
     if (overlappingGhost && !invincible) {
       nextGameState.lives -= 1;
       if (nextGameState.lives <= 0) {
@@ -73,7 +77,7 @@ export function nextGameState(playerDir: Direction): GameState {
         return prevGameState;
       }
       invincible = true;
-      setTimeout(() => invincible = false, INVINCIBLE_MS);
+      setTimeout(() => (invincible = false), INVINCIBLE_MS);
       window.dispatchEvent(new CustomEvent('pacHit'));
     }
   }
