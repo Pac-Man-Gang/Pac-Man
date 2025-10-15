@@ -93,10 +93,15 @@ export default function GamePage() {
   useEffect(() => {
     const handleGameOver = () => {
       setGameOver(true);
-      allGhostTypes().forEach((gt, index) => setTimeout(() => getGhostSprite(gt).style.visibility = 'hidden', index * 100));
+      allGhostTypes().forEach((gt, index) =>
+        setTimeout(
+          () => (getGhostSprite(gt).style.visibility = 'hidden'),
+          index * 100
+        )
+      );
       getPacmanArrow().style.visibility = 'hidden';
       setTimeout(() => setShowGameOverImage(true), 2500);
-    }
+    };
     window.addEventListener('gameOver', handleGameOver);
     return () => window.removeEventListener('gameOver', handleGameOver);
   }, []);

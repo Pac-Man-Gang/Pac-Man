@@ -143,7 +143,7 @@ export default function PacmanSprite({
           <Image
             src="/assets/pacman/facingArrow.png"
             alt="ARROW"
-            data-type='pacArrow'
+            data-type="pacArrow"
             width={size}
             height={size}
             style={{ imageRendering: 'pixelated' }}
