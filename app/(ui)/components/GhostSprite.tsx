@@ -22,7 +22,7 @@ const frightenedFrames = [
 ];
 
 export function getGhostSprite(ghostType: GhostType) {
-  return document.querySelector(`[data-type='${ghostType}']`)!;
+  return document.querySelector(`[data-type='${ghostType}']`)! as HTMLElement;
 }
 
 export default function GhostSprite({
@@ -64,9 +64,14 @@ export default function GhostSprite({
   useEffect(() => frames.forEach((src) => (new window.Image().src = src)), []);
 
   useEffect(() => {
-    const intervalId = setInterval(() => setTimer((t) => (t === 0 ? 1 : 0)));
-    return () => clearInterval(intervalId);
-  }, [frames]);
+    const intervalId = setInterval(() => setTimer((prev) => (prev === 0 ? 1 : 0)), 100);
+    const handleGameOver = () => clearInterval(intervalId);
+    window.addEventListener('gameOver', handleGameOver);
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('gameOver', handleGameOver);
+    }
+  }, []);
 
   const xPixel = Math.round(ghost.pos.x * tileSize + (tileSize - size) / 2);
   const yPixel = Math.round(ghost.pos.y * tileSize + (tileSize - size) / 2);

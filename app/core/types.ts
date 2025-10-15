@@ -1,4 +1,8 @@
 export type Position = { x: number; y: number };
+
+export function allDirections(): Direction[] {
+  return [Direction.N, Direction.W, Direction.S, Direction.E];
+}
 export enum Direction {
   N,
   S,
@@ -17,6 +21,10 @@ export enum GhostMode {
   SCATTER,
   FRIGHTENED,
   EATEN,
+}
+
+export function allGhostTypes(): GhostType[] {
+  return [GhostType.BLINKY, GhostType.PINKY, GhostType.INKY, GhostType.CLYDE];
 }
 export enum GhostType {
   BLINKY,
