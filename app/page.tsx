@@ -54,7 +54,7 @@ export default function HomePage() {
           backgroundColor: 'transparent',
         }}
       >
-        <img
+        <Image
           src="/assets/hud/title.png"
           alt="Pacman's Rogue Logo"
           style={{ width: `${titleWidth}px` }}
