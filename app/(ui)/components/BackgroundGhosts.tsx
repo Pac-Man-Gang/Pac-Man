@@ -61,7 +61,7 @@ export default function BackgroundGhosts({
   fps = 6,
   opacity = 0.9,
 }: Props) {
-  // simple 2-frame eye/leg flap
+  // simple 2 frame eye/leg flap
   const [frame, setFrame] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setFrame((f) => (f ? 0 : 1)), 1000 / fps);
