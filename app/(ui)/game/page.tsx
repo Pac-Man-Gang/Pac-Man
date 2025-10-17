@@ -247,7 +247,7 @@ export default function GamePage() {
             zIndex: 999, // make sure it's above everything
             display: 'grid',
             justifyItems: 'center',
-            rowGap: 40, // space between image & button
+            rowGap: 80, // space between image & button
             pointerEvents: 'auto',
           }}
         >
