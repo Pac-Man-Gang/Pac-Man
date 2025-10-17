@@ -83,7 +83,11 @@ export default function GamePage() {
     if (gameOver) return;
     setGameState(nextGameState(playerDir!));
   }, [gameOver, playerDir]);
-  useEffect(() => tick(), [tick]);
+
+  useEffect(() => {
+    tick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     window.addEventListener('tick', tick);
