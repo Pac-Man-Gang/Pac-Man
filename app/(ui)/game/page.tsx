@@ -49,6 +49,7 @@ const motivationalTexts = [
   'Is this how you spend your free time?',
   'What are you trying to prove?',
   'Every retry brings you closer to... nothing',
+  'This gameplay has to be ragebait',
 ];
 let motivationalText = '';
 
