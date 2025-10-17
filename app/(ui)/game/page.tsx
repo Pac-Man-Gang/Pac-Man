@@ -285,8 +285,8 @@ export default function GamePage() {
               <Image
                 src={
                   playAgainButtonPressed
-                    ? '/assets/hud/playagainbutton_pressed.png'
-                    : '/assets/hud/playagainbutton.png'
+                    ? '/assets/hud/tryagainbutton_pressed.png'
+                    : '/assets/hud/tryagainbutton.png'
                 }
                 alt="Play button"
                 width={300}
