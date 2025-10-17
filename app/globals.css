@@ -48,6 +48,7 @@ body {
 
 /* e.g. styles.module.css */
 @keyframes pacman-flash {
+
   0%,
   100% {
     opacity: 1;
@@ -96,5 +97,11 @@ body {
   to {
     opacity: 1;
     transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes gameoverFade {
+  to {
+    opacity: 1;
   }
 }
