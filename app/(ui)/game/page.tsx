@@ -30,7 +30,7 @@ const aubreyFont = localFont({
   src: '../../../public/fonts/Jacquard.ttf',
   weight: '400',
   style: 'normal',
-  display: 'swap'
+  display: 'swap',
 });
 
 export type PopupBean = {
@@ -48,8 +48,8 @@ const motivationalTexts = [
   'Each death tells me a little more about you',
   'Is this how you spend your free time?',
   'What are you trying to prove?',
-  'Every retry brings you closer to... nothing'
-]
+  'Every retry brings you closer to... nothing',
+];
 let motivationalText = '';
 
 export function calcPixelPos(rect: DOMRect): Position {
@@ -128,7 +128,8 @@ export default function GamePage() {
         )
       );
       getPacmanArrow().style.visibility = 'hidden';
-      motivationalText = motivationalTexts[Math.floor(Math.random() * motivationalTexts.length)];
+      motivationalText =
+        motivationalTexts[Math.floor(Math.random() * motivationalTexts.length)];
       setTimeout(() => setShowGameOverImage(true), 2750);
     };
     window.addEventListener('gameOver', handleGameOver);
@@ -239,14 +240,14 @@ export default function GamePage() {
       {showGameOverImage && (
         <div
           style={{
-            position: 'fixed',      // 👈 independent of board scaling
+            position: 'fixed', // 👈 independent of board scaling
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%)',
-            zIndex: 999,            // make sure it's above everything
+            zIndex: 999, // make sure it's above everything
             display: 'grid',
             justifyItems: 'center',
-            rowGap: 40,             // space between image & button
+            rowGap: 40, // space between image & button
             pointerEvents: 'auto',
           }}
         >
@@ -297,7 +298,9 @@ export default function GamePage() {
                   cursor: 'pointer',
                   borderRadius: '12px',
                   userSelect: 'none',
-                  transform: playAgainButtonPressed ? 'translateY(2px)' : 'translateY(0)',
+                  transform: playAgainButtonPressed
+                    ? 'translateY(2px)'
+                    : 'translateY(0)',
                   opacity: 0,
                   animation: 'gameoverFade 0.5s ease forwards',
                 }}
@@ -311,13 +314,13 @@ export default function GamePage() {
         <div
           className={aubreyFont.className}
           style={{
-            position: 'fixed',        // 👈 stays relative to viewport
-            bottom: 80,               // 👈 distance from bottom edge
-            left: 100,                 // 👈 distance from left edge
+            position: 'fixed', // 👈 stays relative to viewport
+            bottom: 80, // 👈 distance from bottom edge
+            left: 100, // 👈 distance from left edge
             pointerEvents: 'none',
             zIndex: 1000,
             fontSize: 34,
-            maxWidth: '40vw',         // optional line wrap
+            maxWidth: '40vw', // optional line wrap
             textAlign: 'left',
             opacity: 0,
             animation: 'gameoverFade 1s ease forwards',
@@ -327,7 +330,6 @@ export default function GamePage() {
           {motivationalText}
         </div>
       )}
-
     </main>
   );
 }
