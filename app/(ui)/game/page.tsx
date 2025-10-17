@@ -1,11 +1,19 @@
 'use client';
 import { INITIAL_GAMESTATE, nextGameState } from '@/app/core/GameStateManager';
 import localFont from 'next/font/local';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
-import { Direction, GameState, Position } from '../../core/types';
+import {
+  allGhostTypes,
+  Direction,
+  GameState,
+  Position,
+} from '../../core/types';
+import { getGhostSprite } from '../components/GhostSprite';
+import { getPacmanArrow } from '../components/PacmanSprite';
 import EntityLayer from './EntityLayer';
-import MazeLayer from './MazeLayer';
+import { MazeLayer } from './MazeLayer';
 
 const BASE_W = 560;
 const BASE_H = 620;
@@ -39,6 +47,8 @@ export function calcPixelPos(rect: DOMRect): Position {
 }
 
 export default function GamePage() {
+  const [gameOver, setGameOver] = useState(false);
+  const [showGameOverImage, setShowGameOverImage] = useState(false);
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAMESTATE);
   const [playerDir, setPlayerDir] = useState<Direction | undefined>(undefined);
 
@@ -65,18 +75,36 @@ export default function GamePage() {
       const dir = keyToDirection[e.key];
       if (dir !== undefined) setPlayerDir(dir);
     };
-
-    window.addEventListener('keydown', handleKey);
+    if (!gameOver) window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, []);
+  }, [gameOver]);
 
-  const tick = () => setGameState(nextGameState(playerDir!));
+  const tick = () => {
+    if (gameOver) return;
+    setGameState(nextGameState(playerDir!));
+  };
   useEffect(() => tick(), []);
 
   useEffect(() => {
     window.addEventListener('tick', tick);
     return () => window.removeEventListener('tick', tick);
   }, [playerDir]);
+
+  useEffect(() => {
+    const handleGameOver = () => {
+      setGameOver(true);
+      allGhostTypes().forEach((gt, index) =>
+        setTimeout(
+          () => (getGhostSprite(gt).style.visibility = 'hidden'),
+          index * 100
+        )
+      );
+      getPacmanArrow().style.visibility = 'hidden';
+      setTimeout(() => setShowGameOverImage(true), 2500);
+    };
+    window.addEventListener('gameOver', handleGameOver);
+    return () => window.removeEventListener('gameOver', handleGameOver);
+  }, []);
 
   useEffect(() => {
     const handler = (e: CustomEvent<PopupBean>) => {
@@ -88,12 +116,6 @@ export default function GamePage() {
       }, 1000);
     };
     window.addEventListener('newPopup', handler as EventListener);
-
-    window.dispatchEvent(
-      new CustomEvent<PopupBean>('newPopup', {
-        detail: { x: 100, y: 100, text: '200' },
-      })
-    );
     return () =>
       window.removeEventListener('newPopup', handler as EventListener);
   }, []);
@@ -123,6 +145,20 @@ export default function GamePage() {
       >
         SCORE: {gameState.score}
       </div>
+      <div
+        className={arcadeFont.className}
+        style={{
+          position: 'absolute',
+          top: 50,
+          left: '15%',
+          transform: 'translateX(-50%)',
+          pointerEvents: 'none',
+          zIndex: 2,
+          fontSize: 45,
+        }}
+      >
+        LIVES: {gameState.lives}
+      </div>
 
       <div
         className="board"
@@ -134,12 +170,32 @@ export default function GamePage() {
           transform: `scale(${scale})`,
         }}
       >
-        <MazeLayer></MazeLayer>
+        <MazeLayer gameOver={gameOver}></MazeLayer>
         <EntityLayer
           pacman={gameState.pacman}
           ghosts={gameState.ghosts}
           uiPlayerDir={playerDir}
         ></EntityLayer>
+
+        {showGameOverImage && (
+          <Image
+            src="/assets/hud/gameover.png" // adjust path
+            alt="Game Over"
+            width={500}
+            height={300}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 20, // above ghosts & maze, below popups if needed
+              opacity: 0,
+              animation: 'fadeIn 1s ease forwards',
+              pointerEvents: 'none',
+              imageRendering: 'pixelated',
+            }}
+          />
+        )}
 
         <div
           style={{

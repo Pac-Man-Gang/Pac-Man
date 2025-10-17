@@ -1,3 +1,4 @@
+import { INVINCIBLE_MS } from '@/app/core/GameStateManager';
 import { Direction, PacManState } from '@/app/core/types';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
@@ -11,7 +12,11 @@ type PacmanSpriteProps = {
 };
 
 export function getPacmanSprite() {
-  return document.querySelector("[data-type='PacMan']")!;
+  return document.querySelector("[data-type='PacMan']")! as HTMLElement;
+}
+
+export function getPacmanArrow() {
+  return document.querySelector("[data-type='pacArrow']")! as HTMLElement;
 }
 
 export default function PacmanSprite({
@@ -22,6 +27,8 @@ export default function PacmanSprite({
   fps = 8,
 }: PacmanSpriteProps) {
   const getPath = (frame: number) => `/assets/pacman/pacman${frame}.png`;
+
+  const [invincible, setInvincible] = useState(false);
   const [anim, setAnim] = useState<{ frame: number; opening: boolean }>({
     frame: 1,
     opening: true,
@@ -51,8 +58,27 @@ export default function PacmanSprite({
         return { frame: opening ? frame + 1 : frame - 1, opening };
       });
     }, 1000 / fps);
-    return () => clearInterval(id);
+    const handleGameOver = () => clearInterval(id);
+    window.addEventListener('gameOver', handleGameOver);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener('gameOver', handleGameOver);
+    };
   }, [fps]);
+
+  useEffect(() => {
+    const handleHit = () => {
+      setInvincible(true);
+    };
+    window.addEventListener('pacHit', handleHit);
+    return () => window.removeEventListener('pacHit', handleHit);
+  }, []);
+
+  useEffect(() => {
+    if (!invincible) return;
+    const t = setTimeout(() => setInvincible(false), INVINCIBLE_MS);
+    return () => clearTimeout(t);
+  }, [invincible]);
 
   const pacSrc = useMemo(() => getPath(anim.frame), [anim.frame]);
   const pacRotation = dirToRotation(pacman.movingDir);
@@ -94,6 +120,7 @@ export default function PacmanSprite({
           }}
         >
           <Image
+            className={invincible ? 'flashOnHit' : ''}
             data-type="PacMan"
             src={pacSrc}
             alt="PACMAN"
@@ -116,6 +143,7 @@ export default function PacmanSprite({
           <Image
             src="/assets/pacman/facingArrow.png"
             alt="ARROW"
+            data-type="pacArrow"
             width={size}
             height={size}
             style={{ imageRendering: 'pixelated' }}
