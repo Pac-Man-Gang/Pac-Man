@@ -2,7 +2,7 @@
 import { INITIAL_GAMESTATE, nextGameState } from '@/app/core/GameStateManager';
 import localFont from 'next/font/local';
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
 import {
   allGhostTypes,
@@ -79,16 +79,20 @@ export default function GamePage() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [gameOver]);
 
-  const tick = () => {
+  const tick = useCallback(() => {
     if (gameOver) return;
     setGameState(nextGameState(playerDir!));
-  };
-  useEffect(() => tick(), []);
+  }, [gameOver, playerDir]);
+
+  useEffect(() => {
+    tick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     window.addEventListener('tick', tick);
     return () => window.removeEventListener('tick', tick);
-  }, [playerDir]);
+  }, [playerDir, tick, gameOver]);
 
   useEffect(() => {
     const handleGameOver = () => {
