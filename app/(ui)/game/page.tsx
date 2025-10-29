@@ -1,15 +1,13 @@
 'use client';
-import { INITIAL_GAMESTATE, nextGameState } from '@/app/core/GameStateManager';
+import { INITIAL_GAMESTATE } from '@/app/core/GameStateManager';
 import localFont from 'next/font/local';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { keyToDirection } from '../../core/pacman';
+import { useEffect, useRef, useState } from 'react';
 import {
   allGhostTypes,
-  Direction,
   GameState,
-  Position,
+  Position
 } from '../../core/types';
 import { getGhostSprite } from '../components/GhostSprite';
 import { getPacmanArrow } from '../components/PacmanSprite';
@@ -75,7 +73,6 @@ export default function GamePage() {
   const [playAgainButtonPressed, setPlayAgainButtonPressed] = useState(false);
 
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAMESTATE);
-  const [playerDir, setPlayerDir] = useState<Direction | undefined>(undefined);
 
   const [scale, setScale] = useState(1);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -94,30 +91,6 @@ export default function GamePage() {
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      const dir = keyToDirection[e.key];
-      if (dir !== undefined) setPlayerDir(dir);
-    };
-    if (!gameOver) window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [gameOver]);
-
-  const tick = useCallback(() => {
-    if (gameOver) return;
-    setGameState(nextGameState(playerDir!));
-  }, [gameOver, playerDir]);
-
-  useEffect(() => {
-    tick();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener('tick', tick);
-    return () => window.removeEventListener('tick', tick);
-  }, [playerDir, tick, gameOver]);
 
   useEffect(() => {
     const handleGameOver = () => {
@@ -204,8 +177,6 @@ export default function GamePage() {
         <MazeLayer gameOver={gameOver}></MazeLayer>
         <EntityLayer
           pacman={gameState.pacman}
-          ghosts={gameState.ghosts}
-          uiPlayerDir={playerDir}
         ></EntityLayer>
         <div
           style={{

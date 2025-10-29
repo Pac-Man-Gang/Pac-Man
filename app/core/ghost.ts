@@ -38,7 +38,7 @@ let frightenedModeEnteredTimestamp: number;
 // WARNING: HARDCODED
 const housePos = { x: 14, y: 14 };
 
-export function initalGhosts(): GhostState[] {
+export function initialGhosts(): GhostState[] {
   return [
     {
       pos: { x: 15, y: 14 },
@@ -71,11 +71,15 @@ export function initalGhosts(): GhostState[] {
   ];
 }
 
+export function getInitialGhost(type: GhostType) {
+  return initialGhosts().find((ghost) => ghost.type === type)!;
+}
+
 export function nextGhostStates(gameState: GameState): GhostState[] {
   return gameState.ghosts.map((ghost) => nextGhostState(gameState, ghost.type));
 }
 
-function nextGhostState(
+export function nextGhostState(
   gameState: GameState,
   ghostType: GhostType
 ): GhostState {
@@ -115,7 +119,7 @@ function shortestPath(paths: Position[], targetPoint: Position): Position {
   return paths.reduce(
     (bestPath, currentPath) =>
       euclideanDistance(currentPath, targetPoint) <
-      euclideanDistance(bestPath, targetPoint)
+        euclideanDistance(bestPath, targetPoint)
         ? currentPath
         : bestPath,
     paths[0]
