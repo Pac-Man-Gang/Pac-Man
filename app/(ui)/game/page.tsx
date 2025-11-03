@@ -1,12 +1,10 @@
 'use client';
-import { INITIAL_GAMESTATE } from '@/app/core/GameStateManager';
 import localFont from 'next/font/local';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import {
   allGhostTypes,
-  GameState,
   Position
 } from '../../core/types';
 import { getGhostSprite } from '../components/GhostSprite';
@@ -36,6 +34,10 @@ export type PopupBean = {
   y: number;
   text: string;
 };
+
+export type ScoreBean = {
+  score: number
+}
 
 const motivationalTexts = [
   'Seems to be a skill issue',
@@ -72,7 +74,8 @@ export default function GamePage() {
   const [showPlayAgainButton, setShowPlayAgainButton] = useState(false);
   const [playAgainButtonPressed, setPlayAgainButtonPressed] = useState(false);
 
-  const [gameState, setGameState] = useState<GameState>(INITIAL_GAMESTATE);
+  const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(3);
 
   const [scale, setScale] = useState(1);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -111,6 +114,21 @@ export default function GamePage() {
   }, []);
 
   useEffect(() => {
+    const handleAddScore = (e: CustomEvent<ScoreBean>) => {
+      const { score } = e.detail;
+      setScore(score);
+    }
+    window.addEventListener('addScore', handleAddScore as EventListener);
+    return () => window.removeEventListener('addScore', handleAddScore as EventListener);
+  }, []);
+
+  useEffect(() => {
+    const handlePacHit = () => setLives(lives - 1);
+    window.addEventListener('pacHit', handlePacHit);
+    return () => window.removeEventListener('addScore', handlePacHit);
+  }, [lives]);
+
+  useEffect(() => {
     const handler = (e: CustomEvent<PopupBean>) => {
       const { x, y, text } = e.detail;
       const id = Date.now();
@@ -147,7 +165,7 @@ export default function GamePage() {
           fontSize: 45,
         }}
       >
-        SCORE: {gameState.score}
+        SCORE: {score}
       </div>
       <div
         className={arcadeFont.className}
@@ -161,7 +179,7 @@ export default function GamePage() {
           fontSize: 45,
         }}
       >
-        LIVES: {gameState.lives}
+        LIVES: {lives}
       </div>
 
       <div
@@ -175,9 +193,7 @@ export default function GamePage() {
         }}
       >
         <MazeLayer gameOver={gameOver}></MazeLayer>
-        <EntityLayer
-          pacman={gameState.pacman}
-        ></EntityLayer>
+        <EntityLayer></EntityLayer>
         <div
           style={{
             position: 'absolute',

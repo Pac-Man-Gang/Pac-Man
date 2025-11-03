@@ -1,16 +1,8 @@
-import { allGhostTypes, Direction, PacManState } from '@/app/core/types';
+import { allGhostTypes } from '@/app/core/types';
 import GhostSprite from '../components/GhostSprite';
 import PacmanSprite from '../components/PacmanSprite';
 
-type GhostLayerProps = {
-  pacman: PacManState;
-  uiPlayerDir?: Direction;
-};
-
-export default function EntityLayer({
-  pacman,
-  uiPlayerDir,
-}: GhostLayerProps) {
+export default function EntityLayer() {
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 10 }}>
       <PacmanSprite />

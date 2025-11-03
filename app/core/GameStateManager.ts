@@ -1,7 +1,7 @@
 import { initialGhosts, nextGhostState, nextGhostStates } from '@/app/core/ghost';
 import { getGhostSprite } from '../(ui)/components/GhostSprite';
 import { getPacmanSprite } from '../(ui)/components/PacmanSprite';
-import { calcPixelPos, PopupBean } from '../(ui)/game/page';
+import { calcPixelPos, PopupBean, ScoreBean } from '../(ui)/game/page';
 import { initialPacman, nextPacManState } from './pacman';
 import { Direction, GameState, GhostMode, GhostState, GhostType } from './types';
 
@@ -118,13 +118,13 @@ export function nextGameState(playerDir: Direction): GameState {
       );
     if (overlappingGhost && !invincible) {
       nextGameState.lives -= 1;
+      window.dispatchEvent(new CustomEvent('pacHit'));
       if (nextGameState.lives <= 0) {
         window.dispatchEvent(new CustomEvent('gameOver'));
         return prevGameState;
       }
       invincible = true;
       setTimeout(() => (invincible = false), INVINCIBLE_MS);
-      window.dispatchEvent(new CustomEvent('pacHit'));
     }
   }
   gameStates.push(nextGameState);
@@ -137,4 +137,9 @@ export function previousGameState(): GameState {
 
 export function addScore(amount: number) {
   score += amount;
+  window.dispatchEvent(
+    new CustomEvent<ScoreBean>('addScore', {
+      detail: { score },
+    })
+  );
 }
