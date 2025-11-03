@@ -119,7 +119,7 @@ function shortestPath(paths: Position[], targetPoint: Position): Position {
   return paths.reduce(
     (bestPath, currentPath) =>
       euclideanDistance(currentPath, targetPoint) <
-        euclideanDistance(bestPath, targetPoint)
+      euclideanDistance(bestPath, targetPoint)
         ? currentPath
         : bestPath,
     paths[0]

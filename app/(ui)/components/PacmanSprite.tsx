@@ -27,7 +27,9 @@ export default function PacmanSprite({
 }: PacmanSpriteProps) {
   const getPath = (frame: number) => `/assets/pacman/pacman${frame}.png`;
 
-  const [pacmanState, setPacmanState] = useState<PacManState>(initialPacman(13, 23));
+  const [pacmanState, setPacmanState] = useState<PacManState>(
+    initialPacman(13, 23)
+  );
   const [playerDir, setPlayerDir] = useState<Direction | undefined>(undefined);
   const [pacIsStanding, setPacIsStanding] = useState(true);
   const [invincible, setInvincible] = useState(false);
@@ -57,7 +59,8 @@ export default function PacmanSprite({
     if (dir !== undefined) {
       if (pacIsStanding) {
         const newPacmanState = updatePacman(dir!);
-        if (!equalPos(pacmanState.pos, newPacmanState.pos)) setPacIsStanding(false);
+        if (!equalPos(pacmanState.pos, newPacmanState.pos))
+          setPacIsStanding(false);
         setPacmanState(newPacmanState);
       }
       setPlayerDir(dir);
@@ -82,7 +85,7 @@ export default function PacmanSprite({
       setGameOver(true);
       clearInterval(id);
       window.removeEventListener('keydown', handleKey);
-    }
+    };
     window.addEventListener('gameOver', handleGameOver);
     return () => {
       clearInterval(id);
@@ -97,8 +100,6 @@ export default function PacmanSprite({
     window.addEventListener('pacHit', handleHit);
     return () => window.removeEventListener('pacHit', handleHit);
   }, []);
-
-
 
   useEffect(() => {
     if (!invincible) return;
@@ -141,7 +142,8 @@ export default function PacmanSprite({
         onTransitionEnd={(e) => {
           if (e.propertyName === 'transform' && !gameOver) {
             const newPacmanState = updatePacman(playerDir!);
-            if (equalPos(pacmanState.pos, newPacmanState.pos)) setPacIsStanding(true);
+            if (equalPos(pacmanState.pos, newPacmanState.pos))
+              setPacIsStanding(true);
             setPacmanState(newPacmanState);
           }
         }}

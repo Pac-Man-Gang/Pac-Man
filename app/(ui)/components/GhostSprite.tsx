@@ -32,7 +32,9 @@ export default function GhostSprite({
   tileSize = 20,
 }: GhostSpriteProps) {
   const [timer, setTimer] = useState(0);
-  const [ghostState, setGhostState] = useState<GhostState>(getInitialGhost(ghostType));
+  const [ghostState, setGhostState] = useState<GhostState>(
+    getInitialGhost(ghostType)
+  );
   const [speed, setSpeed] = useState(0.2); // Seconds per Tile
 
   const baseName = useMemo(
@@ -63,8 +65,10 @@ export default function GhostSprite({
         : frames[timer];
 
   useEffect(() => {
-    if (ghostState.mode === GhostMode.FRIGHTENED && speed !== 0.4) setSpeed(0.4);
-    else if (ghostState.mode !== GhostMode.FRIGHTENED && speed !== 0.2) setSpeed(0.2);
+    if (ghostState.mode === GhostMode.FRIGHTENED && speed !== 0.4)
+      setSpeed(0.4);
+    else if (ghostState.mode !== GhostMode.FRIGHTENED && speed !== 0.2)
+      setSpeed(0.2);
   }, [ghostState]);
 
   useEffect(
@@ -87,8 +91,12 @@ export default function GhostSprite({
 
   useEffect(() => setGhostState(updateGhost(ghostType)), []);
 
-  const xPixel = Math.round(ghostState.pos.x * tileSize + (tileSize - size) / 2);
-  const yPixel = Math.round(ghostState.pos.y * tileSize + (tileSize - size) / 2);
+  const xPixel = Math.round(
+    ghostState.pos.x * tileSize + (tileSize - size) / 2
+  );
+  const yPixel = Math.round(
+    ghostState.pos.y * tileSize + (tileSize - size) / 2
+  );
 
   return (
     <div
@@ -101,7 +109,8 @@ export default function GhostSprite({
         willChange: 'transform',
       }}
       onTransitionEnd={(e) => {
-        if (e.propertyName === 'transform') setGhostState(updateGhost(ghostType));
+        if (e.propertyName === 'transform')
+          setGhostState(updateGhost(ghostType));
       }}
     >
       <Image
