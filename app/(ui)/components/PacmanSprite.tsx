@@ -35,6 +35,7 @@ export default function PacmanSprite({
     frame: 1,
     opening: true,
   });
+  const [gameOver, setGameOver] = useState(false);
 
   const dirToRotation = (dir: Direction): number => {
     return dir === Direction.N
@@ -63,9 +64,10 @@ export default function PacmanSprite({
     }
   };
   useEffect(() => {
+    if (gameOver) return;
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [playerDir]);
+  }, [pacIsStanding, pacmanState]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -77,6 +79,7 @@ export default function PacmanSprite({
       });
     }, 1000 / fps);
     const handleGameOver = () => {
+      setGameOver(true);
       clearInterval(id);
       window.removeEventListener('keydown', handleKey);
     }
@@ -136,7 +139,7 @@ export default function PacmanSprite({
           willChange: 'transform',
         }}
         onTransitionEnd={(e) => {
-          if (e.propertyName === 'transform') {
+          if (e.propertyName === 'transform' && !gameOver) {
             const newPacmanState = updatePacman(playerDir!);
             if (equalPos(pacmanState.pos, newPacmanState.pos)) setPacIsStanding(true);
             setPacmanState(newPacmanState);
