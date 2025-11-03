@@ -3,10 +3,7 @@ import localFont from 'next/font/local';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import {
-  allGhostTypes,
-  Position
-} from '../../core/types';
+import { allGhostTypes, Position } from '../../core/types';
 import { getGhostSprite } from '../components/GhostSprite';
 import { getPacmanArrow } from '../components/PacmanSprite';
 import EntityLayer from './EntityLayer';
@@ -36,8 +33,8 @@ export type PopupBean = {
 };
 
 export type ScoreBean = {
-  score: number
-}
+  score: number;
+};
 
 const motivationalTexts = [
   'Seems to be a skill issue',
@@ -117,9 +114,10 @@ export default function GamePage() {
     const handleAddScore = (e: CustomEvent<ScoreBean>) => {
       const { score } = e.detail;
       setScore(score);
-    }
+    };
     window.addEventListener('addScore', handleAddScore as EventListener);
-    return () => window.removeEventListener('addScore', handleAddScore as EventListener);
+    return () =>
+      window.removeEventListener('addScore', handleAddScore as EventListener);
   }, []);
 
   useEffect(() => {

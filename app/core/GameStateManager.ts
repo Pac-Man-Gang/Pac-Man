@@ -1,9 +1,19 @@
-import { initialGhosts, nextGhostState, nextGhostStates } from '@/app/core/ghost';
+import {
+  initialGhosts,
+  nextGhostState,
+  nextGhostStates,
+} from '@/app/core/ghost';
 import { getGhostSprite } from '../(ui)/components/GhostSprite';
 import { getPacmanSprite } from '../(ui)/components/PacmanSprite';
 import { calcPixelPos, PopupBean, ScoreBean } from '../(ui)/game/page';
 import { initialPacman, nextPacManState } from './pacman';
-import { Direction, GameState, GhostMode, GhostState, GhostType } from './types';
+import {
+  Direction,
+  GameState,
+  GhostMode,
+  GhostState,
+  GhostType,
+} from './types';
 
 export const INITIAL_GAMESTATE: GameState = {
   pacman: initialPacman(13, 23),
@@ -36,13 +46,25 @@ export function updateGhost(type: GhostType) {
   const prevGhostState = prevGameState.ghosts.find((g) => g.type === type)!;
   const newGhostState = nextGhostState(prevGameState, type);
 
-  let ghosts: GhostState[] = [];
-  prevGameState.ghosts.forEach((ghost) => ghosts.push(ghost.type === type ? newGhostState : ghost));
-  const nextGameState = { ghosts, pacman: prevGameState.pacman, score, lives: prevGameState.lives };
+  const ghosts: GhostState[] = [];
+  prevGameState.ghosts.forEach((ghost) =>
+    ghosts.push(ghost.type === type ? newGhostState : ghost)
+  );
+  const nextGameState = {
+    ghosts,
+    pacman: prevGameState.pacman,
+    score,
+    lives: prevGameState.lives,
+  };
 
-  if (newGhostState.mode === GhostMode.EATEN
-    && prevGameState.ghosts.find((g) => g.type === type)!.mode === GhostMode.FRIGHTENED) {
-    const ghostSpritePos = calcPixelPos(getGhostSprite(type).getBoundingClientRect());
+  if (
+    newGhostState.mode === GhostMode.EATEN &&
+    prevGameState.ghosts.find((g) => g.type === type)!.mode ===
+      GhostMode.FRIGHTENED
+  ) {
+    const ghostSpritePos = calcPixelPos(
+      getGhostSprite(type).getBoundingClientRect()
+    );
     window.dispatchEvent(
       new CustomEvent<PopupBean>('newPopup', {
         detail: {
@@ -53,8 +75,12 @@ export function updateGhost(type: GhostType) {
       })
     );
     addScore(200);
-  } else if (prevGhostState.mode !== GhostMode.FRIGHTENED && prevGhostState.mode !== GhostMode.EATEN
-    && spritesOverlapping(getPacmanSprite(), getGhostSprite(type)) && !invincible) {
+  } else if (
+    prevGhostState.mode !== GhostMode.FRIGHTENED &&
+    prevGhostState.mode !== GhostMode.EATEN &&
+    spritesOverlapping(getPacmanSprite(), getGhostSprite(type)) &&
+    !invincible
+  ) {
     nextGameState.lives -= 1;
     if (nextGameState.lives <= 0) {
       window.dispatchEvent(new CustomEvent('gameOver'));
@@ -73,7 +99,12 @@ export function updatePacman(dir: Direction) {
   const prevGameState = previousGameState();
 
   const newPacmanState = nextPacManState(prevGameState.pacman, dir);
-  gameStates.push({ ghosts: prevGameState.ghosts, pacman: newPacmanState, score, lives: prevGameState.lives });
+  gameStates.push({
+    ghosts: prevGameState.ghosts,
+    pacman: newPacmanState,
+    score,
+    lives: prevGameState.lives,
+  });
   return newPacmanState;
 }
 
@@ -92,7 +123,7 @@ export function nextGameState(playerDir: Direction): GameState {
     (ghost) =>
       ghost.mode === GhostMode.EATEN &&
       prevGameState.ghosts.find((g) => g.type === ghost.type)!.mode !==
-      GhostMode.EATEN
+        GhostMode.EATEN
   );
   if (eatenGhost) {
     const ghostSpritePos = calcPixelPos(

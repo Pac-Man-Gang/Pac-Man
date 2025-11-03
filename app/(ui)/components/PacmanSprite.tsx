@@ -3,7 +3,7 @@ import { initialPacman, keyToDirection } from '@/app/core/pacman';
 import { Direction, PacManState } from '@/app/core/types';
 import { equalPos } from '@/app/core/util/position';
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 type PacmanSpriteProps = {
   uiPlayerDir?: Direction;
@@ -27,7 +27,9 @@ export default function PacmanSprite({
 }: PacmanSpriteProps) {
   const getPath = (frame: number) => `/assets/pacman/pacman${frame}.png`;
 
-  const [pacmanState, setPacmanState] = useState<PacManState>(initialPacman(13, 23));
+  const [pacmanState, setPacmanState] = useState<PacManState>(
+    initialPacman(13, 23)
+  );
   const [playerDir, setPlayerDir] = useState<Direction | undefined>(undefined);
   const [pacIsStanding, setPacIsStanding] = useState(true);
   const [invincible, setInvincible] = useState(false);
@@ -52,22 +54,26 @@ export default function PacmanSprite({
     for (let i = 1; i <= 3; i++) new window.Image().src = getPath(i);
   }, []);
 
-  const handleKey = (e: KeyboardEvent) => {
-    const dir = keyToDirection[e.key];
-    if (dir !== undefined) {
-      if (pacIsStanding) {
-        const newPacmanState = updatePacman(dir!);
-        if (!equalPos(pacmanState.pos, newPacmanState.pos)) setPacIsStanding(false);
-        setPacmanState(newPacmanState);
+  const handleKey = useCallback(
+    (e: KeyboardEvent) => {
+      const dir = keyToDirection[e.key];
+      if (dir !== undefined) {
+        if (pacIsStanding) {
+          const newPacmanState = updatePacman(dir!);
+          if (!equalPos(pacmanState.pos, newPacmanState.pos))
+            setPacIsStanding(false);
+          setPacmanState(newPacmanState);
+        }
+        setPlayerDir(dir);
       }
-      setPlayerDir(dir);
-    }
-  };
+    },
+    [pacIsStanding, pacmanState]
+  );
   useEffect(() => {
     if (gameOver) return;
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [pacIsStanding, pacmanState]);
+  }, [pacIsStanding, pacmanState, gameOver, handleKey]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -82,13 +88,13 @@ export default function PacmanSprite({
       setGameOver(true);
       clearInterval(id);
       window.removeEventListener('keydown', handleKey);
-    }
+    };
     window.addEventListener('gameOver', handleGameOver);
     return () => {
       clearInterval(id);
       window.removeEventListener('gameOver', handleGameOver);
     };
-  }, [fps]);
+  }, [fps, handleKey]);
 
   useEffect(() => {
     const handleHit = () => {
@@ -97,8 +103,6 @@ export default function PacmanSprite({
     window.addEventListener('pacHit', handleHit);
     return () => window.removeEventListener('pacHit', handleHit);
   }, []);
-
-
 
   useEffect(() => {
     if (!invincible) return;
@@ -141,7 +145,8 @@ export default function PacmanSprite({
         onTransitionEnd={(e) => {
           if (e.propertyName === 'transform' && !gameOver) {
             const newPacmanState = updatePacman(playerDir!);
-            if (equalPos(pacmanState.pos, newPacmanState.pos)) setPacIsStanding(true);
+            if (equalPos(pacmanState.pos, newPacmanState.pos))
+              setPacIsStanding(true);
             setPacmanState(newPacmanState);
           }
         }}
