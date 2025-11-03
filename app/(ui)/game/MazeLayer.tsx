@@ -403,7 +403,7 @@ function buildHideOrder(rows: number, cols: number) {
 
   items.sort((a, b) => a.layer - b.layer || a.angle - b.angle);
 
-  // Accelerating delay: later tiles have smaller increments
+  // Accelerating delay: later tiles have smaller increments in delay
   const order = new Map<string, number>();
   const n = items.length;
   items.forEach((it, i) => {
