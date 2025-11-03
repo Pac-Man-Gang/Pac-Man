@@ -1,5 +1,6 @@
 // components/BackgroundGhosts.tsx
 'use client';
+import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 type Dir = 'left' | 'right';
@@ -60,7 +61,7 @@ export default function BackgroundGhosts({
   fps = 6,
   opacity = 0.9,
 }: Props) {
-  // simple 2-frame eye/leg flap
+  // simple 2 frame eye/leg flap
   const [frame, setFrame] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setFrame((f) => (f ? 0 : 1)), 1000 / fps);
@@ -167,7 +168,7 @@ export default function BackgroundGhosts({
               opacity: 0, // fades to target in keyframes
             }}
           >
-            <img
+            <Image
               src={src}
               alt=""
               width={g.size}

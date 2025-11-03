@@ -1,5 +1,6 @@
 // components/BackgroundPacman.tsx
 'use client';
+import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 type Dir = 'left' | 'right';
@@ -171,7 +172,7 @@ export default function BackgroundPacman({
               opacity: 0, // fades to target in keyframes
             }}
           >
-            <img
+            <Image
               src={src}
               alt=""
               width={p.size}

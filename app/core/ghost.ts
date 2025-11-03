@@ -6,7 +6,9 @@ import {
   getSuperPelletSprite,
 } from '../(ui)/components/SuperPelletSprite';
 import { initialPelletAmount, LEVEL_MAP } from '../(ui)/game/MazeLayer';
+import { spritesOverlapping } from './GameStateManager';
 import {
+  allDirections,
   Direction,
   GameState,
   GhostMode,
@@ -16,6 +18,7 @@ import {
   Position,
 } from './types';
 import { equalPos, posAt, tileIsFree } from './util/position';
+
 /*
     WARNINGS
     - targetPoints can be outside the maze or on walls
@@ -156,8 +159,10 @@ function nextMode(gameState: GameState, ghost: GhostState): GhostMode {
     frightenedModeEnteredTimestamp = Date.now();
     return GhostMode.FRIGHTENED;
   }
-  //if (ghost.mode === GhostMode.FRIGHTENED && (equalPos(gameState.pacman.pos, ghost.pos) || equalPos(previousGameState().pacman.pos, ghost.pos))) return GhostMode.EATEN;
-  if (ghost.mode === GhostMode.FRIGHTENED && overlappingWithPacman(ghost.type))
+  if (
+    ghost.mode === GhostMode.FRIGHTENED &&
+    spritesOverlapping(getPacmanSprite(), getGhostSprite(ghost.type))
+  )
     return GhostMode.EATEN;
   if (
     ghost.mode === GhostMode.FRIGHTENED &&
@@ -276,24 +281,7 @@ function pacmanAteSuperPellet(pacman: PacManState): boolean {
   return getSuperPelletSprite(pacman.pos.y, pacman.pos.x) !== null;
 }
 
-function overlappingWithPacman(ghostType: GhostType): boolean {
-  const pacman = getPacmanSprite().getBoundingClientRect();
-  const ghost = getGhostSprite(ghostType).getBoundingClientRect();
-
-  return !(
-    pacman.right < ghost.left ||
-    pacman.left > ghost.right ||
-    pacman.bottom < ghost.top ||
-    pacman.top > ghost.bottom
-  );
-}
-
 // Util functions -------------------------------------------
-
-// Dir Utils -----------
-function allDirections(): Direction[] {
-  return [Direction.N, Direction.W, Direction.S, Direction.E];
-}
 
 function reverseDirection(dir: Direction): Direction {
   return dir === Direction.N

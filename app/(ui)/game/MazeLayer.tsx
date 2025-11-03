@@ -88,6 +88,7 @@ class MazeComponent {
   neighbours: Record<string, number | undefined>;
   isNeighbourWall: Record<string, boolean>;
 
+
   constructor(row: number, col: number) {
     this.row = row;
     this.col = col;
@@ -103,6 +104,7 @@ class MazeComponent {
     this.type = this.defineComponentType();
     this.component = this.defineComponent();
   }
+
 
   defineComponent(): ReactElement {
     switch (this.type) {
@@ -358,20 +360,78 @@ class MazeComponent {
   }
 }
 
+
 export let initialPelletAmount = 0;
 
 import { memo, ReactElement, useEffect, useMemo } from 'react';
 
-const MazeLayer = memo(function MazeLayer() {
-  // compute once inside Maze, not on every GamePage render
+type MazeLayerProps = { gameOver: boolean };
+
+export const HIDE_MAZE_DELAY = 2000;
+
+function buildHideOrder(rows: number, cols: number) {
+  const cx = (cols - 1) / 2;
+  const cy = (rows - 1) / 2;
+
+  type Item = {
+    key: string;
+    r: number;
+    c: number;
+    layer: number;
+    angle: number;
+  };
+  const items: Item[] = [];
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const layer = Math.min(r, c, rows - 1 - r, cols - 1 - c);
+      const angle = Math.atan2(r - cy, c - cx);
+      const angleNorm = (angle + Math.PI * 2) % (Math.PI * 2);
+      items.push({ key: `${r}-${c}`, r, c, layer, angle: angleNorm });
+    }
+  }
+
+  items.sort((a, b) => a.layer - b.layer || a.angle - b.angle);
+
+  // Accelerating delay: later tiles have smaller increments
+  const order = new Map<string, number>();
+  const n = items.length;
+  items.forEach((it, i) => {
+    const progress = i / n;
+    const delay =
+      ((Math.exp(progress * 3) - 1) / (Math.exp(3) - 1)) * HIDE_MAZE_DELAY;
+    order.set(it.key, delay);
+  });
+  return order;
+}
+
+export const MazeLayer = memo(function MazeLayer({ gameOver }: MazeLayerProps) {
+  const rows = LEVEL_MAP.length;
+  const cols = LEVEL_MAP[0].length;
+
+  const hideOrder = useMemo(() => buildHideOrder(rows, cols), [rows, cols]);
+
   const cells = useMemo(
     () =>
       LEVEL_MAP.flatMap((row, r) =>
-        row.map((_, c) => (
-          <div key={`${r}-${c}`}>{new MazeComponent(r, c).component}</div>
-        ))
+        row.map((_, c) => {
+          const key = `${r}-${c}`;
+          return (
+            <div
+              key={key}
+              className="maze-cell"
+              style={
+                {
+                  ['--delay']: `${hideOrder.get(key) ?? 0}ms`,
+                } as React.CSSProperties
+              }
+            >
+              {new MazeComponent(r, c).component}
+            </div>
+          );
+        })
       ),
-    []
+    [hideOrder]
   );
 
   useEffect(() => {
@@ -381,7 +441,7 @@ const MazeLayer = memo(function MazeLayer() {
 
   return (
     <div
-      className="maze"
+      className={`maze ${gameOver ? 'maze--hide' : ''}`}
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${LEVEL_MAP[0].length}, 20px)`,
@@ -392,5 +452,3 @@ const MazeLayer = memo(function MazeLayer() {
     </div>
   );
 });
-
-export default MazeLayer;

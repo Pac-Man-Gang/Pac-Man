@@ -45,3 +45,62 @@ body {
     opacity: 0;
   }
 }
+
+/* e.g. styles.module.css */
+@keyframes pacman-flash {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Blink quickly for ~1.2s total (10 cycles × 120ms) */
+.flashOnHit {
+  animation: pacman-flash 120ms steps(2, start) 10;
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  .flashOnHit {
+    animation: none;
+    /* Optional: a safer visual cue */
+    filter: brightness(1.8) saturate(1.4);
+  }
+}
+
+.maze .maze-cell {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.maze.maze--hide .maze-cell {
+  opacity: 0;
+  transform: scale(0.6);
+  transition-delay: var(--delay, 0ms);
+  pointer-events: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -55%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes gameoverFade {
+  to {
+    opacity: 1;
+  }
+}

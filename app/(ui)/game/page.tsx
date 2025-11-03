@@ -1,12 +1,25 @@
 'use client';
 import { INITIAL_GAMESTATE, nextGameState } from '@/app/core/GameStateManager';
 import localFont from 'next/font/local';
-import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
 import { Direction, GameState, Position } from '../../core/types';
 import EntityLayer from './EntityLayer';
 import MazeLayer from './MazeLayer';
 import { Howl } from 'howler';
+import {
+  allGhostTypes,
+  Direction,
+  GameState,
+  Position,
+} from '../../core/types';
+import { getGhostSprite } from '../components/GhostSprite';
+import { getPacmanArrow } from '../components/PacmanSprite';
+import EntityLayer from './EntityLayer';
+import { MazeLayer } from './MazeLayer';
+
 
 const BASE_W = 560;
 const BASE_H = 620;
@@ -18,11 +31,32 @@ const arcadeFont = localFont({
   display: 'swap',
 });
 
+const aubreyFont = localFont({
+  src: '../../../public/fonts/Jacquard.ttf',
+  weight: '400',
+  style: 'normal',
+  display: 'swap',
+});
+
 export type PopupBean = {
   x: number;
   y: number;
   text: string;
 };
+
+const motivationalTexts = [
+  'Seems to be a skill issue',
+  'Do you really think youre capable?',
+  'Some people just arent meant for greatness...',
+  'Pathetic',
+  'Why keep trying?',
+  'Each death tells me a little more about you',
+  'Is this how you spend your free time?',
+  'What are you trying to prove?',
+  'Every retry brings you closer to... nothing',
+  'This gameplay has to be ragebait',
+];
+let motivationalText = '';
 
 export function calcPixelPos(rect: DOMRect): Position {
   const board = document.querySelector<HTMLElement>('.board')!;
@@ -40,6 +74,11 @@ export function calcPixelPos(rect: DOMRect): Position {
 }
 
 export default function GamePage() {
+  const [gameOver, setGameOver] = useState(false);
+  const [showGameOverImage, setShowGameOverImage] = useState(false);
+  const [showPlayAgainButton, setShowPlayAgainButton] = useState(false);
+  const [playAgainButtonPressed, setPlayAgainButtonPressed] = useState(false);
+
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAMESTATE);
   const [playerDir, setPlayerDir] = useState<Direction | undefined>(undefined);
 
@@ -91,18 +130,42 @@ export default function GamePage() {
         }
       }
     };
-
-    window.addEventListener('keydown', handleKey);
+    if (!gameOver) window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, []);
+  }, [gameOver]);
 
-  const tick = () => setGameState(nextGameState(playerDir!));
-  useEffect(() => tick(), []);
+  const tick = useCallback(() => {
+    if (gameOver) return;
+    setGameState(nextGameState(playerDir!));
+  }, [gameOver, playerDir]);
+
+  useEffect(() => {
+    tick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     window.addEventListener('tick', tick);
     return () => window.removeEventListener('tick', tick);
-  }, [playerDir]);
+  }, [playerDir, tick, gameOver]);
+
+  useEffect(() => {
+    const handleGameOver = () => {
+      setGameOver(true);
+      allGhostTypes().forEach((gt, index) =>
+        setTimeout(
+          () => (getGhostSprite(gt).style.visibility = 'hidden'),
+          index * 100
+        )
+      );
+      getPacmanArrow().style.visibility = 'hidden';
+      motivationalText =
+        motivationalTexts[Math.floor(Math.random() * motivationalTexts.length)];
+      setTimeout(() => setShowGameOverImage(true), 2750);
+    };
+    window.addEventListener('gameOver', handleGameOver);
+    return () => window.removeEventListener('gameOver', handleGameOver);
+  }, []);
 
   useEffect(() => {
     const handler = (e: CustomEvent<PopupBean>) => {
@@ -114,12 +177,6 @@ export default function GamePage() {
       }, 1000);
     };
     window.addEventListener('newPopup', handler as EventListener);
-
-    window.dispatchEvent(
-      new CustomEvent<PopupBean>('newPopup', {
-        detail: { x: 100, y: 100, text: '200' },
-      })
-    );
     return () =>
       window.removeEventListener('newPopup', handler as EventListener);
   }, []);
@@ -149,6 +206,20 @@ export default function GamePage() {
       >
         SCORE: {gameState.score}
       </div>
+      <div
+        className={arcadeFont.className}
+        style={{
+          position: 'absolute',
+          top: 50,
+          left: '15%',
+          transform: 'translateX(-50%)',
+          pointerEvents: 'none',
+          zIndex: 2,
+          fontSize: 45,
+        }}
+      >
+        LIVES: {gameState.lives}
+      </div>
 
       <div
         className="board"
@@ -160,13 +231,12 @@ export default function GamePage() {
           transform: `scale(${scale})`,
         }}
       >
-        <MazeLayer></MazeLayer>
+        <MazeLayer gameOver={gameOver}></MazeLayer>
         <EntityLayer
           pacman={gameState.pacman}
           ghosts={gameState.ghosts}
           uiPlayerDir={playerDir}
         ></EntityLayer>
-
         <div
           style={{
             position: 'absolute',
@@ -197,6 +267,100 @@ export default function GamePage() {
           ))}
         </div>
       </div>
+
+      {showGameOverImage && (
+        <div
+          style={{
+            position: 'fixed', // 👈 independent of board scaling
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 999, // make sure it's above everything
+            display: 'grid',
+            justifyItems: 'center',
+            rowGap: 80, // space between image & button
+            pointerEvents: 'auto',
+          }}
+        >
+          <Image
+            src="/assets/hud/gameover.png"
+            alt="Game Over"
+            width={800}
+            height={300}
+            priority
+            style={{
+              imageRendering: 'pixelated',
+              opacity: 0,
+              animation: 'gameoverFade 1s ease forwards',
+            }}
+            onAnimationEnd={() => setShowPlayAgainButton(true)}
+          />
+
+          {showPlayAgainButton && (
+            <Link
+              href="/game"
+              aria-label="Play again"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = '/game';
+              }}
+              style={{
+                outline: 'none',
+                borderRadius: '12px',
+                transition: 'transform 80ms ease, filter 120ms ease',
+              }}
+              onMouseDown={() => setPlayAgainButtonPressed(true)}
+              onMouseUp={() => setPlayAgainButtonPressed(false)}
+              onMouseLeave={() => setPlayAgainButtonPressed(false)}
+              onBlur={(e) => (e.currentTarget.style.filter = 'none')}
+            >
+              <Image
+                src={
+                  playAgainButtonPressed
+                    ? '/assets/hud/tryagainbutton_pressed.png'
+                    : '/assets/hud/tryagainbutton.png'
+                }
+                alt="Play button"
+                width={300}
+                height={96}
+                priority
+                style={{
+                  display: 'block',
+                  cursor: 'pointer',
+                  borderRadius: '12px',
+                  userSelect: 'none',
+                  transform: playAgainButtonPressed
+                    ? 'translateY(2px)'
+                    : 'translateY(0)',
+                  opacity: 0,
+                  animation: 'gameoverFade 0.5s ease forwards',
+                }}
+              />
+            </Link>
+          )}
+        </div>
+      )}
+
+      {showPlayAgainButton && (
+        <div
+          className={aubreyFont.className}
+          style={{
+            position: 'fixed', // 👈 stays relative to viewport
+            bottom: 80, // 👈 distance from bottom edge
+            left: 100, // 👈 distance from left edge
+            pointerEvents: 'none',
+            zIndex: 1000,
+            fontSize: 34,
+            maxWidth: '40vw', // optional line wrap
+            textAlign: 'left',
+            opacity: 0,
+            animation: 'gameoverFade 1s ease forwards',
+            fontFamily: aubreyFont.style.fontFamily,
+          }}
+        >
+          {motivationalText}
+        </div>
+      )}
     </main>
   );
 }
