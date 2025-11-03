@@ -20,7 +20,6 @@ import { getPacmanArrow } from '../components/PacmanSprite';
 import EntityLayer from './EntityLayer';
 import { MazeLayer } from './MazeLayer';
 
-
 const BASE_W = 560;
 const BASE_H = 620;
 

@@ -88,7 +88,6 @@ class MazeComponent {
   neighbours: Record<string, number | undefined>;
   isNeighbourWall: Record<string, boolean>;
 
-
   constructor(row: number, col: number) {
     this.row = row;
     this.col = col;
@@ -104,7 +103,6 @@ class MazeComponent {
     this.type = this.defineComponentType();
     this.component = this.defineComponent();
   }
-
 
   defineComponent(): ReactElement {
     switch (this.type) {
@@ -135,35 +133,51 @@ class MazeComponent {
     }
 
     if (this.isVertical()) {
-        if ([3, 4, undefined].includes(this.neighbours.E)) {
-            return <DoubleWall mirrored={true}/>;
-        } else if (Object.values(this.neighbours).some(n => n === 3 || n === 4 || n === undefined)) {
-            return <DoubleWall />;
+      if ([3, 4, undefined].includes(this.neighbours.E)) {
+        return <DoubleWall mirrored={true} />;
+      } else if (
+        Object.values(this.neighbours).some(
+          (n) => n === 3 || n === 4 || n === undefined
+        )
+      ) {
+        return <DoubleWall />;
+      } else {
+        if (
+          this.neighbours.E === 2 ||
+          this.neighbours.E === 0 ||
+          this.neighbours.E === 5
+        ) {
+          return <SingleWall mirrored={true} />;
         } else {
-            if (this.neighbours.E === 2 || this.neighbours.E === 0 || this.neighbours.E === 5) {
-                return <SingleWall mirrored={true} />;
-            } else {
-                return <SingleWall />;
-            }
+          return <SingleWall />;
         }
+      }
     } else {
-        if ([3, 4, undefined].includes(this.neighbours.S)) {
-            if (this.neighbours.E === 4) {
-                return <DoubleEndWall mirrored={true}/>;
-            } else if (this.neighbours.W === 4) {
-                return <DoubleEndWall/>;
-            } else {
-              return <DoubleWall rotation={270} mirrored={true} />;
-            }
-        } else if (Object.values(this.neighbours).some(n => n === 3 || n === 4 || n === undefined)){
-            return <DoubleWall rotation={90} />;
+      if ([3, 4, undefined].includes(this.neighbours.S)) {
+        if (this.neighbours.E === 4) {
+          return <DoubleEndWall mirrored={true} />;
+        } else if (this.neighbours.W === 4) {
+          return <DoubleEndWall />;
         } else {
-            if (this.neighbours.S === 2 || this.neighbours.S === 0 || this.neighbours.S === 5) {
-                return <SingleWall rotation={270} mirrored={true} />;
-            } else {
-                return <SingleWall rotation={90} />;
-            }
+          return <DoubleWall rotation={270} mirrored={true} />;
         }
+      } else if (
+        Object.values(this.neighbours).some(
+          (n) => n === 3 || n === 4 || n === undefined
+        )
+      ) {
+        return <DoubleWall rotation={90} />;
+      } else {
+        if (
+          this.neighbours.S === 2 ||
+          this.neighbours.S === 0 ||
+          this.neighbours.S === 5
+        ) {
+          return <SingleWall rotation={270} mirrored={true} />;
+        } else {
+          return <SingleWall rotation={90} />;
+        }
+      }
     }
   }
 
@@ -172,42 +186,42 @@ class MazeComponent {
   }
 
   defineInsideCorner(): ReactElement {
-      const w = this.isNeighbourWall;
-      
-      if (w.N && w.S && w.E && w.W && !w.NE) {
-        return <ShortCorner/>;
-      } else if (w.N && w.S && w.E && w.W && !w.NW) {
-        return <ShortCorner rotation={270}/>;
-      } else if (w.N && w.S && w.E && w.W && !w.SE) {
-        return <ShortCorner rotation={90}/>;
-      } else if (w.N && w.S && w.E && w.W && !w.SW) {
-        return <ShortCorner rotation={180}/>;
-      } else {
-        return <ShortCorner/>;
-      }
+    const w = this.isNeighbourWall;
+
+    if (w.N && w.S && w.E && w.W && !w.NE) {
+      return <ShortCorner />;
+    } else if (w.N && w.S && w.E && w.W && !w.NW) {
+      return <ShortCorner rotation={270} />;
+    } else if (w.N && w.S && w.E && w.W && !w.SE) {
+      return <ShortCorner rotation={90} />;
+    } else if (w.N && w.S && w.E && w.W && !w.SW) {
+      return <ShortCorner rotation={180} />;
+    } else {
+      return <ShortCorner />;
+    }
   }
 
   defineConnector(): ReactElement {
     const w = this.isNeighbourWall;
 
     if (w.E && w.W && w.N && !w.S && !w.NE) {
-      return <Connector rotation={180} mirrored={true}/>;
+      return <Connector rotation={180} mirrored={true} />;
     } else if (w.E && w.W && w.N && !w.S && !w.NW) {
-      return <Connector rotation={180}/>;
+      return <Connector rotation={180} />;
     } else if (w.E && w.W && w.S && !w.N && !w.SE) {
-      return <Connector/>;
+      return <Connector />;
     } else if (w.E && w.W && w.S && !w.N && !w.SW) {
-      return <Connector mirrored={true}/>;
+      return <Connector mirrored={true} />;
     } else if (w.N && w.S && w.E && !w.W && !w.NE) {
-      return <Connector rotation={270}/>;
+      return <Connector rotation={270} />;
     } else if (w.N && w.S && w.E && !w.W && !w.SE) {
-      return <Connector rotation={90} mirrored={true}/>;
+      return <Connector rotation={90} mirrored={true} />;
     } else if (w.N && w.S && w.W && !w.E && !w.NW) {
-      return <Connector rotation={270} mirrored={true}/>;
+      return <Connector rotation={270} mirrored={true} />;
     } else if (w.N && w.S && w.W && !w.E && !w.SW) {
-      return <Connector rotation={90}/>;
+      return <Connector rotation={90} />;
     } else {
-      return <Connector/>;
+      return <Connector />;
     }
   }
 
@@ -220,13 +234,13 @@ class MazeComponent {
       !this.isNeighbourWall.W
     ) {
       if (this.neighbours.S === undefined || this.neighbours.S === 3) {
-        return <DoubleCorner/>;
+        return <DoubleCorner />;
       } else if (this.neighbours.NE === 3) {
-        return <ShortCorner/>;
+        return <ShortCorner />;
       } else if (this.neighbours.NE === 4) {
-        return <SharpDoubleCorner/>;
+        return <SharpDoubleCorner />;
       } else {
-        return <SingleCorner/>;
+        return <SingleCorner />;
       }
       // Corner (N to W)
     } else if (
@@ -236,13 +250,13 @@ class MazeComponent {
       !this.isNeighbourWall.E
     ) {
       if (this.neighbours.S === undefined || this.neighbours.S === 3) {
-        return <DoubleCorner rotation={270}/>;
+        return <DoubleCorner rotation={270} />;
       } else if (this.neighbours.NW === 3) {
-        return <ShortCorner rotation={270}/>;
+        return <ShortCorner rotation={270} />;
       } else if (this.neighbours.NW === 4) {
-        return <SharpDoubleCorner rotation={270}/>;
+        return <SharpDoubleCorner rotation={270} />;
       } else {
-        return <SingleCorner rotation={270}/>;
+        return <SingleCorner rotation={270} />;
       }
       // Corner (S to E)
     } else if (
@@ -258,7 +272,7 @@ class MazeComponent {
       } else if (this.neighbours.SE === 4) {
         return <SharpDoubleCorner rotation={90} />;
       } else {
-        return <SingleCorner rotation={90}/>;        
+        return <SingleCorner rotation={90} />;
       }
       // Corner (S to W)
     } else if (
@@ -274,7 +288,7 @@ class MazeComponent {
       } else if (this.neighbours.SW === 4) {
         return <SharpDoubleCorner rotation={180} />;
       } else {
-        return <SingleCorner rotation={180}/>;
+        return <SingleCorner rotation={180} />;
       }
     }
 
@@ -313,31 +327,28 @@ class MazeComponent {
   isConnector(): boolean {
     const w = this.isNeighbourWall;
     return (
-    (w.E && w.W && w.N && !w.S && (!w.NE || !w.NW)) ||
-    (w.E && w.W && w.S && !w.N && (!w.SE || !w.SW)) ||
-    (w.N && w.S && w.E && !w.W && (!w.NE || !w.SE)) ||
-    (w.N && w.S && w.W && !w.E && (!w.NW || !w.SW))
+      (w.E && w.W && w.N && !w.S && (!w.NE || !w.NW)) ||
+      (w.E && w.W && w.S && !w.N && (!w.SE || !w.SW)) ||
+      (w.N && w.S && w.E && !w.W && (!w.NE || !w.SE)) ||
+      (w.N && w.S && w.W && !w.E && (!w.NW || !w.SW))
     );
   }
 
   isInsideCorner(): boolean {
     const w = this.isNeighbourWall;
-    return (
-      (w.N && w.S && w.E && w.W && (!w.NE || !w.NW || !w.SE || !w.SW))
-    );
+    return w.N && w.S && w.E && w.W && (!w.NE || !w.NW || !w.SE || !w.SW);
   }
 
   isCorner(): boolean {
-  const w = this.isNeighbourWall;
-  return (
-    LEVEL_MAP[this.row][this.col] === 1 &&
-    (
-      (w.N && w.E && !w.S && !w.W) ||
-      (w.N && w.W && !w.S && !w.E) ||
-      (w.S && w.E && !w.N && !w.W) ||
-      (w.S && w.W && !w.N && !w.E))
-  );
-}
+    const w = this.isNeighbourWall;
+    return (
+      LEVEL_MAP[this.row][this.col] === 1 &&
+      ((w.N && w.E && !w.S && !w.W) ||
+        (w.N && w.W && !w.S && !w.E) ||
+        (w.S && w.E && !w.N && !w.W) ||
+        (w.S && w.W && !w.N && !w.E))
+    );
+  }
 
   isSmallPellet(): boolean {
     return LEVEL_MAP[this.row][this.col] === 2;
@@ -359,7 +370,6 @@ class MazeComponent {
     return LEVEL_MAP[this.row][this.col] === 4;
   }
 }
-
 
 export let initialPelletAmount = 0;
 
