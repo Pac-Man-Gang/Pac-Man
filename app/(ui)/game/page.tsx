@@ -5,6 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
+import { Direction, GameState, Position } from '../../core/types';
+import EntityLayer from './EntityLayer';
+import MazeLayer from './MazeLayer';
+import { Howl } from 'howler';
 import {
   allGhostTypes,
   Direction,
@@ -84,6 +88,23 @@ export default function GamePage() {
     { id: number; x: number; y: number; text: string }[]
   >([]);
 
+  const chompSoundRef = useRef<Howl | null>(null);
+  const soundStartedRef = useRef(false);
+
+  // Initialize chomp sound
+  useEffect(() => {
+    chompSoundRef.current = new Howl({
+      src: ['/assets/sounds/pacman-chomp.wav'],
+      loop: true,
+      volume: 0.25,
+      rate: 0.75,
+    });
+
+    return () => {
+      chompSoundRef.current?.unload();
+    };
+  }, []);
+
   useEffect(() => {
     const update = () => {
       const w = wrapRef.current?.clientWidth ?? window.innerWidth;
@@ -98,7 +119,15 @@ export default function GamePage() {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       const dir = keyToDirection[e.key];
-      if (dir !== undefined) setPlayerDir(dir);
+      if (dir !== undefined) {
+        setPlayerDir(dir);
+
+        // Start chomp sound on first valid keypress
+        if (!soundStartedRef.current && chompSoundRef.current) {
+          chompSoundRef.current.play();
+          soundStartedRef.current = true;
+        }
+      }
     };
     if (!gameOver) window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
