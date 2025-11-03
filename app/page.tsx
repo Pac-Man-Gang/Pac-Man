@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { Howl } from 'howler';
 
 const BackgroundPacman = dynamic(
   () => import('./(ui)/components/BackgroundPacman'),
@@ -35,6 +36,21 @@ export default function HomePage() {
       });
     }, 8);
     return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    const startMusic = new Howl({
+      src: ['/assets/sounds/Start-Music.wav'],
+      loop: true,
+      volume: 0.5,
+    });
+
+    startMusic.play();
+
+    return () => {
+      startMusic.stop();
+      startMusic.unload();
+    };
   }, []);
 
   return (
