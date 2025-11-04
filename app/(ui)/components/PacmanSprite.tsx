@@ -1,4 +1,4 @@
-import { INVINCIBLE_MS } from '@/app/core/GameStateManager';
+import { INVINCIBLE_MS } from '@/app/core/game-state-manager';
 import { Direction, PacManState } from '@/app/core/types';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';

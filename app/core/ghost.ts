@@ -6,7 +6,7 @@ import {
   getSuperPelletSprite,
 } from '../(ui)/components/SuperPelletSprite';
 import { initialPelletAmount, LEVEL_MAP } from '../(ui)/game/MazeLayer';
-import { spritesOverlapping } from './GameStateManager';
+import { spritesOverlapping } from './game-state-manager';
 import {
   allDirections,
   Direction,

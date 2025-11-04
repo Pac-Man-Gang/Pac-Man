@@ -1,5 +1,5 @@
 import { getPelletSprite } from '../(ui)/components/SmallPelletSprite';
-import { addScore } from './GameStateManager';
+import { addScore } from './game-state-manager';
 import { Direction, PacManState } from './types';
 import { posAt, tileIsFree } from './util/position';
 
