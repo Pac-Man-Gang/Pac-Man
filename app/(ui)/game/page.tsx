@@ -5,20 +5,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
-import { Direction, GameState, Position } from '../../core/types';
-import EntityLayer from './EntityLayer';
-import MazeLayer from './MazeLayer';
-import { Howl } from 'howler';
-import {
-  allGhostTypes,
-  Direction,
-  GameState,
-  Position,
-} from '../../core/types';
-import { getGhostSprite } from '../components/GhostSprite';
-import { getPacmanArrow } from '../components/PacmanSprite';
+import { allGhostTypes, Direction, GameState, Position } from '../../core/types';
 import EntityLayer from './EntityLayer';
 import { MazeLayer } from './MazeLayer';
+import { Howl } from 'howler';
+import { getGhostSprite } from '../components/GhostSprite';
+import { getPacmanArrow } from '../components/PacmanSprite';
+
 
 const BASE_W = 560;
 const BASE_H = 620;
