@@ -8,7 +8,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { keyToDirection } from '../../core/pacman';
-import { Direction, GameState, Position } from '../../core/types';
+import {
+  Direction,
+  GameState,
+  Position,
+  allGhostTypes,
+} from '../../core/types';
 import EntityLayer from './EntityLayer';
 import { MazeLayer } from './MazeLayer';
 import { Howl } from 'howler';
