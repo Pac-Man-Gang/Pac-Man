@@ -81,6 +81,23 @@ export default function GamePage() {
     { id: number; x: number; y: number; text: string }[]
   >([]);
 
+  const chompSoundRef = useRef<Howl | null>(null);
+  const soundStartedRef = useRef(false);
+
+  // Initialize chomp sound
+  useEffect(() => {
+    chompSoundRef.current = new Howl({
+      src: ['/assets/sounds/pacman-chomp.wav'],
+      loop: true,
+      volume: 0.25,
+      rate: 0.75,
+    });
+
+    return () => {
+      chompSoundRef.current?.unload();
+    };
+  }, []);
+
   useEffect(() => {
     const update = () => {
       const w = wrapRef.current?.clientWidth ?? window.innerWidth;
