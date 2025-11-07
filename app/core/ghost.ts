@@ -6,7 +6,7 @@ import {
   getSuperPelletSprite,
 } from '../(ui)/components/SuperPelletSprite';
 import { initialPelletAmount, LEVEL_MAP } from '../(ui)/game/MazeLayer';
-import { spritesOverlapping } from './GameStateManager';
+import { spritesOverlapping } from './game-state-manager';
 import {
   allDirections,
   Direction,
@@ -38,7 +38,7 @@ let frightenedModeEnteredTimestamp: number;
 // WARNING: HARDCODED
 const housePos = { x: 14, y: 14 };
 
-export function initialGhosts(): GhostState[] {
+export function initalGhosts(): GhostState[] {
   return [
     {
       pos: { x: 15, y: 14 },
@@ -71,15 +71,11 @@ export function initialGhosts(): GhostState[] {
   ];
 }
 
-export function getInitialGhost(type: GhostType) {
-  return initialGhosts().find((ghost) => ghost.type === type)!;
-}
-
 export function nextGhostStates(gameState: GameState): GhostState[] {
   return gameState.ghosts.map((ghost) => nextGhostState(gameState, ghost.type));
 }
 
-export function nextGhostState(
+function nextGhostState(
   gameState: GameState,
   ghostType: GhostType
 ): GhostState {

@@ -1,14 +1,24 @@
 'use client';
-import { Howl } from 'howler';
+import {
+  INITIAL_GAMESTATE,
+  nextGameState,
+} from '@/app/core/game-state-manager';
 import localFont from 'next/font/local';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import { allGhostTypes, Position } from '../../core/types';
-import { getGhostSprite } from '../components/GhostSprite';
-import { getPacmanArrow } from '../components/PacmanSprite';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { keyToDirection } from '../../core/pacman';
+import {
+  Direction,
+  GameState,
+  Position,
+  allGhostTypes,
+} from '../../core/types';
 import EntityLayer from './EntityLayer';
 import { MazeLayer } from './MazeLayer';
+import { Howl } from 'howler';
+import { getGhostSprite } from '../components/GhostSprite';
+import { getPacmanArrow } from '../components/PacmanSprite';
 
 const BASE_W = 560;
 const BASE_H = 620;
@@ -31,10 +41,6 @@ export type PopupBean = {
   x: number;
   y: number;
   text: string;
-};
-
-export type ScoreBean = {
-  score: number;
 };
 
 const motivationalTexts = [
@@ -72,8 +78,8 @@ export default function GamePage() {
   const [showPlayAgainButton, setShowPlayAgainButton] = useState(false);
   const [playAgainButtonPressed, setPlayAgainButtonPressed] = useState(false);
 
-  const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(3);
+  const [gameState, setGameState] = useState<GameState>(INITIAL_GAMESTATE);
+  const [playerDir, setPlayerDir] = useState<Direction | undefined>(undefined);
 
   const [scale, setScale] = useState(1);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -111,6 +117,38 @@ export default function GamePage() {
   }, []);
 
   useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      const dir = keyToDirection[e.key];
+      if (dir !== undefined) {
+        setPlayerDir(dir);
+
+        // Start chomp sound on first valid keypress
+        if (!soundStartedRef.current && chompSoundRef.current) {
+          chompSoundRef.current.play();
+          soundStartedRef.current = true;
+        }
+      }
+    };
+    if (!gameOver) window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [gameOver]);
+
+  const tick = useCallback(() => {
+    if (gameOver) return;
+    setGameState(nextGameState(playerDir!));
+  }, [gameOver, playerDir]);
+
+  useEffect(() => {
+    tick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('tick', tick);
+    return () => window.removeEventListener('tick', tick);
+  }, [playerDir, tick, gameOver]);
+
+  useEffect(() => {
     const handleGameOver = () => {
       setGameOver(true);
       allGhostTypes().forEach((gt, index) =>
@@ -127,22 +165,6 @@ export default function GamePage() {
     window.addEventListener('gameOver', handleGameOver);
     return () => window.removeEventListener('gameOver', handleGameOver);
   }, []);
-
-  useEffect(() => {
-    const handleAddScore = (e: CustomEvent<ScoreBean>) => {
-      const { score } = e.detail;
-      setScore(score);
-    };
-    window.addEventListener('addScore', handleAddScore as EventListener);
-    return () =>
-      window.removeEventListener('addScore', handleAddScore as EventListener);
-  }, []);
-
-  useEffect(() => {
-    const handlePacHit = () => setLives(lives - 1);
-    window.addEventListener('pacHit', handlePacHit);
-    return () => window.removeEventListener('addScore', handlePacHit);
-  }, [lives]);
 
   useEffect(() => {
     const handler = (e: CustomEvent<PopupBean>) => {
@@ -181,7 +203,7 @@ export default function GamePage() {
           fontSize: 45,
         }}
       >
-        SCORE: {score}
+        SCORE: {gameState.score}
       </div>
       <div
         className={arcadeFont.className}
@@ -195,7 +217,7 @@ export default function GamePage() {
           fontSize: 45,
         }}
       >
-        LIVES: {lives}
+        LIVES: {gameState.lives}
       </div>
 
       <div
@@ -209,14 +231,18 @@ export default function GamePage() {
         }}
       >
         <MazeLayer gameOver={gameOver}></MazeLayer>
-        <EntityLayer></EntityLayer>
+        <EntityLayer
+          pacman={gameState.pacman}
+          ghosts={gameState.ghosts}
+          uiPlayerDir={playerDir}
+        ></EntityLayer>
         <div
           style={{
             position: 'absolute',
             inset: 0,
             pointerEvents: 'none',
             zIndex: 10,
-            fontFamily: arcadeFont.style.fontFamily, // keeps same font
+            fontFamily: arcadeFont.style.fontFamily, // keeps same fonts
           }}
         >
           {popups.map((p) => (

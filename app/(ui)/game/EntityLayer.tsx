@@ -1,13 +1,23 @@
-import { allGhostTypes } from '@/app/core/types';
+import { Direction, GhostState, PacManState } from '@/app/core/types';
 import GhostSprite from '../components/GhostSprite';
 import PacmanSprite from '../components/PacmanSprite';
 
-export default function EntityLayer() {
+type GhostLayerProps = {
+  pacman: PacManState;
+  ghosts: GhostState[];
+  uiPlayerDir?: Direction;
+};
+
+export default function EntityLayer({
+  pacman,
+  ghosts,
+  uiPlayerDir,
+}: GhostLayerProps) {
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 10 }}>
-      <PacmanSprite />
-      {allGhostTypes().map((type) => (
-        <GhostSprite key={type} ghostType={type} />
+      <PacmanSprite pacman={pacman} uiPlayerDir={uiPlayerDir} />
+      {ghosts.map((ghost) => (
+        <GhostSprite key={ghost.type} ghost={ghost} />
       ))}
     </div>
   );

@@ -80,10 +80,6 @@ export default function HomePage() {
         <Link
           href="/game"
           aria-label="Start game"
-          onClick={(e) => {
-            e.preventDefault();
-            window.location.href = '/game';
-          }}
           style={{
             display: 'inline-block',
             outline: 'none',

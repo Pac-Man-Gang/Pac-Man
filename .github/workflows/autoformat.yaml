@@ -7,7 +7,6 @@ on:
       - opened
       - synchronize
       - reopened
-      - edited
 
 permissions:
   contents: write
@@ -68,3 +67,7 @@ jobs:
           else
             npx eslint .
           fi
+      # ---- Build the Project ----
+      - name: Build the project
+        run: |
+          npm run build

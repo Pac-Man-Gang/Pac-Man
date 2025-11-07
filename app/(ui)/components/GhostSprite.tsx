@@ -1,11 +1,9 @@
-import { updateGhost } from '@/app/core/GameStateManager';
-import { getInitialGhost } from '@/app/core/ghost';
 import { Direction, GhostMode, GhostState, GhostType } from '@/app/core/types';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 type GhostSpriteProps = {
-  ghostType: GhostType;
+  ghost: GhostState;
   size?: number;
   tileSize?: number;
 };
@@ -27,21 +25,17 @@ export function getGhostSprite(ghostType: GhostType) {
 }
 
 export default function GhostSprite({
-  ghostType,
+  ghost,
   size = 32,
   tileSize = 20,
 }: GhostSpriteProps) {
   const [timer, setTimer] = useState(0);
-  const [ghostState, setGhostState] = useState<GhostState>(
-    getInitialGhost(ghostType)
-  );
-  const [speed, setSpeed] = useState(0.2); // Seconds per Tile
 
   const baseName = useMemo(
-    () => ghostState.sprite.replace('.png', ''),
-    [ghostState.sprite]
+    () => ghost.sprite.replace('.png', ''),
+    [ghost.sprite]
   );
-  const dirKey = DIR_KEY[ghostState.dir];
+  const dirKey = DIR_KEY[ghost.dir];
 
   const frames = useMemo(
     () => [
@@ -57,19 +51,12 @@ export default function GhostSprite({
   );
 
   let src = '';
-  if (ghostState.mode === GhostMode.EATEN) src = eatenFrame;
+  if (ghost.mode === GhostMode.EATEN) src = eatenFrame;
   else
     src =
-      ghostState.mode === GhostMode.FRIGHTENED
+      ghost.mode === GhostMode.FRIGHTENED
         ? frightenedFrames[timer]
         : frames[timer];
-
-  useEffect(() => {
-    if (ghostState.mode === GhostMode.FRIGHTENED && speed !== 0.4)
-      setSpeed(0.4);
-    else if (ghostState.mode !== GhostMode.FRIGHTENED && speed !== 0.2)
-      setSpeed(0.2);
-  }, [ghostState, speed]);
 
   useEffect(
     () => frames.forEach((src) => (new window.Image().src = src)),
@@ -89,14 +76,8 @@ export default function GhostSprite({
     };
   }, []);
 
-  useEffect(() => setGhostState(updateGhost(ghostType)), [ghostType]);
-
-  const xPixel = Math.round(
-    ghostState.pos.x * tileSize + (tileSize - size) / 2
-  );
-  const yPixel = Math.round(
-    ghostState.pos.y * tileSize + (tileSize - size) / 2
-  );
+  const xPixel = Math.round(ghost.pos.x * tileSize + (tileSize - size) / 2);
+  const yPixel = Math.round(ghost.pos.y * tileSize + (tileSize - size) / 2);
 
   return (
     <div
@@ -105,16 +86,16 @@ export default function GhostSprite({
         left: 0,
         right: 0,
         transform: `translate3d(${xPixel}px, ${yPixel}px, 0)`,
-        transition: `transform ${speed}s linear`,
+        transition: 'transform 0.2s linear',
         willChange: 'transform',
       }}
       onTransitionEnd={(e) => {
-        if (e.propertyName === 'transform')
-          setGhostState(updateGhost(ghostType));
+        if (e.propertyName === 'transform' && ghost.type === GhostType.BLINKY)
+          window.dispatchEvent(new CustomEvent('tick'));
       }}
     >
       <Image
-        data-type={ghostState.type}
+        data-type={ghost.type}
         src={src}
         alt="BLINKY"
         width={size}
