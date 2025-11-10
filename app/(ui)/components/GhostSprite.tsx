@@ -1,4 +1,4 @@
-import { updateGhost } from '@/app/core/GameStateManager';
+import { updateGhost } from '@/app/core/game-state-manager';
 import { getInitialGhost } from '@/app/core/ghost';
 import { Direction, GhostMode, GhostState, GhostType } from '@/app/core/types';
 import Image from 'next/image';

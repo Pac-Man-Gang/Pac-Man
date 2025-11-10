@@ -1,4 +1,4 @@
-import { INVINCIBLE_MS, updatePacman } from '@/app/core/GameStateManager';
+import { INVINCIBLE_MS, updatePacman } from '@/app/core/game-state-manager';
 import { initialPacman, keyToDirection } from '@/app/core/pacman';
 import { Direction, PacManState } from '@/app/core/types';
 import { equalPos } from '@/app/core/util/position';

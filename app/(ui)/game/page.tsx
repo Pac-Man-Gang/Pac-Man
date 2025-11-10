@@ -216,7 +216,7 @@ export default function GamePage() {
             inset: 0,
             pointerEvents: 'none',
             zIndex: 10,
-            fontFamily: arcadeFont.style.fontFamily, // keeps same font
+            fontFamily: arcadeFont.style.fontFamily, // keeps same fonts
           }}
         >
           {popups.map((p) => (
