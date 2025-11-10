@@ -78,7 +78,7 @@ export default function GhostSprite({
 
   const xPixel = Math.round(ghost.pos.x * tileSize + (tileSize - size) / 2);
   const yPixel = Math.round(ghost.pos.y * tileSize + (tileSize - size) / 2);
-
+  console.log(ghost.isTeleporting);
   return (
     <div
       style={{
@@ -86,7 +86,7 @@ export default function GhostSprite({
         left: 0,
         right: 0,
         transform: `translate3d(${xPixel}px, ${yPixel}px, 0)`,
-        transition: 'transform 0.2s linear',
+        transition: ghost.isTeleporting ? 'none' : 'transform 0.2s linear',
         willChange: 'transform',
       }}
       onTransitionEnd={(e) => {

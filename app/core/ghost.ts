@@ -104,6 +104,8 @@ function teleportGhostIfInTunnel(
     return newPos; // not leaving the tunnel at the border
   }
 
+  ghost.isTeleporting = true;
+
   // Find opposite tunnel range
   const otherRange =
     rangesOnRow.length === 2
@@ -123,6 +125,10 @@ function teleportGhostIfInTunnel(
     : otherRange.startX; // leaving right side → appear on far left edge
 
   const targetPos = { x: targetX, y: otherRange.row };
+
+  setTimeout(() => {
+    ghost.isTeleporting = false;
+  }, 0);
 
   return targetPos;
 }
@@ -195,6 +201,7 @@ function nextGhostState(
 
     type: ghost.type,
     sprite: ghost.sprite,
+    isTeleporting: ghost.isTeleporting,
   };
 }
 
