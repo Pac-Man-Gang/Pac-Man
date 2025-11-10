@@ -32,6 +32,101 @@ import { equalPos, posAt, tileIsFree } from './util/position';
     - Blinky speeds up and stops scattering if only few pellets are left
 */
 
+// Precompute tunnel runs by row when module loads
+type TunnelRange = { row: number; startX: number; endX: number }; // inclusive indices
+
+const TUNNEL_RANGES: TunnelRange[] = (function computeTunnelRanges() {
+  const ranges: TunnelRange[] = [];
+  for (let r = 0; r < LEVEL_MAP.length; r++) {
+    let inRange = false;
+    let rangeStart = -1;
+    for (let c = 0; c < LEVEL_MAP[0].length; c++) {
+      const isTunnel = LEVEL_MAP[r][c] === 6;
+      if (isTunnel && !inRange) {
+        inRange = true;
+        rangeStart = c;
+      } else if (!isTunnel && inRange) {
+        ranges.push({ row: r, startX: rangeStart, endX: c - 1 });
+        inRange = false;
+      }
+    }
+    if (inRange) {
+      ranges.push({
+        row: r,
+        startX: rangeStart,
+        endX: LEVEL_MAP[0].length - 1,
+      });
+    }
+  }
+  return ranges;
+})();
+
+/**
+ * If `pos` is a tunnel tile and there's another tunnel range on the same row,
+ * teleport it to the equivalent offset inside the opposite range.
+ * Only called for ghosts.
+ */
+function teleportGhostIfInTunnel(
+  ghost: GhostState,
+  newPos: Position
+): Position {
+  const prevPos = ghost.pos;
+  const prevTile = LEVEL_MAP[prevPos.y]?.[prevPos.x];
+  const nextTile = LEVEL_MAP[newPos.y]?.[newPos.x];
+
+  // Only consider rows that contain tunnels
+  const rangesOnRow = TUNNEL_RANGES.filter((r) => r.row === newPos.y);
+  if (rangesOnRow.length < 2) return newPos;
+
+  // Find which range we’re in
+  const currentRange = rangesOnRow.find(
+    (r) => newPos.x >= r.startX && newPos.x <= r.endX
+  );
+  if (!currentRange) return newPos;
+
+  // We only teleport if:
+  // - The ghost is currently ON the outermost tunnel tile
+  // - And is trying to move OUT of the tunnel (next tile would be non-tunnel)
+  // - And the tunnel is at the border of the map
+  const movingLeft = newPos.x < prevPos.x;
+  const movingRight = newPos.x > prevPos.x;
+
+  const isAtLeftEdge = newPos.x === currentRange.startX;
+  const isAtRightEdge = newPos.x === currentRange.endX;
+
+  const goingOutLeft = isAtLeftEdge && movingLeft && currentRange.startX === 0;
+  const goingOutRight =
+    isAtRightEdge &&
+    movingRight &&
+    currentRange.endX === LEVEL_MAP[0].length - 1;
+
+  if (!goingOutLeft && !goingOutRight) {
+    return newPos; // not leaving the tunnel at the border
+  }
+
+  // Find opposite tunnel range
+  const otherRange =
+    rangesOnRow.length === 2
+      ? rangesOnRow.find((r) => r !== currentRange)!
+      : rangesOnRow.reduce((farthest, r) => {
+          const curCenter = (currentRange.startX + currentRange.endX) / 2;
+          const farCenter = (farthest.startX + farthest.endX) / 2;
+          const rCenter = (r.startX + r.endX) / 2;
+          return Math.abs(rCenter - curCenter) > Math.abs(farCenter - curCenter)
+            ? r
+            : farthest;
+        }, rangesOnRow[0]);
+
+  // Teleport to the OPPOSITE edge tile
+  const targetX = goingOutLeft
+    ? otherRange.endX // leaving left side → appear on far right edge
+    : otherRange.startX; // leaving right side → appear on far left edge
+
+  const targetPos = { x: targetX, y: otherRange.row };
+
+  return targetPos;
+}
+
 let firstTickTimestamp: number;
 let frightenedModeEnteredTimestamp: number;
 
@@ -88,10 +183,13 @@ function nextGhostState(
     newMode,
     calcTargetPoint(newMode, ghost, gameState)
   );
-  const newFacing = calcFacing(ghost.pos, newPos);
+
+  const teleportedPos = teleportGhostIfInTunnel(ghost, newPos);
+
+  const newFacing = calcFacing(ghost.pos, teleportedPos);
 
   return {
-    pos: newPos,
+    pos: teleportedPos,
     dir: newFacing,
     mode: newMode,
 
