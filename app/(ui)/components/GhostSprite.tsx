@@ -97,7 +97,7 @@ export default function GhostSprite({
   const yPixel = Math.round(
     ghostState.pos.y * tileSize + (tileSize - size) / 2
   );
-
+  //asdf
   return (
     <div
       style={{
