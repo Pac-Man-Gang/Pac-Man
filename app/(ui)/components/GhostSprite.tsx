@@ -107,7 +107,7 @@ export default function GhostSprite({
     if (ghostState.isTeleporting) {
       // Wait one animation frame so the teleport position renders first
       const raf = requestAnimationFrame(() => {
-        setGhostState(updateGhost(ghostType));
+        setGhostState(updateGhost(ghostType, null));
       });
       console.log('teleport started' + ghostState.isTeleporting);
       return () => cancelAnimationFrame(raf);
