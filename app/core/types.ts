@@ -32,7 +32,11 @@ export enum GhostType {
   INKY,
   CLYDE,
 }
-export type GhostState = MoveableEntity & { type: GhostType; mode: GhostMode };
+export type GhostState = MoveableEntity & {
+  type: GhostType;
+  mode: GhostMode;
+  isTeleporting?: boolean;
+};
 
 export type GameState = {
   pacman: PacManState;
