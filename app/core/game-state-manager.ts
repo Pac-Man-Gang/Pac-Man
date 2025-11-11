@@ -33,6 +33,14 @@ export function spritesOverlapping(sprite1: Element, sprite2: Element) {
 
   const shrinkHitbox = 3;
 
+  return rectOverlapping(rect1, rect2, shrinkHitbox);
+}
+
+export function rectOverlapping(
+  rect1: DOMRect,
+  rect2: DOMRect,
+  shrinkHitbox: number
+) {
   return !(
     rect1.right - shrinkHitbox < rect2.left + shrinkHitbox ||
     rect1.left + shrinkHitbox > rect2.right - shrinkHitbox ||
@@ -41,9 +49,10 @@ export function spritesOverlapping(sprite1: Element, sprite2: Element) {
   );
 }
 
-export function updateGhost(type: GhostType) {
+export function updateGhost(type: GhostType, insertMode: GhostMode | null) {
   const prevGameState = previousGameState();
   const prevGhostState = prevGameState.ghosts.find((g) => g.type === type)!;
+  if (insertMode) prevGhostState.mode = insertMode;
   const newGhostState = nextGhostState(prevGameState, type);
 
   const ghosts: GhostState[] = [];
@@ -173,4 +182,8 @@ export function addScore(amount: number) {
       detail: { score },
     })
   );
+}
+
+export function getGhostState(ghostType: GhostType) {
+  return previousGameState().ghosts.find((g) => g.type === ghostType);
 }

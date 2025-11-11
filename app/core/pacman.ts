@@ -47,12 +47,12 @@ export function nextPacManState(
 }
 
 export const keyToDirection: Record<string, Direction> = {
-  w: Direction.N,
+  KeyW: Direction.N,
   ArrowUp: Direction.N,
-  s: Direction.S,
+  KeyS: Direction.S,
   ArrowDown: Direction.S,
-  a: Direction.W,
+  KeyA: Direction.W,
   ArrowLeft: Direction.W,
-  d: Direction.E,
+  KeyD: Direction.E,
   ArrowRight: Direction.E,
 };
