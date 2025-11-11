@@ -1,10 +1,11 @@
-import { INVINCIBLE_MS } from '@/app/core/game-state-manager';
+import { INVINCIBLE_MS, updatePacman } from '@/app/core/game-state-manager';
+import { initialPacman, keyToDirection } from '@/app/core/pacman';
 import { Direction, PacManState } from '@/app/core/types';
+import { equalPos } from '@/app/core/util/position';
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 type PacmanSpriteProps = {
-  pacman: PacManState;
   uiPlayerDir?: Direction;
   size?: number;
   tileSize?: number;
@@ -20,19 +21,23 @@ export function getPacmanArrow() {
 }
 
 export default function PacmanSprite({
-  pacman,
-  uiPlayerDir,
   size = 32,
   tileSize = 20,
   fps = 8,
 }: PacmanSpriteProps) {
   const getPath = (frame: number) => `/assets/pacman/pacman${frame}.png`;
 
+  const [pacmanState, setPacmanState] = useState<PacManState>(
+    initialPacman(13, 23)
+  );
+  const [playerDir, setPlayerDir] = useState<Direction | undefined>(undefined);
+  const [pacIsStanding, setPacIsStanding] = useState(true);
   const [invincible, setInvincible] = useState(false);
   const [anim, setAnim] = useState<{ frame: number; opening: boolean }>({
     frame: 1,
     opening: true,
   });
+  const [gameOver, setGameOver] = useState(false);
 
   const dirToRotation = (dir: Direction): number => {
     return dir === Direction.N
@@ -49,6 +54,27 @@ export default function PacmanSprite({
     for (let i = 1; i <= 3; i++) new window.Image().src = getPath(i);
   }, []);
 
+  const handleKey = useCallback(
+    (e: KeyboardEvent) => {
+      const dir = keyToDirection[e.key];
+      if (dir !== undefined) {
+        if (pacIsStanding) {
+          const newPacmanState = updatePacman(dir!);
+          if (!equalPos(pacmanState.pos, newPacmanState.pos))
+            setPacIsStanding(false);
+          setPacmanState(newPacmanState);
+        }
+        setPlayerDir(dir);
+      }
+    },
+    [pacIsStanding, pacmanState]
+  );
+  useEffect(() => {
+    if (gameOver) return;
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [pacIsStanding, pacmanState, gameOver, handleKey]);
+
   useEffect(() => {
     const id = setInterval(() => {
       setAnim((anim) => {
@@ -58,13 +84,17 @@ export default function PacmanSprite({
         return { frame: opening ? frame + 1 : frame - 1, opening };
       });
     }, 1000 / fps);
-    const handleGameOver = () => clearInterval(id);
+    const handleGameOver = () => {
+      setGameOver(true);
+      clearInterval(id);
+      window.removeEventListener('keydown', handleKey);
+    };
     window.addEventListener('gameOver', handleGameOver);
     return () => {
       clearInterval(id);
       window.removeEventListener('gameOver', handleGameOver);
     };
-  }, [fps]);
+  }, [fps, handleKey]);
 
   useEffect(() => {
     const handleHit = () => {
@@ -81,12 +111,12 @@ export default function PacmanSprite({
   }, [invincible]);
 
   const pacSrc = useMemo(() => getPath(anim.frame), [anim.frame]);
-  const pacRotation = dirToRotation(pacman.movingDir);
-  const pacX = Math.round(pacman.pos.x * tileSize + (tileSize - size) / 2);
-  const pacY = Math.round(pacman.pos.y * tileSize + (tileSize - size) / 2);
+  const pacRotation = dirToRotation(pacmanState.movingDir);
+  const pacX = Math.round(pacmanState.pos.x * tileSize + (tileSize - size) / 2);
+  const pacY = Math.round(pacmanState.pos.y * tileSize + (tileSize - size) / 2);
 
   const arrowOffset = 30;
-  const arrowDir = uiPlayerDir ?? pacman.dir;
+  const arrowDir = playerDir ?? pacmanState.dir;
   const arrowX =
     arrowDir === Direction.E
       ? arrowOffset
@@ -99,7 +129,7 @@ export default function PacmanSprite({
       : arrowDir === Direction.N
         ? -arrowOffset
         : 0;
-  const arrowRotation = dirToRotation(uiPlayerDir ?? pacman.dir);
+  const arrowRotation = dirToRotation(playerDir ?? pacmanState.dir);
 
   return (
     <div style={{ position: 'relative' }}>
@@ -111,6 +141,14 @@ export default function PacmanSprite({
           transform: `translate3d(${pacX}px, ${pacY}px, 0)`,
           transition: 'transform 0.2s linear',
           willChange: 'transform',
+        }}
+        onTransitionEnd={(e) => {
+          if (e.propertyName === 'transform' && !gameOver) {
+            const newPacmanState = updatePacman(playerDir!);
+            if (equalPos(pacmanState.pos, newPacmanState.pos))
+              setPacIsStanding(true);
+            setPacmanState(newPacmanState);
+          }
         }}
       >
         <div
