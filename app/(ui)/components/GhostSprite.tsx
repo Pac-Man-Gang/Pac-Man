@@ -89,11 +89,6 @@ export default function GhostSprite({
     };
   }, []);
 
-<<<<<<< HEAD
-  const xPixel = Math.round(ghost.pos.x * tileSize + (tileSize - size) / 2);
-  const yPixel = Math.round(ghost.pos.y * tileSize + (tileSize - size) / 2);
-  console.log(ghost.isTeleporting);
-=======
   useEffect(() => setGhostState(updateGhost(ghostType)), [ghostType]);
 
   const xPixel = Math.round(
@@ -103,7 +98,6 @@ export default function GhostSprite({
     ghostState.pos.y * tileSize + (tileSize - size) / 2
   );
   //asdf
->>>>>>> main
   return (
     <div
       style={{
@@ -111,11 +105,7 @@ export default function GhostSprite({
         left: 0,
         right: 0,
         transform: `translate3d(${xPixel}px, ${yPixel}px, 0)`,
-<<<<<<< HEAD
-        transition: ghost.isTeleporting ? 'none' : 'transform 0.2s linear',
-=======
         transition: `transform ${speed}s linear`,
->>>>>>> main
         willChange: 'transform',
       }}
       onTransitionEnd={(e) => {
