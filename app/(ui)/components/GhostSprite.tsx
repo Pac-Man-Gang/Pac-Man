@@ -37,6 +37,8 @@ export default function GhostSprite({
   );
   const [speed, setSpeed] = useState(0.2); // Seconds per Tile
 
+  const [insertMode, setInsertMode] = useState<GhostMode | null>(null);
+
   const baseName = useMemo(
     () => ghostState.sprite.replace('.png', ''),
     [ghostState.sprite]
@@ -77,6 +79,16 @@ export default function GhostSprite({
   );
 
   useEffect(() => {
+    const onBulletHit = () => {
+      ghostState.mode = GhostMode.EATEN;
+      setInsertMode(GhostMode.EATEN);
+    };
+    window.addEventListener(`bulletHit-${ghostType}`, onBulletHit);
+    return () =>
+      window.removeEventListener(`bulletHit-${ghostType}`, onBulletHit);
+  }, [ghostState, ghostType]);
+
+  useEffect(() => {
     const intervalId = setInterval(
       () => setTimer((prev) => (prev === 0 ? 1 : 0)),
       100
@@ -89,13 +101,13 @@ export default function GhostSprite({
     };
   }, []);
 
-  useEffect(() => setGhostState(updateGhost(ghostType)), [ghostType]);
+  useEffect(() => setGhostState(updateGhost(ghostType, null)), [ghostType]);
 
   useEffect(() => {
     if (ghostState.isTeleporting) {
       // Wait one animation frame so the teleport position renders first
       const raf = requestAnimationFrame(() => {
-        setGhostState(updateGhost(ghostType));
+        setGhostState(updateGhost(ghostType, null));
       });
       console.log('teleport started' + ghostState.isTeleporting);
       return () => cancelAnimationFrame(raf);
@@ -123,7 +135,12 @@ export default function GhostSprite({
       }}
       onTransitionEnd={(e) => {
         if (e.propertyName === 'transform')
-          setGhostState(updateGhost(ghostType));
+          if (insertMode) {
+            setGhostState(updateGhost(ghostType, insertMode));
+            setInsertMode(null);
+          } else {
+            setGhostState(updateGhost(ghostType, null));
+          }
       }}
     >
       <Image

@@ -1,15 +1,23 @@
 import { INVINCIBLE_MS, updatePacman } from '@/app/core/game-state-manager';
 import { initialPacman, keyToDirection } from '@/app/core/pacman';
-import { Direction, PacManState } from '@/app/core/types';
+import { Direction, GhostType, PacManState, Position } from '@/app/core/types';
 import { equalPos } from '@/app/core/util/position';
 import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import BulletSprite from './BulletSprite';
 
 type PacmanSpriteProps = {
   uiPlayerDir?: Direction;
   size?: number;
   tileSize?: number;
   fps?: number;
+};
+
+type BulletData = {
+  id: string;
+  initialPos: Position;
+  dir: Direction;
+  speed: number;
 };
 
 export function getPacmanSprite() {
@@ -19,6 +27,8 @@ export function getPacmanSprite() {
 export function getPacmanArrow() {
   return document.querySelector("[data-type='pacArrow']")! as HTMLElement;
 }
+
+const shootCooldown = 750;
 
 export default function PacmanSprite({
   size = 32,
@@ -39,6 +49,12 @@ export default function PacmanSprite({
   });
   const [gameOver, setGameOver] = useState(false);
 
+  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+  const [lastMovementKey, setLastMovementKey] = useState<string | null>(null);
+  const [lastArrowKey, setLastArrowKey] = useState<string | null>(null);
+  const [bullets, setBullets] = useState<BulletData[]>([]);
+  const [shootOnCooldown, setShootOnCooldown] = useState(false);
+
   const dirToRotation = (dir: Direction): number => {
     return dir === Direction.N
       ? 270
@@ -54,26 +70,76 @@ export default function PacmanSprite({
     for (let i = 1; i <= 3; i++) new window.Image().src = getPath(i);
   }, []);
 
-  const handleKey = useCallback(
-    (e: KeyboardEvent) => {
-      const dir = keyToDirection[e.key];
-      if (dir !== undefined) {
-        if (pacIsStanding) {
-          const newPacmanState = updatePacman(dir!);
-          if (!equalPos(pacmanState.pos, newPacmanState.pos))
-            setPacIsStanding(false);
-          setPacmanState(newPacmanState);
-        }
-        setPlayerDir(dir);
-      }
-    },
-    [pacIsStanding, pacmanState]
-  );
   useEffect(() => {
     if (gameOver) return;
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [pacIsStanding, pacmanState, gameOver, handleKey]);
+    const keyDown = (e: KeyboardEvent) => {
+      if (['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code))
+        setLastMovementKey(e.code);
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code))
+        setLastArrowKey(e.code);
+      setPressedKeys((prev) => {
+        const next = new Set(prev);
+        next.add(e.code);
+        return next;
+      });
+    };
+    const keyUp = (e: KeyboardEvent) =>
+      setPressedKeys((prev) => {
+        const next = new Set(prev);
+        next.delete(e.code);
+        return next;
+      });
+    window.addEventListener('keydown', keyDown);
+    window.addEventListener('keyup', keyUp);
+    return () => {
+      window.removeEventListener('keydown', keyDown);
+      window.removeEventListener('keyup', keyUp);
+    };
+  }, [gameOver]);
+
+  useEffect(() => {
+    if (
+      (pressedKeys.has('ArrowUp') ||
+        pressedKeys.has('ArrowDown') ||
+        pressedKeys.has('ArrowLeft') ||
+        pressedKeys.has('ArrowRight')) &&
+      !shootOnCooldown &&
+      !gameOver
+    ) {
+      setShootOnCooldown(true);
+      setBullets((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          initialPos: pacmanState.pos,
+          dir: keyToDirection[lastArrowKey!],
+          speed: 0.05,
+        },
+      ]);
+      setTimeout(() => {
+        setShootOnCooldown(false);
+      }, shootCooldown);
+    }
+
+    const dir = keyToDirection[lastMovementKey!];
+    if (dir !== undefined) {
+      if (pacIsStanding) {
+        const newPacmanState = updatePacman(dir!);
+        if (!equalPos(pacmanState.pos, newPacmanState.pos))
+          setPacIsStanding(false);
+        setPacmanState(newPacmanState);
+      }
+      setPlayerDir(dir);
+    }
+  }, [
+    pressedKeys,
+    lastArrowKey,
+    lastMovementKey,
+    pacmanState.pos,
+    pacIsStanding,
+    shootOnCooldown,
+    gameOver,
+  ]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -87,14 +153,14 @@ export default function PacmanSprite({
     const handleGameOver = () => {
       setGameOver(true);
       clearInterval(id);
-      window.removeEventListener('keydown', handleKey);
+      //window.removeEventListener('keydown', handleKey);
     };
     window.addEventListener('gameOver', handleGameOver);
     return () => {
       clearInterval(id);
       window.removeEventListener('gameOver', handleGameOver);
     };
-  }, [fps, handleKey]);
+  }, [fps]);
 
   useEffect(() => {
     const handleHit = () => {
@@ -109,6 +175,13 @@ export default function PacmanSprite({
     const t = setTimeout(() => setInvincible(false), INVINCIBLE_MS);
     return () => clearTimeout(t);
   }, [invincible]);
+
+  const onBulletHit = useCallback((id: string, hitGhost: GhostType | null) => {
+    setBullets((prev) => prev.filter((b) => b.id !== id));
+    if (hitGhost !== null) {
+      window.dispatchEvent(new CustomEvent(`bulletHit-${hitGhost}`));
+    }
+  }, []);
 
   const pacSrc = useMemo(() => getPath(anim.frame), [anim.frame]);
   const pacRotation = dirToRotation(pacmanState.movingDir);
@@ -189,6 +262,16 @@ export default function PacmanSprite({
           />
         </div>
       </div>
+      {bullets.map((b) => (
+        <BulletSprite
+          key={b.id}
+          id={b.id}
+          initialPos={b.initialPos}
+          dir={b.dir}
+          speed={b.speed}
+          onHit={onBulletHit}
+        />
+      ))}
     </div>
   );
 }
