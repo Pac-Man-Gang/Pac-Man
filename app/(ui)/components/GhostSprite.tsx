@@ -103,6 +103,17 @@ export default function GhostSprite({
 
   useEffect(() => setGhostState(updateGhost(ghostType, null)), [ghostType]);
 
+  useEffect(() => {
+    if (ghostState.isTeleporting) {
+      // Wait one animation frame so the teleport position renders first
+      const raf = requestAnimationFrame(() => {
+        setGhostState(updateGhost(ghostType));
+      });
+      console.log('teleport started' + ghostState.isTeleporting);
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [ghostState.isTeleporting, ghostType]);
+
   const xPixel = Math.round(
     ghostState.pos.x * tileSize + (tileSize - size) / 2
   );
@@ -117,7 +128,9 @@ export default function GhostSprite({
         left: 0,
         right: 0,
         transform: `translate3d(${xPixel}px, ${yPixel}px, 0)`,
-        transition: `transform ${speed}s linear`,
+        transition: ghostState.isTeleporting
+          ? 'none'
+          : `transform ${speed}s linear`,
         willChange: 'transform',
       }}
       onTransitionEnd={(e) => {
