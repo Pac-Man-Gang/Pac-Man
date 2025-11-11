@@ -131,7 +131,15 @@ export default function PacmanSprite({
       }
       setPlayerDir(dir);
     }
-  }, [pressedKeys, lastArrowKey, lastMovementKey, pacmanState.pos, pacIsStanding, shootOnCooldown, gameOver]);
+  }, [
+    pressedKeys,
+    lastArrowKey,
+    lastMovementKey,
+    pacmanState.pos,
+    pacIsStanding,
+    shootOnCooldown,
+    gameOver,
+  ]);
 
   useEffect(() => {
     const id = setInterval(() => {
