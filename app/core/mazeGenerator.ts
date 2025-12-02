@@ -1,18 +1,23 @@
 'use client';
 import data from '../../public/assets/maze/MazeChunks.json'
 
-
+interface ChunkData {
+    weight: number;
+    data: number[][];
+}
 
 class Chunk {
     
     content: number[][];
     width: number;
     height: number;
+    weight: number;
 
-    constructor(chunkArray: number[][]) {
-        this.width = chunkArray.length;
-        this.height = chunkArray[0].length;
-        this.content = chunkArray
+    constructor(chunkArray: number[][], weight: number) {
+        this.height = chunkArray.length;
+        this.width = chunkArray[0].length;
+        this.content = chunkArray;
+        this.weight = weight;
     }
 }
 
@@ -22,12 +27,20 @@ class RandomMaze {
     width: number;
     height: number;
     seed: number;
+    private chunks: Chunk[];
+    private totalWeight: number;
 
     constructor(width: number, height: number, seed: number) {
         this.width = width;
         this.height = height;
         this.seed = seed;
         this.content = Array(height).fill(null).map(() => Array(width).fill(0));
+        
+        this.chunks = (data.chunks as ChunkData[]).map(
+            chunkData => new Chunk(chunkData.data, chunkData.weight)
+        );
+        this.totalWeight = this.chunks.reduce((sum, chunk) => sum + chunk.weight, 0);
+        
         this.generate();
     }
 
@@ -43,7 +56,7 @@ class RandomMaze {
     generate() {
         this.makeBorder();
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 30; i++) {
             let chunk: Chunk = this.getRandomChunk();
             let xRandom: number = Math.floor(this.randomRange(2, 25));
             let yRandom: number = Math.floor(this.randomRange(2, 21));
@@ -62,15 +75,24 @@ class RandomMaze {
     }
 
     getRandomChunk(): Chunk {
-        const randomIndex = Math.floor(this.random() * data.chunks.length);
-        return new Chunk(data.chunks[randomIndex]);
+        let randomWeight = this.random() * this.totalWeight;
+        
+        let cumulativeWeight = 0;
+        for (const chunk of this.chunks) {
+            cumulativeWeight += chunk.weight;
+            if (randomWeight <= cumulativeWeight) {
+                return chunk;
+            }
+        }
+        
+        return this.chunks[0];
     }
 
     insertChunk(startX: number, startY: number, chunk: Chunk) {
         for (let i = 0; i < chunk.content.length; i++) {
             for (let j = 0; j < chunk.content[0].length; j++) {
                 if (chunk.content[i][j] === 1) {
-                    if (startX + i < this.content.length && startY + j < this.content[0].length) {
+                    if (startX + i < this.content.length && startY + j < this.content[0].length) {   
                         this.content[startX + i][startY + j] = chunk.content[i][j];
                     }
                 }
@@ -81,6 +103,6 @@ class RandomMaze {
 
     
 
-let maze = new RandomMaze(28, 31, 6711);
+let maze = new RandomMaze(28, 31, 1);
 console.log(maze.content);
 export const LEVEL_MAP_GENERATED: number[][] = maze.content;
