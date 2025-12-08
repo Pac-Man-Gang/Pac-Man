@@ -80,6 +80,39 @@ class MazeComponent {
   neighbours: Record<string, number | undefined>;
   isNeighbourWall: Record<string, boolean>;
 
+  isEmptyValue(value: number | undefined) {
+    return value === 0;
+  }
+
+  isOutOfBoundsValue(value: number | undefined) {
+    return value === 3 || value === undefined;
+  }
+
+  isGhostHouseValue(value: number | undefined) {
+    return value === 4;
+  }
+
+  isPelletValue(value: number | undefined) {
+    return value === 2 || value === 5;
+  }
+
+  isNonWallValue(value: number | undefined) {
+    // all *non-wall* but valid tiles
+    return value !== 1 && value !== 3 && value !== undefined;
+  }
+
+  isWallOrBlock(value: number | undefined) {
+    return value === 1 || value === 3 || value === 4 || value === undefined;
+  }
+
+  isNonWallOrPellet(value: number | undefined) {
+    return value === 0 || value === 2 || value === 5;
+  }
+
+  isWallorGhostHouse(value: number | undefined) {
+    return value === 1 || value === 4;
+  }
+
   constructor(row: number, col: number) {
     this.row = row;
     this.col = col;
@@ -107,184 +140,179 @@ class MazeComponent {
       case ComponentType.Superpellet:
         return <SuperPelletSprite row={this.row} col={this.col} />;
       case ComponentType.Connector:
-        return this.defineConnector();
+        return <MazeTile tile={this.defineConnector()} />;
       case ComponentType.Insidecorner:
-        return this.defineInsideCorner();
+        return <MazeTile tile={this.defineInsideCorner()} />;
       case ComponentType.Corner:
-        return this.defineCorner();
+        return <MazeTile tile={this.defineCorner()} />;
       case ComponentType.Wall:
-        return this.defineWall();
+        return <MazeTile tile={this.defineWall()} />;
       default:
         return <EmptyCell />;
     }
   }
 
-  defineWall(): ReactElement {
+  defineWall(): string {
+    const N = this.isWallOrBlock(this.neighbours.N);
+    const E = this.isWallOrBlock(this.neighbours.E);
+    const S = this.isWallOrBlock(this.neighbours.S);
+    const W = this.isWallOrBlock(this.neighbours.W);
+
+    const NS = N && S;
+    const EW = E && W;
+
+    const anyOOB = Object.values(this.neighbours).some(
+      (n) => n === 3 || n === 4 || n === undefined
+    );
+
+    // For detecting pellets/empty spots
+    const E_open = this.isNonWallOrPellet(this.neighbours.E);
+    const S_open = this.isNonWallOrPellet(this.neighbours.S);
+
+    // ========================================================
+    // SPECIAL CASE: fully enclosed → EmptyCell
+    // ========================================================
     if (Object.values(this.neighbours).every((n) => n === 1)) {
-      return <EmptyCell />;
+      return 'emptyCell';
     }
 
-    if (this.isVertical()) {
-      if ([3, 4, undefined].includes(this.neighbours.E)) {
-        return <MazeTile tile={'doubleWallFlipped'} />;
-      } else if (
-        Object.values(this.neighbours).some(
-          (n) => n === 3 || n === 4 || n === undefined
-        )
-      ) {
-        return <MazeTile tile={'doubleWall'} />;
-      } else {
-        if (
-          this.neighbours.E === 2 ||
-          this.neighbours.E === 0 ||
-          this.neighbours.E === 5
-        ) {
-          return <MazeTile tile={'singleWallFlipped'} />;
-        } else {
-          return <MazeTile tile={'singleWall'} />;
-        }
-      }
-    } else {
-      if ([3, 4, undefined].includes(this.neighbours.S)) {
-        if (this.neighbours.E === 4) {
-          return <MazeTile tile={'wallStopFlipped'} />;
-        } else if (this.neighbours.W === 4) {
-          return <MazeTile tile={'wallStop'} />;
-        } else {
-          return <MazeTile tile={'doubleWallRotateLeft'} />;
-        }
-      } else if (
-        Object.values(this.neighbours).some(
-          (n) => n === 3 || n === 4 || n === undefined
-        )
-      ) {
-        return <MazeTile tile={'doubleWallRotateRight'} />;
-      } else {
-        if (
-          this.neighbours.S === 2 ||
-          this.neighbours.S === 0 ||
-          this.neighbours.S === 5
-        ) {
-          return <MazeTile tile={'singleWallRotateLeft'} />;
-        } else {
-          return <MazeTile tile={'singleWallRotateRight'} />;
-        }
-      }
+    // ========================================================
+    // VERTICAL WALLS
+    // ========================================================
+    if (N && S) {
+      // Out-of-bounds RIGHT → flipped double wall
+      if (E && anyOOB) return 'doubleWallFlipped';
+
+      // Any boundary → double wall
+      if (anyOOB) return 'doubleWall'; //isGood
+
+      // Normal vertical wall
+      return E_open ? 'singleWallFlipped' : 'singleWall'; //isGood
     }
+
+    // ========================================================
+    // HORIZONTAL WALLS
+    // ========================================================
+    if (E && W) {
+      // Out-of-bounds SOUTH
+      if (S) {
+        if (this.neighbours.E === 4) return 'wallStopFlipped'; // isGood
+        if (this.neighbours.W === 4) return 'wallStop'; // isGood
+        if (anyOOB) return 'doubleWallRotateLeft'; // isGood
+        return 'singleWallFlippedRotateLeft'; //Git Gud
+      }
+
+      // Any boundary → rotated double wall
+      if (anyOOB) return 'doubleWallRotateRight'; //isGood
+
+      // Normal horizontal wall
+      return S_open ? 'singleWallRotateLeft' : 'singleWallRotateRight'; //isGood
+    }
+
+    // Fallback
+    return 'singleWall';
   }
 
   isVertical(): boolean {
     return this.isNeighbourWall.N && this.isNeighbourWall.S;
   }
 
-  defineInsideCorner(): ReactElement {
+  defineInsideCorner(): string {
     const w = this.isNeighbourWall;
 
-    if (w.N && w.S && w.E && w.W && !w.NE) {
-      return <MazeTile tile={'shortCorner'} />;
-    } else if (w.N && w.S && w.E && w.W && !w.NW) {
-      return <MazeTile tile={'shortCornerRotateLeft'} />;
-    } else if (w.N && w.S && w.E && w.W && !w.SE) {
-      return <MazeTile tile={'shortCornerRotateRight'} />;
-    } else if (w.N && w.S && w.E && w.W && !w.SW) {
-      return <MazeTile tile={'shortCornerReverse'} />;
-    } else {
-      return <MazeTile tile={'shortCorner'} />;
+    // All 4 cardinal walls → inside corner cases
+    const allFour = w.N && w.S && w.E && w.W;
+
+    if (allFour) {
+      if (!w.NE) return 'shortCorner'; // inside corner top-right
+      if (!w.NW) return 'shortCornerRotateLeft'; // inside corner top-left
+      if (!w.SE) return 'shortCornerRotateRight'; // inside corner bottom-right
+      if (!w.SW) return 'shortCornerReverse'; // inside corner bottom-left
     }
+
+    // Fallback (rare, but matches old code)
+    return 'shortCorner';
   }
 
-  defineConnector(): ReactElement {
+  defineConnector(): string {
     const w = this.isNeighbourWall;
 
-    if (w.E && w.W && w.N && !w.S && !w.NE) {
-      return <MazeTile tile={'connectorFlippedReverse'} />;
-    } else if (w.E && w.W && w.N && !w.S && !w.NW) {
-      return <MazeTile tile={'connectorReverse'} />;
-    } else if (w.E && w.W && w.S && !w.N && !w.SE) {
-      return <MazeTile tile={'connector'} />;
-    } else if (w.E && w.W && w.S && !w.N && !w.SW) {
-      return <MazeTile tile={'connectorFlipped'} />;
-    } else if (w.N && w.S && w.E && !w.W && !w.NE) {
-      return <MazeTile tile={'connectorRotateLeft'} />;
-    } else if (w.N && w.S && w.E && !w.W && !w.SE) {
-      return <MazeTile tile={'connectorFlippedRotateRight'} />;
-    } else if (w.N && w.S && w.W && !w.E && !w.NW) {
-      return <MazeTile tile={'connectorFlippedRotateLeft'} />;
-    } else if (w.N && w.S && w.W && !w.E && !w.SW) {
-      return <MazeTile tile={'connectorRotateRight'} />;
-    } else {
-      return <MazeTile tile={'connector'} />;
+    // OPEN SOUTH (walls on N, E, W)
+    if (w.N && w.E && w.W && !w.S) {
+      if (!w.NE) return 'connectorFlippedReverse';
+      if (!w.NW) return 'connectorReverse';
     }
+
+    // OPEN NORTH (walls on S, E, W)
+    if (w.S && w.E && w.W && !w.N) {
+      if (!w.SE) return 'connector';
+      if (!w.SW) return 'connectorFlipped';
+    }
+
+    // OPEN WEST (walls on N, S, E)
+    if (w.N && w.S && w.E && !w.W) {
+      if (!w.NE) return 'connectorRotateLeft';
+      if (!w.SE) return 'connectorFlippedRotateRight';
+    }
+
+    // OPEN EAST (walls on N, S, W)
+    if (w.N && w.S && w.W && !w.E) {
+      if (!w.NW) return 'connectorFlippedRotateLeft';
+      if (!w.SW) return 'connectorRotateRight';
+    }
+
+    // DEFAULT fallback
+    return 'connector';
   }
 
-  defineCorner(): ReactElement {
-    // Corner (N to E)
-    if (
-      this.isNeighbourWall.N &&
-      this.isNeighbourWall.E &&
-      !this.isNeighbourWall.S &&
-      !this.isNeighbourWall.W
-    ) {
-      if (this.neighbours.S === undefined || this.neighbours.S === 3) {
-        return <MazeTile tile={'doubleCorner'} />;
-      } else if (this.neighbours.NE === 3) {
-        return <MazeTile tile={'shortCorner'} />;
-      } else if (this.neighbours.NE === 4) {
-        return <MazeTile tile={'sharpDoubleCorner'} />;
-      } else {
-        return <MazeTile tile={'normalCorner'} />;
-      }
-      // Corner (N to W)
-    } else if (
-      this.isNeighbourWall.N &&
-      this.isNeighbourWall.W &&
-      !this.isNeighbourWall.S &&
-      !this.isNeighbourWall.E
-    ) {
-      if (this.neighbours.S === undefined || this.neighbours.S === 3) {
-        return <MazeTile tile={'doubleCornerRotateLeft'} />;
-      } else if (this.neighbours.NW === 3) {
-        return <MazeTile tile={'shortCornerRotateLeft'} />;
-      } else if (this.neighbours.NW === 4) {
-        return <MazeTile tile={'sharpDoubleCornerRotateLeft'} />;
-      } else {
-        return <MazeTile tile={'normalCornerRotateLeft'} />;
-      }
-      // Corner (S to E)
-    } else if (
-      this.isNeighbourWall.S &&
-      this.isNeighbourWall.E &&
-      !this.isNeighbourWall.N &&
-      !this.isNeighbourWall.W
-    ) {
-      if (this.neighbours.N === undefined || this.neighbours.N === 3) {
-        return <MazeTile tile={'doubleCornerRotateRight'} />;
-      } else if (this.neighbours.SE === 3) {
-        return <MazeTile tile={'shortCornerRotateRight'} />;
-      } else if (this.neighbours.SE === 4) {
-        return <MazeTile tile={'sharpDoubleCornerRotateRight'} />;
-      } else {
-        return <MazeTile tile={'normalCornerRotateRight'} />;
-      }
-      // Corner (S to W)
-    } else if (
-      this.isNeighbourWall.S &&
-      this.isNeighbourWall.W &&
-      !this.isNeighbourWall.N &&
-      !this.isNeighbourWall.E
-    ) {
-      if (this.neighbours.N === undefined || this.neighbours.N === 3) {
-        return <MazeTile tile={'doubleCornerReverse'} />;
-      } else if (this.neighbours.SW === 3) {
-        return <MazeTile tile={'shortCornerReverse'} />;
-      } else if (this.neighbours.SW === 4) {
-        return <MazeTile tile={'sharpDoubleCornerReverse'} />;
-      } else {
-        return <MazeTile tile={'normalCornerReverse'} />;
-      }
+  defineCorner(): string {
+    const w = this.isNeighbourWall;
+    const n = this.neighbours;
+
+    // ========================================================
+    // 1) CORNER: N → E (open to the South & West)
+    // ========================================================
+    if (w.N && w.E && !w.S && !w.W) {
+      if (n.S === undefined || n.S === 3) return 'doubleCorner';
+      if (n.NE === 3) return 'shortCorner';
+      if (n.NE === 4) return 'sharpDoubleCorner';
+      return 'normalCorner';
     }
 
-    return <MazeTile tile={'normalCorner'} />;
+    // ========================================================
+    // 2) CORNER: N → W (open to the South & East)
+    // ========================================================
+    if (w.N && w.W && !w.S && !w.E) {
+      if (n.S === undefined || n.S === 3) return 'doubleCornerRotateLeft';
+      if (n.NW === 3) return 'shortCornerRotateLeft';
+      if (n.NW === 4) return 'sharpDoubleCornerRotateLeft';
+      return 'normalCornerRotateLeft';
+    }
+
+    // ========================================================
+    // 3) CORNER: S → E (open to the North & West)
+    // ========================================================
+    if (w.S && w.E && !w.N && !w.W) {
+      if (n.N === undefined || n.N === 3) return 'doubleCornerRotateRight';
+      if (n.SE === 3) return 'shortCornerRotateRight';
+      if (n.SE === 4) return 'sharpDoubleCornerRotateRight';
+      return 'normalCornerRotateRight';
+    }
+
+    // ========================================================
+    // 4) CORNER: S → W (open to the North & East)
+    // ========================================================
+    if (w.S && w.W && !w.N && !w.E) {
+      if (n.N === undefined || n.N === 3) return 'doubleCornerReverse';
+      if (n.SW === 3) return 'shortCornerReverse';
+      if (n.SW === 4) return 'sharpDoubleCornerReverse';
+      return 'normalCornerReverse';
+    }
+
+    // ========================================================
+    // FALLBACK (should not normally happen)
+    // ========================================================
+    return 'normalCorner';
   }
 
   defineComponentType(): ComponentType {

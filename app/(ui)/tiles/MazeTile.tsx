@@ -27,6 +27,7 @@ const TILE_SPRITES: Record<
   string,
   { src: string; rotation?: number; flipX?: boolean; flipY?: boolean }
 > = {
+  emptyCell: { src: '/assets/Empty.svg' },
   // Variations of single wall
   singleWall: { src: '/assets/maze/SingleWall.svg' },
   singleWallFlipped: { src: '/assets/maze/SingleWall.svg', flipX: true },
@@ -35,6 +36,16 @@ const TILE_SPRITES: Record<
     rotation: 90,
   },
   singleWallRotateLeft: { src: '/assets/maze/SingleWall.svg', rotation: -90 },
+  singleWallFlippedRotateRight: {
+    src: '/assets/maze/SingleWall.svg',
+    rotation: 90,
+    flipX: true,
+  },
+  singleWallFlippedRotateLeft: {
+    src: '/assets/maze/SingleWall.svg',
+    rotation: -90,
+    flipX: true,
+  },
 
   // Variations of connector
   connector: { src: '/assets/maze/Connector.svg' },
