@@ -184,10 +184,10 @@ class MazeComponent {
       if (E && anyOOB) return 'doubleWallFlipped';
 
       // Any boundary → double wall
-      if (anyOOB) return 'doubleWall'; //isGood
+      if (anyOOB) return 'doubleWall';
 
       // Normal vertical wall
-      return E_open ? 'singleWallFlipped' : 'singleWall'; //isGood
+      return E_open ? 'singleWallFlipped' : 'singleWall';
     }
 
     // ========================================================
@@ -196,17 +196,17 @@ class MazeComponent {
     if (E && W) {
       // Out-of-bounds SOUTH
       if (S) {
-        if (this.neighbours.E === 4) return 'wallStopFlipped'; // isGood
-        if (this.neighbours.W === 4) return 'wallStop'; // isGood
-        if (anyOOB) return 'doubleWallRotateLeft'; // isGood
-        return 'singleWallFlippedRotateLeft'; //Git Gud
+        if (this.neighbours.E === 4) return 'wallStopFlipped';
+        if (this.neighbours.W === 4) return 'wallStop';
+        if (anyOOB) return 'doubleWallRotateLeft';
+        return 'singleWallFlippedRotateLeft';
       }
 
       // Any boundary → rotated double wall
-      if (anyOOB) return 'doubleWallRotateRight'; //isGood
+      if (anyOOB) return 'doubleWallRotateRight';
 
       // Normal horizontal wall
-      return S_open ? 'singleWallRotateLeft' : 'singleWallRotateRight'; //isGood
+      return S_open ? 'singleWallRotateLeft' : 'singleWallRotateRight';
     }
 
     // Fallback
