@@ -180,17 +180,14 @@ export default function PacmanSprite({
     return () => clearTimeout(t);
   }, [invincible]);
 
-  const onBulletHit = useCallback(
-    (id: string, hitGhost: GhostType | null) => {
-      if (hitGhost !== null) {
-        window.dispatchEvent(new CustomEvent(`bulletHit-${hitGhost}`));
-      }
-      if (!(weaponType === 'Sword' && hitGhost !== null)) {
-        setBullets((prev) => prev.filter((b) => b.id !== id));
-      }
-    },
-    [weaponType]
-  );
+  const onBulletHit = useCallback((id: string, hitGhost: GhostType | null) => {
+    if (hitGhost !== null) {
+      window.dispatchEvent(new CustomEvent(`bulletHit-${hitGhost}`));
+    }
+    if (!(weaponType === 'Sword' && hitGhost !== null)) {
+      setBullets((prev) => prev.filter((b) => b.id !== id));
+    }
+  }, []);
 
   const pacSrc = useMemo(() => getPath(anim.frame), [anim.frame]);
   const pacRotation = dirToRotation(pacmanState.movingDir);

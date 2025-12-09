@@ -128,7 +128,7 @@ export default function SwordSwingSprite({
         width: 75,
         height: 75,
       }}
-      onTransitionEnd={(e) => {
+      onTransitionEnd={() => {
         setPosition((prev) => posAt(prev, dir, 1));
       }}
       data-type={`bullet-${id}`}
