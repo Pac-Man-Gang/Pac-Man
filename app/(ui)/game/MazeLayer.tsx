@@ -1,4 +1,3 @@
-import EmptyCell from '../components/EmptyCell';
 import SmallPelletSprite, {
   getAllSmallPelletSprites,
 } from '../components/SmallPelletSprite';
@@ -159,7 +158,7 @@ class MazeComponent {
       case ComponentType.Empty:
       case ComponentType.Ghosthouse:
       case ComponentType.Void:
-        return <EmptyCell />;
+        return <MazeTile tile={'emptyCell'} />;
       case ComponentType.Smallpellet:
         return <SmallPelletSprite row={this.row} col={this.col} />;
       case ComponentType.Superpellet:
@@ -173,7 +172,7 @@ class MazeComponent {
       case ComponentType.Wall:
         return <MazeTile tile={this.defineWall()} />;
       default:
-        return <EmptyCell />;
+        return <MazeTile tile={'emptyCell'} />;
     }
   }
 
