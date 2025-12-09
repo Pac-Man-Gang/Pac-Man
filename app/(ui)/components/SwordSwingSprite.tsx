@@ -28,15 +28,15 @@ export default function SwordSwingSprite({
 }: SwordSwingSprite) {
   const [position, setPosition] = useState(() => {
     let position = initialPos;
-    if (dir === 0) {
+    if (dir === Direction.N) {
       position = posAt(position, Direction.N, 3);
       position = posAt(position, Direction.W, 2);
-    } else if (dir === 1) {
+    } else if (dir === Direction.S) {
       position = posAt(position, Direction.W, 2);
-    } else if (dir === 2) {
+    } else if (dir === Direction.W) {
       position = posAt(position, Direction.W, 3);
       position = posAt(position, Direction.N, 2);
-    } else if (dir === 3) {
+    } else if (dir === Direction.E) {
       position = posAt(position, Direction.N, 2);
     }
     return position;
@@ -59,8 +59,7 @@ export default function SwordSwingSprite({
 
     const intervalId = window.setInterval(() => {
       setAnimFrame((prev) => {
-        const frame = prev === 9 ? 9 : prev + 1;
-        return frame;
+        return prev + 1;
       });
     }, 75); // or whatever speed you want
 

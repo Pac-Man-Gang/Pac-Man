@@ -30,7 +30,7 @@ export function getPacmanArrow() {
 }
 
 const shootCooldown = 750;
-const weaponType = 'asdf';
+const weaponType = 'Sword';
 
 export default function PacmanSprite({
   size = 32,
