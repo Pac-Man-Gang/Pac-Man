@@ -6,13 +6,18 @@ import SuperPelletSprite, {
   getAllSuperPelletSprites,
 } from '../components/SuperPelletSprite';
 
-// Empty = 0
-// Wall = 1
-// Small Pellet = 2
-// Out of Map = 3
-// Ghost House = 4
-// Super Pellets = 5
-// Tunnel = 6
+/**
+ * ========================================================
+ * TILE VALUES (LEVEL_MAP encoding)
+ * ========================================================
+ * 0 → Empty
+ * 1 → Wall
+ * 2 → Small pellet
+ * 3 → Out of bounds / void
+ * 4 → Ghost house
+ * 5 → Super pellet
+ * 6 → Tunnel
+ */
 
 // prettier-ignore
 export const LEVEL_MAP: number[][] = [
@@ -61,6 +66,11 @@ enum ComponentType {
   Empty,
 }
 
+/**
+ * ========================================================
+ * DIRECTION OFFSETS
+ * ========================================================
+ */
 const DIRS = {
   N: [-1, 0],
   S: [1, 0],
@@ -80,6 +90,11 @@ class MazeComponent {
   neighbours: Record<string, number | undefined>;
   isNeighbourWall: Record<string, boolean>;
 
+  /**
+   * ========================================================
+   * VALUE HELPERS
+   * ========================================================
+   */
   isEmptyValue(value: number | undefined) {
     return value === 0;
   }
@@ -113,6 +128,11 @@ class MazeComponent {
     return value === 1 || value === 4;
   }
 
+  /**
+   * ========================================================
+   * CONSTRUCTOR: read neighbours and classify component
+   * ========================================================
+   */
   constructor(row: number, col: number) {
     this.row = row;
     this.col = col;
@@ -129,6 +149,11 @@ class MazeComponent {
     this.component = this.defineComponent();
   }
 
+  /**
+   * ========================================================
+   * COMPONENT SELECTION
+   * ========================================================
+   */
   defineComponent(): ReactElement {
     switch (this.type) {
       case ComponentType.Empty:
@@ -152,6 +177,11 @@ class MazeComponent {
     }
   }
 
+  /**
+   * ========================================================
+   * WALL SELECTION
+   * ========================================================
+   */
   defineWall(): string {
     const N = this.isWallOrBlock(this.neighbours.N);
     const E = this.isWallOrBlock(this.neighbours.E);
@@ -217,6 +247,11 @@ class MazeComponent {
     return this.isNeighbourWall.N && this.isNeighbourWall.S;
   }
 
+  /**
+   * ========================================================
+   * INSIDE CORNERS (all 4 walls + one missing diagonal)
+   * ========================================================
+   */
   defineInsideCorner(): string {
     const w = this.isNeighbourWall;
 
@@ -234,6 +269,11 @@ class MazeComponent {
     return 'shortCorner';
   }
 
+  /**
+   * ========================================================
+   * CONNECTORS (T-junctions)
+   * ========================================================
+   */
   defineConnector(): string {
     const w = this.isNeighbourWall;
 
@@ -265,6 +305,11 @@ class MazeComponent {
     return 'connector';
   }
 
+  /**
+   * ========================================================
+   * OUTSIDE CORNERS (L-shapes)
+   * ========================================================
+   */
   defineCorner(): string {
     const w = this.isNeighbourWall;
     const n = this.neighbours;
@@ -391,6 +436,9 @@ class MazeComponent {
   }
 }
 
+// ========================================================
+// MAZE LAYER RENDERING
+// ========================================================
 export let initialPelletAmount = 0;
 
 import { memo, ReactElement, useEffect, useMemo } from 'react';
