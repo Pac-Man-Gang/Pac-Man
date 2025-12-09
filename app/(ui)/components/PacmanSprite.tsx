@@ -5,6 +5,7 @@ import { equalPos } from '@/app/core/util/position';
 import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import BulletSprite from './BulletSprite';
+import SwordSwingSprite from './SwordSwingSprite';
 
 type PacmanSpriteProps = {
   uiPlayerDir?: Direction;
@@ -29,6 +30,7 @@ export function getPacmanArrow() {
 }
 
 const shootCooldown = 750;
+let weaponType = "asdf";
 
 export default function PacmanSprite({
   size = 32,
@@ -107,15 +109,17 @@ export default function PacmanSprite({
       !gameOver
     ) {
       setShootOnCooldown(true);
-      setBullets((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          initialPos: pacmanState.pos,
-          dir: keyToDirection[lastArrowKey!],
-          speed: 0.05,
-        },
-      ]);
+      setBullets((prev) => {
+        return [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            initialPos: pacmanState.pos,
+            dir: keyToDirection[lastArrowKey!],
+            speed: weaponType === "Sword" ? 0.5 : 0.05
+          },
+        ]
+      });
       setTimeout(() => {
         setShootOnCooldown(false);
       }, shootCooldown);
@@ -177,11 +181,13 @@ export default function PacmanSprite({
   }, [invincible]);
 
   const onBulletHit = useCallback((id: string, hitGhost: GhostType | null) => {
-    setBullets((prev) => prev.filter((b) => b.id !== id));
     if (hitGhost !== null) {
       window.dispatchEvent(new CustomEvent(`bulletHit-${hitGhost}`));
     }
-  }, []);
+    if (!(weaponType === "Sword" && hitGhost !== null)) {
+      setBullets(prev => prev.filter(b => b.id !== id));
+    }
+  }, [weaponType]);
 
   const pacSrc = useMemo(() => getPath(anim.frame), [anim.frame]);
   const pacRotation = dirToRotation(pacmanState.movingDir);
@@ -262,16 +268,31 @@ export default function PacmanSprite({
           />
         </div>
       </div>
-      {bullets.map((b) => (
-        <BulletSprite
-          key={b.id}
-          id={b.id}
-          initialPos={b.initialPos}
-          dir={b.dir}
-          speed={b.speed}
-          onHit={onBulletHit}
-        />
-      ))}
+      {bullets.map((b) => {
+        if (weaponType === "Sword") {
+          return (
+            <SwordSwingSprite
+              key={b.id}
+              id={b.id}
+              initialPos={b.initialPos}
+              dir={b.dir}
+              speed={b.speed}
+              onHit={onBulletHit}
+            />
+          )
+        } else {
+          return (
+            <BulletSprite
+              key={b.id}
+              id={b.id}
+              initialPos={b.initialPos}
+              dir={b.dir}
+              speed={b.speed}
+              onHit={onBulletHit}
+            />
+          )
+        }
+      })}
     </div>
   );
 }
