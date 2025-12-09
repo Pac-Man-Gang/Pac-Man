@@ -30,7 +30,7 @@ export function getPacmanArrow() {
 }
 
 const shootCooldown = 750;
-let weaponType = "asdf";
+const weaponType = 'asdf';
 
 export default function PacmanSprite({
   size = 32,
@@ -116,9 +116,9 @@ export default function PacmanSprite({
             id: crypto.randomUUID(),
             initialPos: pacmanState.pos,
             dir: keyToDirection[lastArrowKey!],
-            speed: weaponType === "Sword" ? 0.5 : 0.05
+            speed: weaponType === 'Sword' ? 0.5 : 0.05,
           },
-        ]
+        ];
       });
       setTimeout(() => {
         setShootOnCooldown(false);
@@ -180,14 +180,17 @@ export default function PacmanSprite({
     return () => clearTimeout(t);
   }, [invincible]);
 
-  const onBulletHit = useCallback((id: string, hitGhost: GhostType | null) => {
-    if (hitGhost !== null) {
-      window.dispatchEvent(new CustomEvent(`bulletHit-${hitGhost}`));
-    }
-    if (!(weaponType === "Sword" && hitGhost !== null)) {
-      setBullets(prev => prev.filter(b => b.id !== id));
-    }
-  }, [weaponType]);
+  const onBulletHit = useCallback(
+    (id: string, hitGhost: GhostType | null) => {
+      if (hitGhost !== null) {
+        window.dispatchEvent(new CustomEvent(`bulletHit-${hitGhost}`));
+      }
+      if (!(weaponType === 'Sword' && hitGhost !== null)) {
+        setBullets((prev) => prev.filter((b) => b.id !== id));
+      }
+    },
+    [weaponType]
+  );
 
   const pacSrc = useMemo(() => getPath(anim.frame), [anim.frame]);
   const pacRotation = dirToRotation(pacmanState.movingDir);
@@ -269,7 +272,7 @@ export default function PacmanSprite({
         </div>
       </div>
       {bullets.map((b) => {
-        if (weaponType === "Sword") {
+        if (weaponType === 'Sword') {
           return (
             <SwordSwingSprite
               key={b.id}
@@ -279,7 +282,7 @@ export default function PacmanSprite({
               speed={b.speed}
               onHit={onBulletHit}
             />
-          )
+          );
         } else {
           return (
             <BulletSprite
@@ -290,7 +293,7 @@ export default function PacmanSprite({
               speed={b.speed}
               onHit={onBulletHit}
             />
-          )
+          );
         }
       })}
     </div>
