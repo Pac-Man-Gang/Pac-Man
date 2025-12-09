@@ -187,9 +187,6 @@ class MazeComponent {
     const S = this.isWallOrBlock(this.neighbours.S);
     const W = this.isWallOrBlock(this.neighbours.W);
 
-    const NS = N && S;
-    const EW = E && W;
-
     const anyOOB = Object.values(this.neighbours).some(
       (n) => n === 3 || n === 4 || n === undefined
     );
