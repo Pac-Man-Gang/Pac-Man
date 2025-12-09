@@ -53,12 +53,13 @@ const TILE_SPRITES: Record<
 > = {
   // ============================================================
   // SPECIAL / DEFAULT TILES
+  // These tiles represent empty spaces or default states.
   // ============================================================
   emptyCell: { src: '/assets/Empty.svg' },
 
   // ============================================================
   // SINGLE WALL SEGMENTS
-  // For thin 1-direction wall pieces: used mostly for outer edges.
+  // Thin, one-direction wall pieces, used mostly for outer edges.
   // ============================================================
   singleWall: { src: '/assets/maze/SingleWall.svg' },
   singleWallFlipped: { src: '/assets/maze/SingleWall.svg', flipX: true },
@@ -69,18 +70,20 @@ const TILE_SPRITES: Record<
     rotation: 90,
   },
 
-  // Single wall rotated 90° counter-clockwise
+  // Single wall rotated 90° counter-clockwise (vertical orientation)
   singleWallRotateLeft: {
     src: '/assets/maze/SingleWall.svg',
     rotation: -90,
   },
 
-  // Flipped horizontal + rotated
+  // Flipped horizontally + rotated 90° clockwise
   singleWallFlippedRotateRight: {
     src: '/assets/maze/SingleWall.svg',
     rotation: 90,
     flipX: true,
   },
+
+  // Flipped horizontally + rotated 90° counter-clockwise
   singleWallFlippedRotateLeft: {
     src: '/assets/maze/SingleWall.svg',
     rotation: -90,
@@ -89,12 +92,7 @@ const TILE_SPRITES: Record<
 
   // ============================================================
   // CONNECTORS (T-JUNCTIONS & 4-WAY CROSSINGS)
-  // These tiles visually represent junctions where 3 or 4 paths meet.
-  //
-  // connector            — default orientation (open upward)
-  // connectorReverse     — flipped 180° (open downward)
-  // RotateRight/Left     — open to right/left
-  // Flipped              — used for mirrored layouts in the maze
+  // Tiles representing junctions where 3 or 4 paths meet.
   // ============================================================
   connector: { src: '/assets/maze/Connector.svg' },
   connectorReverse: { src: '/assets/maze/Connector.svg', rotation: 180 },
@@ -105,14 +103,20 @@ const TILE_SPRITES: Record<
     rotation: 180,
   },
 
+  // Connector rotated 90° clockwise
   connectorRotateRight: { src: '/assets/maze/Connector.svg', rotation: 90 },
+
+  // Connector rotated 90° clockwise + flipped vertically
   connectorFlippedRotateRight: {
     src: '/assets/maze/Connector.svg',
     rotation: 90,
     flipY: true,
   },
 
+  // Connector rotated 90° counter-clockwise
   connectorRotateLeft: { src: '/assets/maze/Connector.svg', rotation: -90 },
+
+  // Connector rotated 90° counter-clockwise + flipped vertically
   connectorFlippedRotateLeft: {
     src: '/assets/maze/Connector.svg',
     rotation: -90,
@@ -121,7 +125,7 @@ const TILE_SPRITES: Record<
 
   // ============================================================
   // DOUBLE WALLS (STRAIGHT THICK WALLS)
-  // Used for the wider, double-line walls typical in Pac-Man.
+  // Wider, double-line walls typical in Pac-Man mazes.
   // ============================================================
   doubleWall: { src: '/assets/maze/DoubleWall.svg' },
   doubleWallFlipped: { src: '/assets/maze/DoubleWall.svg', flipX: true },
@@ -136,21 +140,14 @@ const TILE_SPRITES: Record<
 
   // ============================================================
   // WALL STOP / DEAD END
-  // A single-direction wall endcap.
-  // Used when a wall ends abruptly (like cul-de-sacs).
+  // Single-direction wall endcaps, used for cul-de-sacs.
   // ============================================================
   wallStop: { src: '/assets/maze/WallStop.svg' },
   wallStopFlipped: { src: '/assets/maze/WallStop.svg', flipX: true },
 
   // ============================================================
   // CORNERS (OUTSIDE + INSIDE VARIANTS)
-  // These are the most visually complex pieces.
-  // shortCorner         — inside corner (tight turn)
-  // doubleCorner        — large outer corner (rounded)
-  // sharpDoubleCorner   — sharper version for ghost house / inner maze
-  // normalCorner        — default outside corner look
-  //
-  // All exist in multiple rotations.
+  // Complex corner pieces for inside and outside turns.
   // ============================================================
 
   // ---- Inside / short corners ----

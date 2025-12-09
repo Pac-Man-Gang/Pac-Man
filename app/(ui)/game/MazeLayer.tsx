@@ -115,15 +115,15 @@ class MazeComponent {
     return value !== 1 && value !== 3 && value !== undefined;
   }
 
-  isWallOrBlock(value: number | undefined) {
+  isWallOrBlockValue(value: number | undefined) {
     return value === 1 || value === 3 || value === 4 || value === undefined;
   }
 
-  isNonWallOrPellet(value: number | undefined) {
+  isNonWallOrPelletValue(value: number | undefined) {
     return value === 0 || value === 2 || value === 5;
   }
 
-  isWallorGhostHouse(value: number | undefined) {
+  isWallorGhostHouseValue(value: number | undefined) {
     return value === 1 || value === 4;
   }
 
@@ -182,18 +182,18 @@ class MazeComponent {
    * ========================================================
    */
   defineWall(): string {
-    const N = this.isWallOrBlock(this.neighbours.N);
-    const E = this.isWallOrBlock(this.neighbours.E);
-    const S = this.isWallOrBlock(this.neighbours.S);
-    const W = this.isWallOrBlock(this.neighbours.W);
+    const N = this.isWallOrBlockValue(this.neighbours.N);
+    const E = this.isWallOrBlockValue(this.neighbours.E);
+    const S = this.isWallOrBlockValue(this.neighbours.S);
+    const W = this.isWallOrBlockValue(this.neighbours.W);
 
     const anyOOB = Object.values(this.neighbours).some(
       (n) => n === 3 || n === 4 || n === undefined
     );
 
     // For detecting pellets/empty spots
-    const E_open = this.isNonWallOrPellet(this.neighbours.E);
-    const S_open = this.isNonWallOrPellet(this.neighbours.S);
+    const E_open = this.isNonWallOrPelletValue(this.neighbours.E);
+    const S_open = this.isNonWallOrPelletValue(this.neighbours.S);
 
     // ========================================================
     // SPECIAL CASE: fully enclosed → EmptyCell
@@ -206,7 +206,7 @@ class MazeComponent {
     // VERTICAL WALLS
     // ========================================================
     if (N && S) {
-      // Out-of-bounds RIGHT → flipped double wall
+      // Out-of-bounds East → flipped double wall
       if (E && anyOOB) return 'doubleWallFlipped';
 
       // Any boundary → double wall
@@ -255,10 +255,10 @@ class MazeComponent {
     const allFour = w.N && w.S && w.E && w.W;
 
     if (allFour) {
-      if (!w.NE) return 'shortCorner'; // inside corner top-right
-      if (!w.NW) return 'shortCornerRotateLeft'; // inside corner top-left
-      if (!w.SE) return 'shortCornerRotateRight'; // inside corner bottom-right
-      if (!w.SW) return 'shortCornerReverse'; // inside corner bottom-left
+      if (!w.NE) return 'shortCorner'; // inside corner north-east
+      if (!w.NW) return 'shortCornerRotateLeft'; // inside corner north-west
+      if (!w.SE) return 'shortCornerRotateRight'; // inside corner south-east
+      if (!w.SW) return 'shortCornerReverse'; // inside corner south-west
     }
 
     // Fallback (rare, but matches old code)
