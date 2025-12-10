@@ -19,7 +19,7 @@ export const INITIAL_GAMESTATE: GameState = {
   pacman: initialPacman(13, 23),
   ghosts: initialGhosts(),
   score: 0,
-  lives: 30000000000000000,
+  lives: 3000,
 };
 
 const gameStates: GameState[] = [INITIAL_GAMESTATE];

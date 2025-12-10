@@ -122,36 +122,7 @@ let frightenedModeEnteredTimestamp: number;
 const housePos = { x: 14, y: 14 };
 
 export function initialGhosts(): GhostState[] {
-  return [
-    {
-      pos: { x: 15, y: 14 },
-      sprite: 'clyde',
-      dir: Direction.N,
-      type: GhostType.CLYDE,
-      mode: GhostMode.HOME,
-    },
-    {
-      pos: { x: 13, y: 14 },
-      sprite: 'inky',
-      dir: Direction.N,
-      type: GhostType.INKY,
-      mode: GhostMode.HOME,
-    },
-    {
-      pos: { x: 14, y: 14 },
-      sprite: 'pinky',
-      dir: Direction.N,
-      type: GhostType.PINKY,
-      mode: GhostMode.HOME,
-    },
-    {
-      pos: { x: 13, y: 11 },
-      sprite: 'blinky',
-      dir: Direction.N,
-      type: GhostType.BLINKY,
-      mode: GhostMode.SCATTER,
-    },
-  ];
+  return [];
 }
 
 export function getInitialGhost(type: GhostType) {
