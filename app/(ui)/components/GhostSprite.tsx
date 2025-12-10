@@ -1,9 +1,11 @@
+import { updateGhost } from '@/app/core/game-state-manager';
+import { getInitialGhost } from '@/app/core/ghost';
 import { Direction, GhostMode, GhostState, GhostType } from '@/app/core/types';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 type GhostSpriteProps = {
-  ghost: GhostState;
+  ghostType: GhostType;
   size?: number;
   tileSize?: number;
 };
@@ -25,17 +27,23 @@ export function getGhostSprite(ghostType: GhostType) {
 }
 
 export default function GhostSprite({
-  ghost,
+  ghostType,
   size = 32,
   tileSize = 20,
 }: GhostSpriteProps) {
   const [timer, setTimer] = useState(0);
+  const [ghostState, setGhostState] = useState<GhostState>(
+    getInitialGhost(ghostType)
+  );
+  const [speed, setSpeed] = useState(0.2); // Seconds per Tile
+
+  const [insertMode, setInsertMode] = useState<GhostMode | null>(null);
 
   const baseName = useMemo(
-    () => ghost.sprite.replace('.png', ''),
-    [ghost.sprite]
+    () => ghostState.sprite.replace('.png', ''),
+    [ghostState.sprite]
   );
-  const dirKey = DIR_KEY[ghost.dir];
+  const dirKey = DIR_KEY[ghostState.dir];
 
   const frames = useMemo(
     () => [
@@ -51,17 +59,34 @@ export default function GhostSprite({
   );
 
   let src = '';
-  if (ghost.mode === GhostMode.EATEN) src = eatenFrame;
+  if (ghostState.mode === GhostMode.EATEN) src = eatenFrame;
   else
     src =
-      ghost.mode === GhostMode.FRIGHTENED
+      ghostState.mode === GhostMode.FRIGHTENED
         ? frightenedFrames[timer]
         : frames[timer];
+
+  useEffect(() => {
+    if (ghostState.mode === GhostMode.FRIGHTENED && speed !== 0.4)
+      setSpeed(0.4);
+    else if (ghostState.mode !== GhostMode.FRIGHTENED && speed !== 0.2)
+      setSpeed(0.2);
+  }, [ghostState, speed]);
 
   useEffect(
     () => frames.forEach((src) => (new window.Image().src = src)),
     [frames]
   );
+
+  useEffect(() => {
+    const onBulletHit = () => {
+      ghostState.mode = GhostMode.EATEN;
+      setInsertMode(GhostMode.EATEN);
+    };
+    window.addEventListener(`bulletHit-${ghostType}`, onBulletHit);
+    return () =>
+      window.removeEventListener(`bulletHit-${ghostType}`, onBulletHit);
+  }, [ghostState, ghostType]);
 
   useEffect(() => {
     const intervalId = setInterval(
@@ -76,9 +101,26 @@ export default function GhostSprite({
     };
   }, []);
 
-  const xPixel = Math.round(ghost.pos.x * tileSize + (tileSize - size) / 2);
-  const yPixel = Math.round(ghost.pos.y * tileSize + (tileSize - size) / 2);
+  useEffect(() => setGhostState(updateGhost(ghostType, null)), [ghostType]);
 
+  useEffect(() => {
+    if (ghostState.isTeleporting) {
+      // Wait one animation frame so the teleport position renders first
+      const raf = requestAnimationFrame(() => {
+        setGhostState(updateGhost(ghostType, null));
+      });
+      console.log('teleport started' + ghostState.isTeleporting);
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [ghostState.isTeleporting, ghostType]);
+
+  const xPixel = Math.round(
+    ghostState.pos.x * tileSize + (tileSize - size) / 2
+  );
+  const yPixel = Math.round(
+    ghostState.pos.y * tileSize + (tileSize - size) / 2
+  );
+  //asdf
   return (
     <div
       style={{
@@ -86,16 +128,23 @@ export default function GhostSprite({
         left: 0,
         right: 0,
         transform: `translate3d(${xPixel}px, ${yPixel}px, 0)`,
-        transition: 'transform 0.2s linear',
+        transition: ghostState.isTeleporting
+          ? 'none'
+          : `transform ${speed}s linear`,
         willChange: 'transform',
       }}
       onTransitionEnd={(e) => {
-        if (e.propertyName === 'transform' && ghost.type === GhostType.BLINKY)
-          window.dispatchEvent(new CustomEvent('tick'));
+        if (e.propertyName === 'transform')
+          if (insertMode) {
+            setGhostState(updateGhost(ghostType, insertMode));
+            setInsertMode(null);
+          } else {
+            setGhostState(updateGhost(ghostType, null));
+          }
       }}
     >
       <Image
-        data-type={ghost.type}
+        data-type={ghostState.type}
         src={src}
         alt="BLINKY"
         width={size}

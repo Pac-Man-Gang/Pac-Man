@@ -1,5 +1,5 @@
 import { getPelletSprite } from '../(ui)/components/SmallPelletSprite';
-import { addScore } from './GameStateManager';
+import { addScore } from './game-state-manager';
 import { Direction, PacManState } from './types';
 import { posAt, tileIsFree } from './util/position';
 
@@ -47,12 +47,12 @@ export function nextPacManState(
 }
 
 export const keyToDirection: Record<string, Direction> = {
-  w: Direction.N,
+  KeyW: Direction.N,
   ArrowUp: Direction.N,
-  s: Direction.S,
+  KeyS: Direction.S,
   ArrowDown: Direction.S,
-  a: Direction.W,
+  KeyA: Direction.W,
   ArrowLeft: Direction.W,
-  d: Direction.E,
+  KeyD: Direction.E,
   ArrowRight: Direction.E,
 };

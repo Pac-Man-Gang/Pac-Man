@@ -62,6 +62,13 @@ git push origin BRANCH_NAME
 Step 6: Open a Pull Request
 Come to this GitHub Repository and create a Pull Request for this branch
 
+## Naming Conventions
+
+- **Files**: Use `kebab-case` (e.g., `page.tsx`, `player-stats.ts`).
+- **Components**: Use `PascalCase` (e.g., `GameBoard.tsx`, `PlayerStats.tsx`).
+- **Constants**: Use `UPPER_SNAKE_CASE` (e.g., `MAX_SCORE`, `PLAYER_SPEED`).
+- **Variables and Functions**: Use `camelCase` (e.g., `updateScore`, `playerPosition`).
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
