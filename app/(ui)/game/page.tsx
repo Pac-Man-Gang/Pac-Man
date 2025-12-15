@@ -32,8 +32,8 @@ export type PopupBean = {
   x: number;
   y: number;
   text: string;
-  time: number,
-  fontSize: number
+  time: number;
+  fontSize: number;
 };
 
 export type ScoreBean = {
@@ -82,7 +82,14 @@ export default function GamePage() {
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const [popups, setPopups] = useState<
-    { id: number; x: number; y: number; text: string, time: number, fontSize: number }[]
+    {
+      id: number;
+      x: number;
+      y: number;
+      text: string;
+      time: number;
+      fontSize: number;
+    }[]
   >([]);
 
   const chompSoundRef = useRef<Howl | null>(null);
@@ -238,8 +245,7 @@ export default function GamePage() {
                 color: 'blue',
                 fontSize: p.fontSize,
                 fontWeight: 700,
-                animation:
-                  `popupFloat ${p.time}ms cubic-bezier(0.22, 1.0, 0.36, 1.0) forwards`,
+                animation: `popupFloat ${p.time}ms cubic-bezier(0.22, 1.0, 0.36, 1.0) forwards`,
                 willChange: 'transform, opacity',
               }}
             >

@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { PopupBean } from "../(ui)/game/page";
+import { PopupBean } from '../(ui)/game/page';
 
 const GHOSTS_ENABLED_KEY = 'devtools_ghosts_enabled';
 const WEAPON_TYPE_KEY = 'devtools_weapon_type';
