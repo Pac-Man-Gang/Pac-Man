@@ -20,6 +20,7 @@ class Chunk {
         this.content = chunkArray;
         this.weight = weight;
         this.validAsBorder = validAsBorder;
+        this.validAsBorder = validAsBorder;
     }
 }
 
