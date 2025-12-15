@@ -6,6 +6,7 @@ import {
 import { getGhostSprite } from '../(ui)/components/GhostSprite';
 import { getPacmanSprite } from '../(ui)/components/PacmanSprite';
 import { calcPixelPos, PopupBean, ScoreBean } from '../(ui)/game/page';
+import { devToolsInvincible } from './dev-tools';
 import { initialPacman, nextPacManState } from './pacman';
 import {
   Direction,
@@ -80,6 +81,8 @@ export function updateGhost(type: GhostType, insertMode: GhostMode | null) {
           x: ghostSpritePos.x + 30,
           y: ghostSpritePos.y - 30,
           text: '200',
+          time: 1000,
+          fontSize: 24,
         },
       })
     );
@@ -88,6 +91,7 @@ export function updateGhost(type: GhostType, insertMode: GhostMode | null) {
     prevGhostState.mode !== GhostMode.FRIGHTENED &&
     prevGhostState.mode !== GhostMode.EATEN &&
     spritesOverlapping(getPacmanSprite(), getGhostSprite(type)) &&
+    !devToolsInvincible() &&
     !invincible
   ) {
     nextGameState.lives -= 1;
@@ -144,6 +148,8 @@ export function nextGameState(playerDir: Direction): GameState {
           x: ghostSpritePos.x + 30,
           y: ghostSpritePos.y - 30,
           text: '200',
+          time: 1000,
+          fontSize: 24,
         },
       })
     );
@@ -156,7 +162,7 @@ export function nextGameState(playerDir: Direction): GameState {
       .find((g) =>
         spritesOverlapping(getPacmanSprite(), getGhostSprite(g.type))
       );
-    if (overlappingGhost && !invincible) {
+    if (overlappingGhost && !devToolsInvincible() && !invincible) {
       nextGameState.lives -= 1;
       window.dispatchEvent(new CustomEvent('pacHit'));
       if (nextGameState.lives <= 0) {
