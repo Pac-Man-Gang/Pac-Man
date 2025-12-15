@@ -1,3 +1,4 @@
+import { devToolsGetWeaponType } from '@/app/core/dev-tools';
 import { INVINCIBLE_MS, updatePacman } from '@/app/core/game-state-manager';
 import { initialPacman, keyToDirection } from '@/app/core/pacman';
 import { Direction, GhostType, PacManState, Position } from '@/app/core/types';
@@ -30,7 +31,6 @@ export function getPacmanArrow() {
 }
 
 const shootCooldown = 750;
-const weaponType = 'Sword';
 
 export default function PacmanSprite({
   size = 32,
@@ -116,7 +116,7 @@ export default function PacmanSprite({
             id: crypto.randomUUID(),
             initialPos: pacmanState.pos,
             dir: keyToDirection[lastArrowKey!],
-            speed: weaponType === 'Sword' ? 0.5 : 0.05,
+            speed: devToolsGetWeaponType() === 'Sword' ? 0.5 : 0.05,
           },
         ];
       });
@@ -184,7 +184,7 @@ export default function PacmanSprite({
     if (hitGhost !== null) {
       window.dispatchEvent(new CustomEvent(`bulletHit-${hitGhost}`));
     }
-    if (!(weaponType === 'Sword' && hitGhost !== null)) {
+    if (!(devToolsGetWeaponType() === 'Sword' && hitGhost !== null)) {
       setBullets((prev) => prev.filter((b) => b.id !== id));
     }
   }, []);
@@ -269,7 +269,7 @@ export default function PacmanSprite({
         </div>
       </div>
       {bullets.map((b) => {
-        if (weaponType === 'Sword') {
+        if (devToolsGetWeaponType() === 'Sword') {
           return (
             <SwordSwingSprite
               key={b.id}
