@@ -200,10 +200,6 @@ class RandomMaze {
         this.cleanUpMaze();
     }    
 
-    isValidChunkPosition(chunk: Chunk, x: number, y: number) {
-        return true
-    }
-
     insertChunk(startX: number, startY: number, chunk: Chunk) {
         for (let i = 0; i < chunk.content.length; i++) {
             for (let j = 0; j < chunk.content[0].length; j++) {
