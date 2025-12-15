@@ -47,7 +47,7 @@ export function MazeTile({ tile, size = 40 }: MazeTileProps) {
  * defineInsideCorner(), and defineConnector() return.
  */
 
-const TILE_SPRITES: Record<
+export const TILE_SPRITES: Record<
   string,
   { src: string; rotation?: number; flipX?: boolean; flipY?: boolean }
 > = {

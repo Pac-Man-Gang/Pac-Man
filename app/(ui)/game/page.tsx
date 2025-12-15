@@ -1,4 +1,5 @@
 'use client';
+import { initDevTools } from '@/app/core/dev-tools';
 import { Howl } from 'howler';
 import localFont from 'next/font/local';
 import Image from 'next/image';
@@ -32,6 +33,8 @@ export type PopupBean = {
   x: number;
   y: number;
   text: string;
+  time: number;
+  fontSize: number;
 };
 
 export type ScoreBean = {
@@ -80,11 +83,23 @@ export default function GamePage() {
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const [popups, setPopups] = useState<
-    { id: number; x: number; y: number; text: string }[]
+    {
+      id: number;
+      x: number;
+      y: number;
+      text: string;
+      time: number;
+      fontSize: number;
+    }[]
   >([]);
 
   const chompSoundRef = useRef<Howl | null>(null);
   const soundStartedRef = useRef(false);
+
+  useEffect(() => {
+    const cleanup = initDevTools();
+    return () => cleanup();
+  }, []);
 
   // Initialize chomp sound
   useEffect(() => {
@@ -147,12 +162,12 @@ export default function GamePage() {
 
   useEffect(() => {
     const handler = (e: CustomEvent<PopupBean>) => {
-      const { x, y, text } = e.detail;
+      const { x, y, text, time, fontSize } = e.detail;
       const id = Date.now();
-      setPopups((p) => [...p, { id, x, y, text }]);
+      setPopups((p) => [...p, { id, x, y, text, time, fontSize }]);
       setTimeout(() => {
         setPopups((p) => p.filter((pop) => pop.id !== id));
-      }, 1000);
+      }, time);
     };
     window.addEventListener('newPopup', handler as EventListener);
     return () =>
@@ -229,10 +244,9 @@ export default function GamePage() {
                 top: p.y,
                 transform: 'translate(-50%, -50%)',
                 color: 'blue',
-                fontSize: 24,
+                fontSize: p.fontSize,
                 fontWeight: 700,
-                animation:
-                  'popupFloat 900ms cubic-bezier(0.22, 1.0, 0.36, 1.0) forwards',
+                animation: `popupFloat ${p.time}ms cubic-bezier(0.22, 1.0, 0.36, 1.0) forwards`,
                 willChange: 'transform, opacity',
               }}
             >
