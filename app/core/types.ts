@@ -24,7 +24,7 @@ export enum GhostMode {
 }
 
 export function allGhostTypes(): GhostType[] {
-  return [GhostType.BLINKY, GhostType.PINKY, GhostType.INKY, GhostType.CLYDE];
+  return [];
 }
 export enum GhostType {
   BLINKY,

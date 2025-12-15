@@ -17,10 +17,10 @@ import {
 } from './types';
 
 export const INITIAL_GAMESTATE: GameState = {
-  pacman: initialPacman(13, 23),
+  pacman: initialPacman(1, 1),
   ghosts: initialGhosts(),
   score: 0,
-  lives: 3000,
+  lives: 3,
 };
 
 const gameStates: GameState[] = [INITIAL_GAMESTATE];
