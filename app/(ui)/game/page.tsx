@@ -7,6 +7,8 @@ import { useEffect, useRef, useState } from 'react';
 import { allGhostTypes, Position } from '../../core/types';
 import { getGhostSprite } from '../components/GhostSprite';
 import { getPacmanArrow } from '../components/PacmanSprite';
+import EntityLayer from './EntityLayer';
+import { MazeLayer } from './MazeLayer';
 
 
 const BASE_W = 560;

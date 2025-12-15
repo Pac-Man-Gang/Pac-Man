@@ -40,7 +40,7 @@ export default function PacmanSprite({
   const getPath = (frame: number) => `/assets/pacman/pacman${frame}.png`;
 
   const [pacmanState, setPacmanState] = useState<PacManState>(
-    initialPacman(13, 23)
+    initialPacman(1, 1)
   );
   const [playerDir, setPlayerDir] = useState<Direction | undefined>(undefined);
   const [pacIsStanding, setPacIsStanding] = useState(true);

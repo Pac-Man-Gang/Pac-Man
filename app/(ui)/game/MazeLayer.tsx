@@ -4,7 +4,7 @@ import SmallPelletSprite, {
 import SuperPelletSprite, {
   getAllSuperPelletSprites,
 } from '../components/SuperPelletSprite';
-import { LEVEL_MAP_GENERATED } from '@/app/core/mazeGenerator';
+import { generateMaze } from '@/app/core/mazeGenerator';
 
 /**
  * ========================================================
@@ -20,7 +20,7 @@ import { LEVEL_MAP_GENERATED } from '@/app/core/mazeGenerator';
  */
 
 // prettier-ignore
-export const LEVEL_MAP: number[][] = LEVEL_MAP_GENERATED
+export const LEVEL_MAP: number[][] = generateMaze()
 
 
 enum ComponentType {

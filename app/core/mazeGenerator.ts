@@ -31,7 +31,6 @@ class RandomMaze {
     seed: number;
     chunkMap: string[][][];
     private chunks: Chunk[];
-    private totalWeight: number;
 
     constructor(width: number, height: number, seed: number) {
         this.width = width;
@@ -40,7 +39,6 @@ class RandomMaze {
         this.content = this.fillContentArray();
         this.chunks = this.getChunkData();
         this.chunkMap = this.fillChunkMap();
-        this.totalWeight = this.chunks.reduce((sum, chunk) => sum + chunk.weight, 0);
         // Generate actual maze
         this.generate();
     }
@@ -91,28 +89,21 @@ class RandomMaze {
     generate() {
         for (let i = 0; i < this.content.length; i+=5) {
             for (let j = 0; j < this.content[i].length; j+=5) {
-
-                let validChunks = this.chunks.filter(chunk => this.arraysEqual(chunk.validAsBorder, this.chunkMap[i / 5][j / 5]))
-                this.insertChunk(i, j, validChunks[0]);
+                let validChunks;
+                if (i === 0 || i === this.content.length - 5 || j === 0 || j === this.content[i].length - 5) {
+                    validChunks = this.chunks.filter(chunk => this.arraysEqual(chunk.validAsBorder, this.chunkMap[i / 5][j / 5]))
+                } else {
+                    validChunks = this.chunks;
+                }
+                const randomIndex = Math.floor(this.random() * validChunks.length);
+                this.insertChunk(i, j, validChunks[randomIndex]);
             }
         }
-        this.cleanMazeUp();
+        this.cleanUpMaze(); 
     }    
 
     isValidChunkPosition(chunk: Chunk, x: number, y: number) {
         return true
-    }
-
-    getRandomChunk(chunks: Chunk[]): Chunk {
-        let randomWeight = this.random() * this.totalWeight;
-        let cumulativeWeight = 0;
-        for (const chunk of chunks) {
-            cumulativeWeight += chunk.weight;
-            if (randomWeight <= cumulativeWeight) {
-                return chunk;
-            }
-        }
-        return this.chunks[1];
     }
 
     insertChunk(startX: number, startY: number, chunk: Chunk) {
@@ -127,7 +118,7 @@ class RandomMaze {
         }
     }
 
-    cleanMazeUp() {
+    cleanUpMaze() {
         let len = this.content[0].length - 1;
         this.content.splice(0, 1);
         this.content.splice(this.content.length - 1 , 1);
@@ -140,6 +131,20 @@ class RandomMaze {
 
     
 
-let maze = new RandomMaze(30, 30, 1789);
-console.log(maze.content);
-export const LEVEL_MAP_GENERATED: number[][] = maze.content;
+// Generate maze only on client-side to avoid hydration mismatch
+export function generateMaze(width: number = 30, height: number = 30): number[][] {
+    const maze = new RandomMaze(width, height, 5674567);
+    console.log(maze.content);
+    return maze.content;
+}
+
+// For backwards compatibility, export a lazy-initialized maze
+let cachedMaze: number[][] | null = null;
+export const LEVEL_MAP_GENERATED: number[][] = new Proxy([] as number[][], {
+    get(target, prop) {
+        if (!cachedMaze && typeof window !== 'undefined') {
+            cachedMaze = generateMaze();
+        }
+        return cachedMaze ? (cachedMaze as any)[prop] : (target as any)[prop];
+    }
+});
