@@ -88,7 +88,10 @@ export default function GamePage() {
   const chompSoundRef = useRef<Howl | null>(null);
   const soundStartedRef = useRef(false);
 
-  useEffect(() => initDevTools(), []);
+  useEffect(() => {
+    const cleanup = initDevTools();
+    return () => cleanup();
+  }, []);
 
   // Initialize chomp sound
   useEffect(() => {

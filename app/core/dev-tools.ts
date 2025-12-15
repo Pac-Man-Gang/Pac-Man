@@ -6,7 +6,7 @@ const GHOSTS_ENABLED_KEY = 'devtools_ghosts_enabled';
 const WEAPON_TYPE_KEY = 'devtools_weapon_type';
 const INVINCIBLE_KEY = 'devtools_invincible';
 
-export function initDevTools(): void {
+export function initDevTools(): () => void {
     devToolsSetGhostsEnabled(true);
     devToolsSetWeaponType("Bullet");
     devToolsSetInvincible(false);
@@ -18,6 +18,7 @@ export function initDevTools(): void {
     }
 
     window.addEventListener('keydown', keyDown);
+    return () => window.removeEventListener('keydown', keyDown);
 }
 
 export function devToolsGhostsEnabled(): boolean {
