@@ -1,10 +1,10 @@
 'use client';
 
-import { MazeTile } from '@/app/(ui)/tiles/MazeTile'; // adjust path if needed
+import { MazeTile } from '@/app/(ui)/tiles/MazeTile';
 import React from 'react';
 
 // Import the TILE_SPRITES map directly
-import { TILE_SPRITES } from '@/app/(ui)/tiles/MazeTile'; // adjust path
+import { TILE_SPRITES } from '@/app/(ui)/tiles/MazeTile';
 
 // ---- Group tile keys by category for visual organization ----
 const CATEGORIES: Record<string, string[]> = {
