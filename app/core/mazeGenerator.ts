@@ -125,7 +125,7 @@ class RandomMaze {
         return this.placedChunks[chunkRow]?.[chunkCol] || null;
     }
 
-    // Check if a chunk is compatible with adjacent chunks
+    // Check if a chunk is compatible with adjacent chunks (both placed and future)
     private isCompatibleWithNeighbors(chunk: Chunk, chunkRow: number, chunkCol: number): boolean {
         const directions = [
             { dir: 'N', rowOffset: -1, colOffset: 0 },
@@ -135,20 +135,122 @@ class RandomMaze {
         ];
 
         for (const { dir, rowOffset, colOffset } of directions) {
-            const neighbor = this.getPlacedChunk(chunkRow + rowOffset, chunkCol + colOffset);
+            const neighborRow = chunkRow + rowOffset;
+            const neighborCol = chunkCol + colOffset;
+            const neighbor = this.getPlacedChunk(neighborRow, neighborCol);
 
             if (neighbor) {
+                // Check compatibility with already placed neighbor
                 const oppositeDir = this.getOppositeDirection(dir);
 
                 const chunkHasOpening = chunk.validAsBorder.includes(dir);
                 const neighborHasOpening = neighbor.validAsBorder.includes(oppositeDir);
 
-                // To prevent dead ends, openings must match on both sides:
-                // - If chunk has an opening towards the neighbor, neighbor MUST have an opening back
-                // - If chunk is closed towards the neighbor, neighbor MUST also be closed
-                // This ensures paths always have two ways through
+                // Openings must match on both sides to prevent dead ends
                 if (chunkHasOpening !== neighborHasOpening) {
-                    return false; // This would create a dead end (mismatch)
+                    return false;
+                }
+            } else {
+                // Check if a future neighbor position exists
+                const hasNeighborPosition = neighborRow >= 0 &&
+                                          neighborRow < this.height / 5 &&
+                                          neighborCol >= 0 &&
+                                          neighborCol < this.width / 5;
+
+                if (hasNeighborPosition) {
+                    // Ensure that if this chunk has an opening in this direction,
+                    // there exists at least one valid chunk for the neighbor position
+                    // that can connect back
+                    const chunkHasOpening = chunk.validAsBorder.includes(dir);
+
+                    if (chunkHasOpening) {
+                        // Check if the future neighbor position can have a chunk that connects back
+                        if (!this.canFutureNeighborConnect(neighborRow, neighborCol, this.getOppositeDirection(dir), chunkRow, chunkCol)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    // Check if a future neighbor position can have at least one valid chunk that connects back
+    private canFutureNeighborConnect(
+        neighborRow: number,
+        neighborCol: number,
+        requiredDirection: string,
+        currentRow: number,
+        currentCol: number
+    ): boolean {
+        // Get the required border directions for the neighbor position
+        const requiredBorderDirs = this.chunkMap[neighborRow][neighborCol];
+
+        // Get valid chunks for this position
+        let validChunks;
+        const isNeighborOnBorder = neighborRow === 0 ||
+                                   neighborRow === (this.height / 5) - 1 ||
+                                   neighborCol === 0 ||
+                                   neighborCol === (this.width / 5) - 1;
+
+        if (isNeighborOnBorder) {
+            if (this.isCorner(requiredBorderDirs)) {
+                validChunks = this.chunks.filter(chunk => this.arraysEqual(chunk.validAsBorder, requiredBorderDirs));
+            } else {
+                validChunks = this.chunks.filter(chunk => this.containsAllDirections(chunk.validAsBorder, requiredBorderDirs));
+            }
+        } else {
+            validChunks = this.chunks;
+        }
+
+        // Check if any valid chunk has the required opening
+        // and is compatible with OTHER already-placed neighbors
+        for (const potentialChunk of validChunks) {
+            if (potentialChunk.validAsBorder.includes(requiredDirection)) {
+                // Temporarily simulate placing this chunk to check compatibility with other neighbors
+                if (this.isChunkCompatibleWithOtherNeighbors(potentialChunk, neighborRow, neighborCol, currentRow, currentCol)) {
+                    return true; // At least one valid chunk exists
+                }
+            }
+        }
+
+        return false; // No valid chunk can connect back
+    }
+
+    // Check if a chunk is compatible with neighbors, excluding one specific position
+    private isChunkCompatibleWithOtherNeighbors(
+        chunk: Chunk,
+        chunkRow: number,
+        chunkCol: number,
+        excludeRow: number,
+        excludeCol: number
+    ): boolean {
+        const directions = [
+            { dir: 'N', rowOffset: -1, colOffset: 0 },
+            { dir: 'S', rowOffset: 1, colOffset: 0 },
+            { dir: 'E', rowOffset: 0, colOffset: 1 },
+            { dir: 'W', rowOffset: 0, colOffset: -1 }
+        ];
+
+        for (const { dir, rowOffset, colOffset } of directions) {
+            const neighborRow = chunkRow + rowOffset;
+            const neighborCol = chunkCol + colOffset;
+
+            // Skip the excluded position (the chunk we're currently placing)
+            if (neighborRow === excludeRow && neighborCol === excludeCol) {
+                continue;
+            }
+
+            const neighbor = this.getPlacedChunk(neighborRow, neighborCol);
+
+            if (neighbor) {
+                const oppositeDir = this.getOppositeDirection(dir);
+                const chunkHasOpening = chunk.validAsBorder.includes(dir);
+                const neighborHasOpening = neighbor.validAsBorder.includes(oppositeDir);
+
+                if (chunkHasOpening !== neighborHasOpening) {
+                    return false;
                 }
             }
         }
@@ -160,44 +262,127 @@ class RandomMaze {
         // Initialize a map to store placed chunks
         this.placedChunks = Array(this.height / 5).fill(null).map(() => Array(this.width / 5).fill(null));
 
+        const maxAttempts = 100; // Maximum retry attempts for entire maze generation
+        let attempt = 0;
+        let success = false;
+
+        while (attempt < maxAttempts && !success) {
+            attempt++;
+
+            // Reset the maze and placed chunks for new attempt
+            this.content = this.fillContentArray();
+            this.placedChunks = Array(this.height / 5).fill(null).map(() => Array(this.width / 5).fill(null));
+
+            try {
+                success = this.generateWithBacktracking();
+            } catch (e) {
+                // Failed to generate, try again with different random seed
+                this.seed += 1;
+            }
+        }
+
+        if (!success) {
+            console.warn('Failed to generate maze without dead ends after', maxAttempts, 'attempts. Using last attempt.');
+        }
+
+        this.cleanUpMaze();
+    }
+
+    private generateWithBacktracking(): boolean {
+        // Track placement order for backtracking
+        const placementStack: Array<{row: number, col: number, chunk: Chunk}> = [];
+
         for (let i = 0; i < this.content.length; i+=5) {
             for (let j = 0; j < this.content[i].length; j+=5) {
                 const chunkRow = i / 5;
                 const chunkCol = j / 5;
-                let validChunks;
 
-                if (i === 0 || i === this.content.length - 5 || j === 0 || j === this.content[i].length - 5) {
-                    const requiredDirections = this.chunkMap[chunkRow][chunkCol];
+                let placed = false;
+                let backtrackCount = 0;
+                const maxBacktracks = 10;
 
-                    if (this.isCorner(requiredDirections)) {
-                        // Corners: exact match only
-                        validChunks = this.chunks.filter(chunk => this.arraysEqual(chunk.validAsBorder, requiredDirections));
+                while (!placed && backtrackCount < maxBacktracks) {
+                    let validChunks;
+
+                    // Determine valid chunks based on position
+                    if (i === 0 || i === this.content.length - 5 || j === 0 || j === this.content[i].length - 5) {
+                        const requiredDirections = this.chunkMap[chunkRow][chunkCol];
+
+                        if (this.isCorner(requiredDirections)) {
+                            validChunks = this.chunks.filter(chunk => this.arraysEqual(chunk.validAsBorder, requiredDirections));
+                        } else {
+                            validChunks = this.chunks.filter(chunk => this.containsAllDirections(chunk.validAsBorder, requiredDirections));
+                        }
                     } else {
-                        // Sides: must contain the required direction(s), but can have more
-                        validChunks = this.chunks.filter(chunk => this.containsAllDirections(chunk.validAsBorder, requiredDirections));
+                        validChunks = this.chunks;
                     }
-                } else {
-                    validChunks = this.chunks;
+
+                    // Filter chunks based on compatibility with neighbors
+                    const compatibleChunks = validChunks.filter(chunk =>
+                        this.isCompatibleWithNeighbors(chunk, chunkRow, chunkCol)
+                    );
+
+                    if (compatibleChunks.length > 0) {
+                        // Select chunk using weighted random selection
+                        const selectedChunk = this.selectWeightedChunk(compatibleChunks);
+
+                        // Place the chunk
+                        this.placedChunks[chunkRow][chunkCol] = selectedChunk;
+                        this.insertChunk(i, j, selectedChunk);
+                        placementStack.push({row: chunkRow, col: chunkCol, chunk: selectedChunk});
+                        placed = true;
+                    } else {
+                        // No compatible chunks found - need to backtrack
+                        if (placementStack.length === 0) {
+                            // Can't backtrack anymore, generation failed
+                            throw new Error('Cannot generate valid maze');
+                        }
+
+                        // Backtrack: remove the last placed chunk
+                        const lastPlacement = placementStack.pop()!;
+                        this.placedChunks[lastPlacement.row][lastPlacement.col] = null;
+                        this.clearChunk(lastPlacement.row * 5, lastPlacement.col * 5);
+
+                        // Move back to retry the previous position
+                        // Adjust loop indices
+                        if (j > 0) {
+                            j -= 10; // Will be incremented by 5 in the loop, so net -5
+                        } else {
+                            i -= 5;
+                            j = this.content[i].length - 5;
+                        }
+
+                        backtrackCount++;
+                        break; // Exit the while loop to continue with adjusted position
+                    }
                 }
 
-                // Filter chunks based on compatibility with neighbors to prevent dead ends
-                const compatibleChunks = validChunks.filter(chunk =>
-                    this.isCompatibleWithNeighbors(chunk, chunkRow, chunkCol)
-                );
-
-                // If no compatible chunks found, fall back to any valid chunk (shouldn't happen with good chunk design)
-                const chunksToUse = compatibleChunks.length > 0 ? compatibleChunks : validChunks;
-
-                const randomIndex = Math.floor(this.random() * chunksToUse.length);
-                const selectedChunk = chunksToUse[randomIndex];
-
-                // Store the placed chunk
-                this.placedChunks[chunkRow][chunkCol] = selectedChunk;
-
-                this.insertChunk(i, j, selectedChunk);
+                if (!placed && backtrackCount >= maxBacktracks) {
+                    throw new Error('Max backtracks reached');
+                }
             }
         }
-        this.cleanUpMaze();
+
+        return true;
+    }
+
+    // Select a chunk using weighted random selection
+    private selectWeightedChunk(chunks: Chunk[]): Chunk {
+        // For now, use uniform random selection
+        // Weight-based selection can be added if weights are properly defined
+        const randomIndex = Math.floor(this.random() * chunks.length);
+        return chunks[randomIndex];
+    }
+
+    // Clear a chunk from the content grid
+    private clearChunk(startX: number, startY: number) {
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 5; j++) {
+                if (startX + i < this.content.length && startY + j < this.content[0].length) {
+                    this.content[startX + i][startY + j] = 0;
+                }
+            }
+        }
     }    
 
     insertChunk(startX: number, startY: number, chunk: Chunk) {
@@ -227,7 +412,7 @@ class RandomMaze {
 
 // Generate maze only on client-side to avoid hydration mismatch
 export function generateMaze(width: number = 30, height: number = 30): number[][] {
-    const maze = new RandomMaze(width, height, 1);
+    const maze = new RandomMaze(width, height, 67);
     console.log(maze.content);
     return maze.content;
 }
