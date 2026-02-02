@@ -42,6 +42,8 @@ class RandomMaze {
         this.chunks = this.getChunkData();
         this.chunkMap = this.fillChunkMap();
         this.placedChunks = [];
+        // Place ghost house first, then generate maze around it
+        this.placeGhostHouse();
         // Generate actual maze
         this.generate();
     }
@@ -108,6 +110,77 @@ class RandomMaze {
         return opposites[direction];
     }
 
+    // Place ghost house in the center of the maze
+    private placeGhostHouse() {
+        // Ghost house is 7 tiles wide x 5 tiles tall in classic Pac-Man
+        const ghostHouseWidth = 7;
+        const ghostHouseHeight = 5;
+
+        // Calculate starting position (in tile coordinates, centered)
+        const startRow = Math.floor((this.height - ghostHouseHeight) / 2);
+        const startCol = Math.floor((this.width - ghostHouseWidth) / 2);
+
+        // Classic ghost house layout:
+        //  1111111
+        //  1444444
+        //  1444444
+        //  1444444
+        //  1111111
+        const ghostHousePattern = [
+            [1, 1, 4, 4, 4, 1, 1],
+            [1, 4, 4, 4, 4, 4, 1],
+            [1, 4, 4, 4, 4, 4, 1],
+            [1, 4, 4, 4, 4, 4, 1],
+            [1, 1, 1, 1, 1, 1, 1]
+        ];
+
+        // Place the ghost house pattern in the content array
+        for (let i = 0; i < ghostHouseHeight; i++) {
+            for (let j = 0; j < ghostHouseWidth; j++) {
+                const row = startRow + i;
+                const col = startCol + j;
+                if (row >= 0 && row < this.height && col >= 0 && col < this.width) {
+                    this.content[row][col] = ghostHousePattern[i][j];
+                }
+            }
+        }
+
+        // Mark the chunks that contain the ghost house as occupied
+        // This will prevent the generation algorithm from placing chunks there
+        const startChunkRow = Math.floor(startRow / 5);
+        const endChunkRow = Math.floor((startRow + ghostHouseHeight - 1) / 5);
+        const startChunkCol = Math.floor(startCol / 5);
+        const endChunkCol = Math.floor((startCol + ghostHouseWidth - 1) / 5);
+
+        // Mark these chunk positions so generation skips them
+        for (let chunkRow = startChunkRow; chunkRow <= endChunkRow; chunkRow++) {
+            for (let chunkCol = startChunkCol; chunkCol <= endChunkCol; chunkCol++) {
+                if (!this.placedChunks[chunkRow]) {
+                    this.placedChunks[chunkRow] = [];
+                }
+                // Use a special marker to indicate ghost house
+                this.placedChunks[chunkRow][chunkCol] = null;
+            }
+        }
+    }
+
+    // Check if a chunk position overlaps with ghost house
+    private isGhostHouseChunk(chunkRow: number, chunkCol: number): boolean {
+        const ghostHouseWidth = 7;
+        const ghostHouseHeight = 5;
+
+        const startRow = Math.floor((this.height - ghostHouseHeight) / 2);
+        const startCol = Math.floor((this.width - ghostHouseWidth) / 2);
+
+        const startChunkRow = Math.floor(startRow / 5);
+        const endChunkRow = Math.floor((startRow + ghostHouseHeight - 1) / 5);
+        const startChunkCol = Math.floor(startCol / 5);
+        const endChunkCol = Math.floor((startCol + ghostHouseWidth - 1) / 5);
+
+        return chunkRow >= startChunkRow && chunkRow <= endChunkRow &&
+               chunkCol >= startChunkCol && chunkCol <= endChunkCol;
+    }
+
     // Get already placed chunk at a specific grid position
     private getPlacedChunk(chunkRow: number, chunkCol: number): Chunk | null {
         if (chunkRow < 0 || chunkRow >= this.height / 5 || chunkCol < 0 || chunkCol >= this.width / 5) {
@@ -151,22 +224,31 @@ class RandomMaze {
                     return false;
                 }
             } else {
-                // Check if a future neighbor position exists
-                const hasNeighborPosition = neighborRow >= 0 &&
-                                          neighborRow < this.height / 5 &&
-                                          neighborCol >= 0 &&
-                                          neighborCol < this.width / 5;
-
-                if (hasNeighborPosition) {
-                    // Ensure that if this chunk has an opening in this direction,
-                    // there exists at least one valid chunk for the neighbor position
-                    // that can connect back
+                // Check if neighbor is a ghost house chunk (treat as wall/blocked)
+                if (this.isGhostHouseChunk(neighborRow, neighborCol)) {
+                    // Ghost house acts like a wall - chunk should NOT have an opening towards it
                     const chunkHasOpening = chunk.validAsBorder.includes(dir);
-
                     if (chunkHasOpening) {
-                        // Check if the future neighbor position can have a chunk that connects back
-                        if (!this.canFutureNeighborConnect(neighborRow, neighborCol, this.getOppositeDirection(dir), chunkRow, chunkCol)) {
-                            return false;
+                        return false; // Can't open towards ghost house
+                    }
+                } else {
+                    // Check if a future neighbor position exists
+                    const hasNeighborPosition = neighborRow >= 0 &&
+                                              neighborRow < this.height / 5 &&
+                                              neighborCol >= 0 &&
+                                              neighborCol < this.width / 5;
+
+                    if (hasNeighborPosition) {
+                        // Ensure that if this chunk has an opening in this direction,
+                        // there exists at least one valid chunk for the neighbor position
+                        // that can connect back
+                        const chunkHasOpening = chunk.validAsBorder.includes(dir);
+
+                        if (chunkHasOpening) {
+                            // Check if the future neighbor position can have a chunk that connects back
+                            if (!this.canFutureNeighborConnect(neighborRow, neighborCol, this.getOppositeDirection(dir), chunkRow, chunkCol)) {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -242,6 +324,16 @@ class RandomMaze {
                 continue;
             }
 
+            // Check if neighbor is a ghost house chunk
+            if (this.isGhostHouseChunk(neighborRow, neighborCol)) {
+                // Ghost house acts like a wall - chunk should NOT have an opening towards it
+                const chunkHasOpening = chunk.validAsBorder.includes(dir);
+                if (chunkHasOpening) {
+                    return false;
+                }
+                continue;
+            }
+
             const neighbor = this.getPlacedChunk(neighborRow, neighborCol);
 
             if (neighbor) {
@@ -273,6 +365,9 @@ class RandomMaze {
             this.content = this.fillContentArray();
             this.placedChunks = Array(this.height / 5).fill(null).map(() => Array(this.width / 5).fill(null));
 
+            // Re-place ghost house after reset
+            this.placeGhostHouse();
+
             try {
                 success = this.generateWithBacktracking();
             } catch (e) {
@@ -285,7 +380,42 @@ class RandomMaze {
             console.warn('Failed to generate maze without dead ends after', maxAttempts, 'attempts. Using last attempt.');
         }
 
+        this.placePellets();
         this.cleanUpMaze();
+    }
+
+    // Place pellets on all empty spaces except around the ghost house
+    private placePellets() {
+        const ghostHouseWidth = 7;
+        const ghostHouseHeight = 5;
+
+        // Calculate ghost house boundaries
+        const ghostStartRow = Math.floor((this.height - ghostHouseHeight) / 2);
+        const ghostEndRow = ghostStartRow + ghostHouseHeight - 1;
+        const ghostStartCol = Math.floor((this.width - ghostHouseWidth) / 2);
+        const ghostEndCol = ghostStartCol + ghostHouseWidth - 1;
+
+        // Define exclusion zone around ghost house (1 tile buffer)
+        const exclusionStartRow = ghostStartRow - 1;
+        const exclusionEndRow = ghostEndRow + 1;
+        const exclusionStartCol = ghostStartCol - 1;
+        const exclusionEndCol = ghostEndCol + 1;
+
+        for (let i = 0; i < this.content.length; i++) {
+            for (let j = 0; j < this.content[i].length; j++) {
+                // Check if position is empty (0)
+                if (this.content[i][j] === 0) {
+                    // Check if position is outside the ghost house exclusion zone
+                    const isInExclusionZone = i >= exclusionStartRow && i <= exclusionEndRow &&
+                                             j >= exclusionStartCol && j <= exclusionEndCol;
+
+                    if (!isInExclusionZone) {
+                        // Place a pellet
+                        this.content[i][j] = 2;
+                    }
+                }
+            }
+        }
     }
 
     private generateWithBacktracking(): boolean {
@@ -296,6 +426,11 @@ class RandomMaze {
             for (let j = 0; j < this.content[i].length; j+=5) {
                 const chunkRow = i / 5;
                 const chunkCol = j / 5;
+
+                // Skip chunks that overlap with ghost house
+                if (this.isGhostHouseChunk(chunkRow, chunkCol)) {
+                    continue;
+                }
 
                 let placed = false;
                 let backtrackCount = 0;
@@ -412,8 +547,8 @@ class RandomMaze {
 
 // Generate maze only on client-side to avoid hydration mismatch
 export function generateMaze(width: number = 30, height: number = 30): number[][] {
-    const maze = new RandomMaze(width, height, 67);
-    console.log(maze.content);
+    const maze = new RandomMaze(width, height, 356456);
+    // console.log(maze.content);
     return maze.content;
 }
 
