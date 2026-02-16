@@ -12,8 +12,8 @@ import EntityLayer from './EntityLayer';
 import { MazeLayer } from './MazeLayer';
 
 
-const BASE_W = 560;
-const BASE_H = 620;
+const BASE_W = 560 / 0.9;
+const BASE_H = 620 / 0.9;
 
 const arcadeFont = localFont({
   src: '../../../public/fonts/ARCADECLASSIC.ttf',
